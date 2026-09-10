@@ -25,6 +25,9 @@ const serverSchema = z.object({
   EMAIL_SERVER: z.string().default(""),
   EMAIL_FROM: z.string().min(1).default(`${BRAND.name} <no-reply@${BRAND.domain}>`),
 
+  // Mail transport. Optional at boot: the public site does not need it, so a
+  // missing SMTP server must not stop the whole app from starting. Sign-in DOES
+  // need it, and refuses to run without it — see sendSignInCode.
   // Ops. All optional — an unconfigured alert channel degrades to a log line
   // rather than stopping the process.
   SENTRY_DSN: z.string().default(""),
@@ -51,10 +54,6 @@ export function serverEnv(): ServerEnv {
     // Each of these fails silently or dangerously rather than loudly if it is
     // missing, so they are checked at boot instead of at first use.
     const missing: string[] = [];
-
-    // No mail transport means sign-in codes are never delivered — the failure
-    // is invisible from the server side.
-    if (parsed.data.EMAIL_SERVER === "") missing.push("EMAIL_SERVER (OTP delivery depends on it)");
 
     // Without this the Host header decides the auth origin. See AUTH_URL above.
     if (!parsed.data.AUTH_URL) missing.push("AUTH_URL (pins the auth origin behind the proxy)");

@@ -75,6 +75,12 @@ async function deliver({ to, subject, body, unsubscribeToken }: Delivery): Promi
   const unsubscribeUrl = `${env.NEXT_PUBLIC_APP_URL}/unsubscribe/${unsubscribeToken}`;
 
   if (env.EMAIL_SERVER === "") {
+    // Not a credential, so logging it is only a development convenience. In
+    // production, say nothing was sent rather than pretending it was.
+    if (env.NODE_ENV === "production") {
+      throw new Error("EMAIL_SERVER is not set, so notifications cannot be sent.");
+    }
+
     console.info(`\n  [notify] to ${to}: ${subject}\n  ${body}\n`);
     return;
   }

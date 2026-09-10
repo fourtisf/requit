@@ -119,8 +119,9 @@ the code is printed to the dev server log instead:
   [auth] sign-in code for you@example.com: 607352
 ```
 
-`serverEnv()` refuses to boot in production with `EMAIL_SERVER` unset, so this
-shortcut cannot escape development.
+In production the same missing transport does NOT print the code — it throws,
+and `/signin` says sign-in is unavailable. A production log line containing a
+sign-in code would let anyone who can read `/var/log` sign in as anyone.
 
 ---
 

@@ -62,9 +62,13 @@ AUTH_URL="https://requit.xyz"
 NEXT_PUBLIC_APP_URL="https://requit.xyz"
 ```
 
-`serverEnv()` refuses to boot in production without `AUTH_URL` and
-`EMAIL_SERVER`, so a half-filled `.env` fails loudly at start rather than
-quietly at the first sign-in.
+`serverEnv()` refuses to boot in production without `AUTH_URL`, so a half-filled
+`.env` fails loudly at start rather than quietly on the first sign-in.
+
+`EMAIL_SERVER` may be left empty to get the site up. The app boots, the public
+pages work, and `/signin` states that sign-in is unavailable rather than handing
+out a code that never arrives. Nothing can sign in until it is set — including
+you.
 
 Lock the file down — it holds the database password and the app secret:
 

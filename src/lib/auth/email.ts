@@ -44,17 +44,37 @@ function htmlBody(code: string): string {
 </body></html>`;
 }
 
+export class EmailTransportMissingError extends Error {
+  override name = "EmailTransportMissingError";
+
+  constructor() {
+    super("EMAIL_SERVER is not set, so sign-in codes cannot be sent.");
+  }
+}
+
+/** Whether sign-in can work at all right now. Read by the sign-in page. */
+export function emailTransportConfigured(): boolean {
+  return serverEnv().EMAIL_SERVER !== "";
+}
+
 /**
  * Sends the sign-in code.
  *
- * With no EMAIL_SERVER configured — local development only, `serverEnv()`
- * refuses to boot production without one — the code goes to the server log so
- * the flow stays testable without SMTP.
+ * With no EMAIL_SERVER configured the code goes to the server log so the flow
+ * stays testable without SMTP — in development only. In production the same
+ * situation throws, because that log line is a credential.
  */
 export async function sendSignInCode({ to, code }: SignInEmail): Promise<void> {
   const env = serverEnv();
 
   if (env.EMAIL_SERVER === "") {
+    // The code is a credential. Printing it to a production log would let
+    // anyone who can read /var/log sign in as anyone — so refuse instead.
+    // Sign-in fails visibly; the rest of the site is unaffected.
+    if (env.NODE_ENV === "production") {
+      throw new EmailTransportMissingError();
+    }
+
     console.info(`\n  [auth] sign-in code for ${to}: ${code}\n`);
     return;
   }
