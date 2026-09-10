@@ -42,7 +42,27 @@ The earlier sets are kept for reference: `preview-x.html` (first pass) and
 `render-premium.html`, `render-black.html` and `render.html` hold the source of
 every tile. Edit one, then screenshot each `.tile` element at 1000×1000.
 
+## X header
+
+1500×500. Four options, compared in `preview-header.html` against a mock of the
+real profile — header, avatar overlapping it, name and bio — under both
+candidate avatars.
+
+| File | |
+|---|---|
+| **`x-header-line.png`** | The positioning sentence. Uses the space to say something the profile does not already say. |
+| `x-header-mark.png` | The mark alone, right of the avatar. |
+| `x-header-quiet.png` | Atmosphere only. Nothing to collide with, nothing to go stale. |
+| `x-header-lockup.png` | Mark and wordmark — but the account name sits directly beneath it, so this repeats itself. |
+
+Two constraints shaped all of them:
+
+- **The avatar covers the bottom-left.** At 1500×500 it eats roughly the first
+  370px horizontally and the lower third. Content starts at x=430.
+- **Mobile crops the top and bottom bands.** Everything is inset 96px from
+  every edge, and the bloom sits right of centre so the light is not in the
+  part the avatar hides.
+
 ## Not made yet
 
-The header banner (1500×500) and the Open Graph card (1200×630). Ask if you
-want them.
+The Open Graph card (1200×630) that link previews use. Ask if you want it.
