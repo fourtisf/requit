@@ -18,6 +18,26 @@ BRANCH="${BRANCH:-main}"
 
 cd "$APP_DIR"
 
+# Load .env into this shell so every command below has it — prisma, the build,
+# and anything added later. Relying on prisma.config.ts to load it worked only
+# for Prisma, and only as long as that import stayed there.
+if [ ! -f .env ]; then
+  echo "    No .env in $APP_DIR. Copy .env.example and fill it in first." >&2
+  exit 1
+fi
+
+set -a
+# shellcheck disable=SC1091
+. ./.env
+set +a
+
+for required in DATABASE_URL REDIS_URL AUTH_SECRET AUTH_URL; do
+  if [ -z "${!required:-}" ]; then
+    echo "    $required is empty in .env. Fill it in before deploying." >&2
+    exit 1
+  fi
+done
+
 echo "==> Refusing to deploy with uncommitted changes"
 if ! git diff --quiet || ! git diff --cached --quiet; then
   echo "    Working tree is dirty. Commit or stash on the server first." >&2
