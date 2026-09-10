@@ -5,7 +5,9 @@ import { requitAdapter } from "@/lib/auth/adapter";
 import { sendSignInCode } from "@/lib/auth/email";
 import { OTP_TTL_SECONDS } from "@/lib/auth/otp";
 import { generateOtp } from "@/lib/auth/otp.server";
-import { rateLimit } from "@/lib/rate-limit";
+import { toSessionUser } from "@/lib/auth/session-payload";
+import { rateLimitAll } from "@/lib/rate-limit";
+import { clientIp, hashIp } from "@/lib/request-ip";
 import type { RiskTier } from "@prisma/client";
 
 declare module "next-auth/adapters" {
@@ -25,7 +27,13 @@ declare module "next-auth" {
       handle: string;
       countryCode: string;
       riskTier: RiskTier;
-      suspendedAt: Date | null;
+      /**
+       * The decision, not the timestamp. The session payload is serialised to
+       * JSON, so a Date here arrives at the reader as a string while still
+       * being typed as a Date. Pages that need the date or the reason read
+       * them from the row.
+       */
+      suspended: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -48,8 +56,20 @@ const emailOtp: EmailConfig = {
   maxAge: OTP_TTL_SECONDS,
   generateVerificationToken: () => generateOtp(),
   async sendVerificationRequest({ identifier, token }) {
-    // 5 codes per address per 15 minutes. Mail cost, and grinding defence.
-    const limit = await rateLimit(`otp:${identifier.toLowerCase()}`, 5, 15 * 60);
+    const email = identifier.toLowerCase();
+    const rules = [
+      // Per address: mail cost, and grinding defence for one inbox.
+      { key: `otp:email:${email}`, limit: 5, windowSeconds: 15 * 60 },
+    ];
+
+    // Per source: the per-address limit alone is bypassed by rotating the
+    // address, which costs the attacker nothing and costs us an email each time.
+    const ip = await requestIpHash();
+    if (ip) {
+      rules.push({ key: `otp:ip:${ip}`, limit: 20, windowSeconds: 60 * 60 });
+    }
+
+    const limit = await rateLimitAll(rules);
     if (!limit.allowed) {
       throw new Error("Too many sign-in codes requested. Try again shortly.");
     }
@@ -59,11 +79,28 @@ const emailOtp: EmailConfig = {
   options: {},
 };
 
+/**
+ * Auth.js owns the call site, so the request headers are reached the same way
+ * the adapter reaches them. Returns null when there is no request context.
+ */
+async function requestIpHash(): Promise<string | null> {
+  try {
+    const { headers } = await import("next/headers");
+    const ip = clientIp(await headers());
+    return ip ? hashIp(ip) : null;
+  } catch {
+    return null;
+  }
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
   adapter: requitAdapter(),
   secret: serverEnv().AUTH_SECRET,
-  session: { strategy: "database" },
+  // Required behind Cloudflare and Nginx. serverEnv() refuses to boot in
+  // production without AUTH_URL, which pins the origin this would otherwise
+  // take from the Host header.
   trustHost: true,
+  session: { strategy: "database" },
   pages: {
     signIn: "/signin",
     verifyRequest: "/signin/code",
@@ -72,21 +109,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
   providers: [emailOtp],
   callbacks: {
     session({ session, user }) {
-      // Build the payload explicitly rather than decorating the adapter's object.
-      // /api/auth/session is readable by the browser, and the raw session row
-      // carries `sessionToken` — the credential itself. Mutate-and-return would
-      // publish it, and adding a column to User would silently publish that too.
-      return {
-        expires: session.expires,
-        user: {
-          id: user.id,
-          email: user.email,
-          handle: user.handle,
-          countryCode: user.countryCode,
-          riskTier: user.riskTier,
-          suspendedAt: user.suspendedAt,
-        },
-      };
+      // See toSessionUser: allowlisted fields, JSON primitives only.
+      return { expires: session.expires, user: toSessionUser(user) };
     },
   },
 }));

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
-import { auth, signOut } from "@/auth";
+import { signOut } from "@/auth";
+import { requireUser } from "@/lib/session";
 import { BRAND } from "@/lib/brand";
 import { Card, CardHeader } from "@/components/ui/card";
 import { StatGrid, Stat } from "@/components/ui/stat";
@@ -16,10 +16,7 @@ export const metadata = { title: "Dashboard" };
  * zero that looks computed.
  */
 export default async function DashboardPage() {
-  const session = await auth();
-  if (!session?.user) redirect("/signin");
-
-  const { handle, countryCode, riskTier } = session.user;
+  const { handle, countryCode, riskTier } = await requireUser();
   const countryKnown = countryCode !== UNKNOWN_COUNTRY;
 
   return (

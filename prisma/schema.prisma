@@ -4,6 +4,20 @@
 // unique constraints are load-bearing (they are the dedupe and anti-multi-account
 // guards, not hints). Section 3 holds the models Auth.js requires; it is additive.
 //
+// DEVIATIONS FROM §3 — every one, listed. No column in §3 was changed or dropped.
+//   1. Wallet.withdrawals / Withdrawal.wallet — §3 gives Withdrawal a `walletId`
+//      but no relation. Prisma cannot express the foreign key without both
+//      sides, so the back-relation is declared. No new column: `walletId` is
+//      the same field §3 specifies.
+//   2. User.emailVerified, User.name, User.image and the accounts/sessions
+//      back-relations — required by @auth/prisma-adapter. See section 3.
+//   3. Account, Session, VerificationToken — required by @auth/prisma-adapter.
+//
+// Known gap, deliberately left as §3 specifies: there is no index serving the
+// job that flips Reward PENDING -> AVAILABLE (it filters on status and
+// availableAt; the existing index is [userId, status]). Raise it with ALFA in
+// Phase 1 rather than adding it here — §3 is the source of truth for this file.
+//
 // Phase 5 models (Distribution, SnapshotHolder, VaultLedger) are specified in
 // HANDOFF.md §9 and MUST NOT be migrated until the legal gate clears.
 

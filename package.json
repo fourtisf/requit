@@ -13,8 +13,10 @@
     "worker": "tsx src/worker/index.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test": "vitest run --project unit",
+    "test:watch": "vitest --project unit",
+    "test:db": "vitest run --project integration",
+    "test:all": "vitest run",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
@@ -25,9 +27,10 @@
   "dependencies": {
     "@auth/prisma-adapter": "2.11.3",
     "@prisma/client": "6.19.3",
+    "@sentry/nextjs": "10.74.0",
     "bullmq": "6.3.4",
     "dotenv": "17.2.4",
-    "geist": "^1.7.2",
+    "geist": "1.7.2",
     "ioredis": "5.9.0",
     "next": "15.5.25",
     "next-auth": "5.0.0-beta.32",
@@ -38,7 +41,7 @@
     "zod": "4.6.1"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.7",
+    "@eslint/eslintrc": "3.3.7",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "22.18.11",
     "@types/nodemailer": "7.0.4",
