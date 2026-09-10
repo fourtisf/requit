@@ -26,11 +26,12 @@ Where they disagree, ask. Do not pick one.
 | 0 | Next.js + Prisma + Redis + Auth.js, CI | ✅ done |
 | 0.1 | Hardening: route gate, CSP, suspension, health, alerting, DB tests | ✅ done |
 | 0.2 | Member surfaces: settings, referral, notifications, leaderboard, statement | ✅ done |
+| 0.3 | Public site (non-numeric sections) and the three policy pages | ✅ done |
 | 1 | Offer ingestion and postbacks (staging only) | not started |
 | — | **Gate: ALFA approves staging before Phase 2** | |
 | 2 | Wallets and withdrawals | not started |
 | 3 | Disputes, admin, treasury | not started |
-| 4 | Public proof pages | not started |
+| 4 | Public proof pages — the numeric half | not started |
 | 5 | Vault and distributions | **legally gated — do not start** |
 
 Phase 5 must not be built, and its models must not be migrated, until ALFA
@@ -146,6 +147,36 @@ sign-in code would let anyone who can read `/var/log` sign in as anyone.
 
 CI runs typecheck, lint, unit tests, a migration + seed pass against a real
 Postgres, the integration suite, a schema-drift check, and a production build.
+
+---
+
+## The public site
+
+`/` carries the sections that make no quantitative claim: how the money flows,
+the comparison against the category, payout timing, and the FAQ. Payout timing
+reads `TIER_RULES` — the same table the payout pipeline reads — so the page
+cannot quote a hold window the product does not honour.
+
+Deliberately absent until Phase 4: the proof table, the tier tables with
+completion rates, the country checker and the dispute SLA. Every figure in them
+has to come from a query (§8) and there is nothing to query yet. Also absent:
+the team section, whose prototype content is `[Founder name]` and which §14 says
+must not ship as a placeholder, and anything about the token, which is Phase 5
+and legally gated.
+
+### Policy pages
+
+`/terms`, `/privacy` and `/reward-policy` are live. They were written from the
+schema and the code rather than from a template — the Privacy notice lists the
+columns that actually exist, and the Reward policy's hold windows come from
+`TIER_RULES`.
+
+**They have not been through legal review.** What is outstanding is listed in
+[`docs/LEGAL-REVIEW.md`](docs/LEGAL-REVIEW.md), split into what blocks offer
+network approval, what needs a lawyer, and what needs ALFA. The registered
+entity is not named because §14 puts that with ALFA; until it is set in
+`src/lib/legal.ts`, every policy page says so rather than printing a plausible
+placeholder.
 
 ---
 
