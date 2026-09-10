@@ -38,6 +38,34 @@ confirms in writing that a lawyer has reviewed it (HANDOFF.md §0.2).
 
 ---
 
+## Deploying
+
+`deploy/` holds the VPS setup — PM2, Nginx, and a deploy script that migrates
+before it builds and builds before it reloads, so a broken build never replaces a
+working site. Full walkthrough in [`deploy/README.md`](deploy/README.md).
+
+```bash
+cd /var/www/requit && ./deploy/deploy.sh
+```
+
+> **Country detection needs Cloudflare in front.** `src/lib/country.ts` reads
+> `cf-ipcountry`, which only exists when the domain is proxied through
+> Cloudflare. Pointed straight at the box, every signup records `XX` — and
+> offers are matched by country, so nobody is eligible for anything. Step 6 of
+> the deploy guide. Do it before Phase 1.
+
+---
+
+## Brand assets
+
+Logo candidates live in [`docs/brand/`](docs/brand/) as SVG, with
+`preview.html` showing each at 88px, as a lockup, at 19px (the nav size, where
+marks fall apart), and on a light background (the one that decides whether it
+can go on an invoice). Nothing is wired in yet — the app still uses the
+prototype's gradient tile.
+
+---
+
 ## Running it locally
 
 Requires Node 22 and Docker.

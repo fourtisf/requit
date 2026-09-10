@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Requit — Tally">
+  <g fill="none" stroke-linecap="round" stroke-width="3">
+    <path d="M10 8.5v15" stroke="#FBFBFA"/>
+    <path d="M16 8.5v15" stroke="#FBFBFA"/>
+    <path d="M22 8.5v15" stroke="#FBFBFA"/>
+    <path d="M6.75 23.25 25.25 8.75" stroke="#6BCBA5"/>
+  </g>
+</svg>

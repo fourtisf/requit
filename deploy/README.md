@@ -1,0 +1,162 @@
+# Deploying to the VPS
+
+Target: `requit.xyz` → `31.97.57.242`, Ubuntu, Nginx, PM2 — the pattern
+HANDOFF.md §1 specifies.
+
+> **Read this first: country detection does not work yet.**
+> `src/lib/country.ts` reads the `cf-ipcountry` header, which only exists when
+> Cloudflare is in front of the site. DNS is currently at Hostinger pointing
+> straight at the box, so every signup will record country `XX` — and offers are
+> matched by country, so nobody will be eligible for anything. Fix it with
+> **Step 6** before Phase 1 goes live. It is free and takes ten minutes.
+
+---
+
+## 1. Packages
+
+```bash
+sudo apt update && sudo apt install -y curl git nginx postgresql-16 redis-server
+
+# Node 22
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+sudo npm install -g pm2
+```
+
+## 2. Postgres and Redis
+
+```bash
+sudo -u postgres psql -c "CREATE USER requit WITH PASSWORD 'CHANGE-ME';"
+sudo -u postgres psql -c "CREATE DATABASE requit OWNER requit;"
+```
+
+Redis must not evict — BullMQ jobs are postbacks and payouts, and a queue whose
+jobs can be dropped loses money silently:
+
+```bash
+sudo sed -i 's/^# *maxmemory-policy .*/maxmemory-policy noeviction/' /etc/redis/redis.conf
+sudo systemctl restart redis-server
+```
+
+Neither service should be reachable from the internet. Check with
+`sudo ss -lntp` that both bind to `127.0.0.1` only.
+
+## 3. The app
+
+```bash
+sudo mkdir -p /var/www/requit /var/log/requit
+sudo chown -R "$USER" /var/www/requit /var/log/requit
+
+git clone https://github.com/fourtisf/requit.git /var/www/requit
+cd /var/www/requit
+cp .env.example .env
+```
+
+Fill in `.env`. The four that must be right on the first boot:
+
+```bash
+DATABASE_URL="postgresql://requit:CHANGE-ME@localhost:5432/requit?schema=public"
+REDIS_URL="redis://localhost:6379"
+AUTH_SECRET="$(openssl rand -base64 32)"
+AUTH_URL="https://requit.xyz"
+NEXT_PUBLIC_APP_URL="https://requit.xyz"
+```
+
+`serverEnv()` refuses to boot in production without `AUTH_URL` and
+`EMAIL_SERVER`, so a half-filled `.env` fails loudly at start rather than
+quietly at the first sign-in.
+
+Lock the file down — it holds the database password and the app secret:
+
+```bash
+chmod 600 .env
+```
+
+## 4. First deploy
+
+```bash
+./deploy/deploy.sh
+```
+
+It refuses to run on a dirty tree, applies migrations before building, builds
+before reloading, and then polls `/api/health` — so a broken build never
+replaces a working site.
+
+```bash
+pm2 startup   # then run the line it prints, so PM2 survives a reboot
+pm2 save
+```
+
+## 5. Nginx and TLS
+
+```bash
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/requit
+sudo ln -sf /etc/nginx/sites-available/requit /etc/nginx/sites-enabled/requit
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t && sudo systemctl reload nginx
+
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d requit.xyz -d www.requit.xyz
+```
+
+## 6. Cloudflare — required before Phase 1
+
+Without this, `cf-ipcountry` never arrives and every member is country `XX`.
+
+1. Add `requit.xyz` to Cloudflare (free plan).
+2. At Hostinger, change the nameservers to the two Cloudflare gives you.
+3. In Cloudflare DNS, keep `A @ → 31.97.57.242` and `CNAME www → requit.xyz`,
+   both **Proxied** (orange cloud). The orange cloud is what adds the header.
+4. SSL/TLS mode **Full (strict)** — certbot already issued a real certificate.
+5. On the box, restore the visitor IP, or Nginx will see Cloudflare's edge as
+   every visitor and the rate limiter will bucket the whole world together:
+
+```bash
+( for t in v4 v6; do curl -s "https://www.cloudflare.com/ips-$t"; echo; done ) \
+  | sed 's/^/set_real_ip_from /; s/$/;/' | sudo tee /etc/nginx/cloudflare-ips.conf
+```
+
+Then uncomment the two `real_ip` lines in `deploy/nginx.conf` and reload.
+
+Verify:
+
+```bash
+curl -sI https://requit.xyz | grep -i cf-ray     # present = proxied
+```
+
+## 7. Firewall
+
+```bash
+sudo ufw allow OpenSSH && sudo ufw allow 'Nginx Full' && sudo ufw enable
+```
+
+Once Cloudflare is proxying, restrict 80/443 to Cloudflare's ranges as well —
+otherwise the origin IP is still directly reachable and the proxy is bypassable.
+
+---
+
+## Later deploys
+
+```bash
+cd /var/www/requit && ./deploy/deploy.sh
+```
+
+## Checks
+
+```bash
+curl -s https://requit.xyz/api/health     # {"status":"ok",...}
+pm2 status
+pm2 logs requit-web --lines 50
+pm2 logs requit-worker --lines 50
+```
+
+## Not covered here, on purpose
+
+- **Backups.** Nothing in this repo backs up Postgres, and from Phase 1 that
+  database *is* the record of what members are owed. Set up `pg_dump` to
+  off-box storage before real money moves.
+- **The hot wallet passphrase** (§6.3) is supplied out of band at process start.
+  It must not be in `.env`, in `ecosystem.config.cjs`, or in this script.
+- **The postback endpoint needs this stable IP** (§4.2). Register
+  `https://requit.xyz/api/postback/<network>` in each network's dashboard, and
+  put their published IPs in the `*_POSTBACK_IPS` variables.

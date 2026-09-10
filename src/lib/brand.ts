@@ -7,9 +7,9 @@
  */
 export const BRAND = {
   name: "Requit",
-  domain: "requit.com",
+  domain: "requit.xyz",
   ticker: "RQT",
-  supportEmail: "support@requit.com",
+  supportEmail: "support@requit.xyz",
 } as const;
 
 export type Brand = typeof BRAND;
