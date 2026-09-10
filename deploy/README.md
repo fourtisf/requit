@@ -139,6 +139,29 @@ otherwise the origin IP is still directly reachable and the proxy is bypassable.
 
 ---
 
+## If port 3000 is taken
+
+`EADDRINUSE: address already in use :::3000` in `web.error.log` means another
+service on the box owns the port. Next cannot bind, PM2 restarts it forever,
+and — before the health check learned to identify itself — the probe would go
+green against whatever else was answering.
+
+Give Requit its own port. Edit the INSTALLED nginx config, not the one in the
+repo: `deploy.sh` refuses to run with a dirty working tree.
+
+```bash
+cd /var/www/requit
+echo 'PORT="3001"' >> .env
+
+sed -i 's|127.0.0.1:[0-9]*;|127.0.0.1:3001;|' /etc/nginx/sites-available/requit
+nginx -t && systemctl reload nginx
+
+pm2 delete requit-web requit-worker
+./deploy/deploy.sh
+```
+
+`deploy.sh` warns if the installed nginx upstream and `PORT` disagree.
+
 ## Later deploys
 
 ```bash

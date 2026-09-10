@@ -77,6 +77,14 @@ fi
 
 PORT="${PORT:-3000}"
 
+# Nginx cannot read the environment, so its upstream is a literal. If PORT moves
+# and nginx does not, the site 502s while every process looks healthy.
+NGINX_CONF="/etc/nginx/sites-available/requit"
+if [ -f "$NGINX_CONF" ] && ! grep -q "127.0.0.1:${PORT};" "$NGINX_CONF"; then
+  echo "    WARNING: $NGINX_CONF does not point at 127.0.0.1:${PORT}" >&2
+  echo "    fix: sed -i 's|127.0.0.1:[0-9]*;|127.0.0.1:${PORT};|' $NGINX_CONF && nginx -t && systemctl reload nginx" >&2
+fi
+
 echo "==> Waiting for health on port $PORT"
 for attempt in $(seq 1 20); do
   body="$(curl -fsS --max-time 3 "http://127.0.0.1:${PORT}/api/health" 2>/dev/null || true)"
