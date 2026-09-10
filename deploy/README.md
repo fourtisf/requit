@@ -105,10 +105,25 @@ that got there first is not the one that moves. Add Requit to the existing
 server instead:
 
 ```bash
+cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak
 cat deploy/Caddyfile.snippet >> /etc/caddy/Caddyfile
 caddy validate --config /etc/caddy/Caddyfile
 systemctl reload caddy
 ```
+
+**Back the file up first.** It also serves whatever else is on the box, so a
+failed reload takes that down too. If the reload fails:
+
+```bash
+journalctl -xeu caddy.service --no-pager | tail -30
+cp /etc/caddy/Caddyfile.bak /etc/caddy/Caddyfile
+systemctl reload caddy || systemctl restart caddy
+```
+
+`caddy validate` is not proof the reload will work. It runs as root; the
+service runs as the `caddy` user. Anything that user cannot open — a log path
+under a directory that does not exist, a certificate directory it cannot
+write — passes validation and then fails at reload.
 
 Caddy issues and renews the certificate itself — skip certbot entirely. Then
 skip to step 7.

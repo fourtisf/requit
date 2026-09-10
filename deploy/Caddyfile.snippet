@@ -34,8 +34,9 @@ requit.xyz {
 		header_up X-Real-IP {remote_host}
 	}
 
-	log {
-		output file /var/log/caddy/requit.log
-		format json
-	}
+	# No `log` block on purpose. The systemd unit runs Caddy as the `caddy`
+	# user; a file under /var/log/caddy that this user cannot create makes the
+	# reload fail even though `caddy validate` (run as root) passed. Access logs
+	# go to the journal by default — `journalctl -u caddy`. Add a file target
+	# later, after creating the directory and chowning it to caddy.
 }
