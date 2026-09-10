@@ -80,6 +80,11 @@ the same gesture, kept in case the plain pair of chevrons reads too much like a
 transport control. `preview-flow.html` compares all four, including at 14px,
 which is the size the favicon actually renders at.
 
+Social images are in [`docs/brand/social/`](docs/brand/social/) — X profile
+pictures, with `preview-x.html` testing each at the sizes X actually renders
+them (24–48px) across its three themes. Two of the five fail on X's default
+dark theme; the README there says which and why.
+
 Emails carry the wordmark only. Gmail strips inline SVG, and a hosted PNG needs
 an absolute URL that does not exist until the site is deployed.
 
