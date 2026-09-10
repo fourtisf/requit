@@ -10,16 +10,20 @@
  * explicit that the hot wallet passphrase is supplied out of band and never
  * lands in the repo or the deploy script.
  */
+// Set PORT in .env if 3000 is taken. deploy.sh sources .env before reloading,
+// so PM2 inherits it — but remember to change the upstream in nginx.conf too.
+const PORT = process.env.PORT || "3000";
+
 module.exports = {
   apps: [
     {
       name: "requit-web",
       cwd: "/var/www/requit",
       script: "node_modules/next/dist/bin/next",
-      args: "start -p 3000",
+      args: `start -p ${PORT}`,
       instances: 1,
       exec_mode: "fork",
-      env: { NODE_ENV: "production", PORT: "3000" },
+      env: { NODE_ENV: "production", PORT },
       max_memory_restart: "600M",
       // Next serves traffic within a second or two; anything longer is a real
       // failure, not a slow boot.

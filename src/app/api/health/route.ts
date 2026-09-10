@@ -8,6 +8,13 @@ export const dynamic = "force-dynamic";
 type Check = { name: string; ok: boolean; latencyMs: number; error?: string };
 
 /**
+ * Identifies the responder. A deploy that probes a port rather than an app will
+ * go green whenever anything at all is listening — which is exactly what
+ * happened on a box already running another service on 3000.
+ */
+const SERVICE = "requit";
+
+/**
  * Liveness and readiness for PM2, Nginx and uptime monitoring.
  *
  * Returns 503 when a dependency is down so a load balancer takes the instance
@@ -37,7 +44,7 @@ export async function GET(): Promise<NextResponse> {
   const healthy = checks.every((check) => check.ok);
 
   return NextResponse.json(
-    { status: healthy ? "ok" : "degraded", checks },
+    { service: SERVICE, status: healthy ? "ok" : "degraded", checks },
     {
       status: healthy ? 200 : 503,
       headers: { "cache-control": "no-store" },

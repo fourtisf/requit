@@ -75,14 +75,30 @@ else
   pm2 save
 fi
 
-echo "==> Waiting for health"
+PORT="${PORT:-3000}"
+
+echo "==> Waiting for health on port $PORT"
 for attempt in $(seq 1 20); do
-  if curl -fsS --max-time 3 http://127.0.0.1:3000/api/health >/dev/null 2>&1; then
-    echo "    healthy after ${attempt}s"
-    curl -sS http://127.0.0.1:3000/api/health
-    echo
-    exit 0
-  fi
+  body="$(curl -fsS --max-time 3 "http://127.0.0.1:${PORT}/api/health" 2>/dev/null || true)"
+
+  case "$body" in
+    *'"service":"requit"'*)
+      echo "    healthy after ${attempt}s"
+      echo "    $body"
+      exit 0
+      ;;
+    "")
+      ;;
+    *)
+      # Something is listening, but it is not us. Keep going in case our app is
+      # still booting, but say what was found — a silent pass here is how a
+      # deploy "succeeds" against another service entirely.
+      echo "    port $PORT answered, but not with Requit: $body" >&2
+      echo "    another app is probably bound to $PORT — check: ss -lntp | grep :$PORT" >&2
+      exit 1
+      ;;
+  esac
+
   sleep 1
 done
 
