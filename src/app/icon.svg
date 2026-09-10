@@ -1,11 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-  <!-- The prototype's .bmark: rounded square, 148deg gradient. -->
-  <defs>
-    <linearGradient id="m" x1="0" y1="0" x2="0.62" y2="1">
-      <stop offset="0" stop-color="#FFFFFF"/>
-      <stop offset="0.58" stop-color="#A9E7CD"/>
-      <stop offset="1" stop-color="#3E9878"/>
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="9" fill="url(#m)"/>
+  <!-- The mark on a dark plate. Transparent would vanish against a light tab
+       bar, and a favicon has no control over what it sits on. -->
+  <rect width="32" height="32" rx="7.5" fill="#0C0D0F"/>
+  <path d="M8.5 9 16 16 8.5 23Z" fill="#FBFBFA"/>
+  <path d="M17 9 24.5 16 17 23Z" fill="#6BCBA5"/>
 </svg>

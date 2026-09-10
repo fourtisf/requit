@@ -70,8 +70,18 @@ The SVG files are the source of truth. Edit one and rebuild the sheet:
 python3 docs/brand/build.py
 ```
 
-Nothing is wired in — the app still uses the prototype's gradient tile, and
-§14 puts the choice with ALFA.
+**Flow is the chosen mark** and is live: `<BrandMark />` and `<BrandLockup />`
+in `src/components/ui/brand-mark.tsx`, plus `src/app/icon.svg` for the favicon.
+It is defined once, the same way the name is — before this it was pasted into
+five files.
+
+`mark-flow-grade`, `mark-flow-stroke` and `mark-flow-nest` are refinements of
+the same gesture, kept in case the plain pair of chevrons reads too much like a
+transport control. `preview-flow.html` compares all four, including at 14px,
+which is the size the favicon actually renders at.
+
+Emails carry the wordmark only. Gmail strips inline SVG, and a hosted PNG needs
+an absolute URL that does not exist until the site is deployed.
 
 ---
 

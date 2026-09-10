@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
-import { BRAND } from "@/lib/brand";
+import { BrandLockup } from "@/components/ui/brand-mark";
 
 const LINKS = [
   { href: "/dashboard", label: "Dashboard" },
@@ -13,10 +13,7 @@ const LINKS = [
 export function AppNav({ current }: { current: string }) {
   return (
     <header className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-bd pb-4">
-      <Link href="/dashboard" className="flex items-center gap-[9px] text-[15px] font-semibold tracking-[-0.03em]">
-        <span className="size-[19px] shrink-0 rounded-[5.5px] bg-[linear-gradient(148deg,#fff,#A9E7CD_58%,#3E9878)] shadow-[0_0_14px_rgba(107,203,165,.36)]" />
-        {BRAND.name}
-      </Link>
+      <BrandLockup href="/dashboard" />
 
       <nav className="flex flex-wrap gap-0.5">
         {LINKS.map((link) => (

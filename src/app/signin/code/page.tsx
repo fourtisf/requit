@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { BRAND } from "@/lib/brand";
+import { BrandLockup } from "@/components/ui/brand-mark";
 import { Button } from "@/components/ui/button";
 import { OTP_LENGTH, OTP_TTL_SECONDS } from "@/lib/auth/otp";
 
@@ -25,10 +25,7 @@ export default async function VerifyCodePage() {
   return (
     <main className="shell flex min-h-dvh items-center justify-center py-20">
       <div className="w-full max-w-[380px]">
-        <div className="flex items-center gap-[9px] text-[15px] font-semibold tracking-[-0.03em]">
-          <span className="size-[19px] shrink-0 rounded-[5.5px] bg-[linear-gradient(148deg,#fff,#A9E7CD_58%,#3E9878)] shadow-[0_0_14px_rgba(107,203,165,.36)]" />
-          {BRAND.name}
-        </div>
+        <BrandLockup />
 
         <h1 className="mt-7 text-[27px] font-semibold leading-tight tracking-[-0.042em]">
           Check your email

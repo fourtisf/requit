@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Requit — Flow variants</title>
+<style>
+  :root{--bg:#08090A;--bg2:#0C0D0F;--bd:rgba(255,255,255,.075);--fg:#FBFBFA;--fg2:#9C9E9C;--fg4:#434645}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font:16px/1.55 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
+       letter-spacing:-.011em;padding:56px 40px 72px;
+       background-image:radial-gradient(900px 460px at 50% -12%,rgba(107,203,165,.10),transparent 64%)}
+  header{max-width:1180px;margin:0 auto 22px}
+  h1{font-size:30px;font-weight:600;letter-spacing:-.042em}
+  .sub{color:var(--fg2);font-size:14px;margin-top:9px;max-width:74ch;font-weight:300}
+  .grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:14px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));
+        border-radius:16px;padding:22px;box-shadow:inset 0 0 0 1px var(--bd)}
+  .stage{height:140px;display:grid;place-items:center;background:var(--bg2);border-radius:11px;
+         box-shadow:inset 0 0 0 1px var(--bd)}
+  .lockup{display:flex;align-items:center;gap:9px;margin-top:14px;padding:11px 13px;border-radius:9px;
+          background:rgba(255,255,255,.026);box-shadow:inset 0 0 0 1px var(--bd)}
+  .word{font-size:15px;font-weight:600;letter-spacing:-.035em}
+  .sizes{display:flex;gap:6px;margin-top:9px}
+  .chip{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;padding:11px 3px;border-radius:9px;
+        background:rgba(255,255,255,.026);box-shadow:inset 0 0 0 1px var(--bd)}
+  .chip.light{background:#F4F5F3;box-shadow:inset 0 0 0 1px rgba(0,0,0,.09)}
+  .chip.light svg [fill="#FBFBFA"]{fill:#14171A} .chip.light svg [stroke="#FBFBFA"]{stroke:#14171A}
+  .chip i{font-style:normal;font-size:9.5px;color:var(--fg4);font-family:ui-monospace,monospace}
+  .chip.light i{color:#7A8079}
+  h3{font-size:15.5px;font-weight:600;letter-spacing:-.025em;margin-top:16px}
+  .card p{color:var(--fg2);font-size:12.5px;line-height:1.55;margin-top:6px;font-weight:300}
+  code{display:block;margin-top:12px;font-family:ui-monospace,monospace;font-size:10.5px;color:var(--fg4)}
+</style></head><body>
+<header><h1>Flow — the picked mark, and three refinements</h1>
+<p class="sub">Same gesture in all four. The refinements exist only to break the fast-forward read; if the original looks right to you, it ships as it is. A 14px column is added here because this mark now has to work as the favicon.</p></header>
+<div class="grid">
+  <article class="card">
+    <div class="stage"><svg viewBox="0 0 32 32" width="96" height="96" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg></div>
+    <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg><span class="word">Requit</span></div>
+    <div class="sizes">
+      <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg><i>32</i></span>
+      <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg><i>19 · nav</i></span>
+      <span class="chip"><svg viewBox="0 0 32 32" width="14" height="14" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg><i>14 · favicon</i></span>
+      <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg><i>on light</i></span>
+    </div>
+    <h3>Flow — as picked</h3><p>Two equal chevrons. The gesture that was chosen, unchanged.</p><code>docs/brand/mark-flow.svg</code>
+  </article>
+  <article class="card">
+    <div class="stage"><svg viewBox="0 0 32 32" width="96" height="96" aria-hidden="true"><path d="M8.5 11.5 13.5 16 8.5 20.5Z" fill="#FBFBFA" stroke="#FBFBFA" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M17.5 8 25 16 17.5 24Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="3" stroke-linejoin="round"/></svg></div>
+    <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M8.5 11.5 13.5 16 8.5 20.5Z" fill="#FBFBFA" stroke="#FBFBFA" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M17.5 8 25 16 17.5 24Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="3" stroke-linejoin="round"/></svg><span class="word">Requit</span></div>
+    <div class="sizes">
+      <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M8.5 11.5 13.5 16 8.5 20.5Z" fill="#FBFBFA" stroke="#FBFBFA" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M17.5 8 25 16 17.5 24Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="3" stroke-linejoin="round"/></svg><i>32</i></span>
+      <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M8.5 11.5 13.5 16 8.5 20.5Z" fill="#FBFBFA" stroke="#FBFBFA" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M17.5 8 25 16 17.5 24Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="3" stroke-linejoin="round"/></svg><i>19 · nav</i></span>
+      <span class="chip"><svg viewBox="0 0 32 32" width="14" height="14" aria-hidden="true"><path d="M8.5 11.5 13.5 16 8.5 20.5Z" fill="#FBFBFA" stroke="#FBFBFA" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M17.5 8 25 16 17.5 24Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="3" stroke-linejoin="round"/></svg><i>14 · favicon</i></span>
+      <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M8.5 11.5 13.5 16 8.5 20.5Z" fill="#FBFBFA" stroke="#FBFBFA" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M17.5 8 25 16 17.5 24Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="3" stroke-linejoin="round"/></svg><i>on light</i></span>
+    </div>
+    <h3>Flow · graduated</h3><p>The second chevron is larger and both corners are rounded. Equal sharp triangles are what a transport control looks like; unequal rounded ones are not.</p><code>docs/brand/mark-flow-grade.svg</code>
+  </article>
+  <article class="card">
+    <div class="stage"><svg viewBox="0 0 32 32" width="96" height="96" aria-hidden="true"><g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 8.5 15.5 16 8 23.5" stroke="#FBFBFA"/>
+      <path d="M17.5 8.5 25 16 17.5 23.5" stroke="#6BCBA5"/>
+    </g></svg></div>
+    <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 8.5 15.5 16 8 23.5" stroke="#FBFBFA"/>
+      <path d="M17.5 8.5 25 16 17.5 23.5" stroke="#6BCBA5"/>
+    </g></svg><span class="word">Requit</span></div>
+    <div class="sizes">
+      <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 8.5 15.5 16 8 23.5" stroke="#FBFBFA"/>
+      <path d="M17.5 8.5 25 16 17.5 23.5" stroke="#6BCBA5"/>
+    </g></svg><i>32</i></span>
+      <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 8.5 15.5 16 8 23.5" stroke="#FBFBFA"/>
+      <path d="M17.5 8.5 25 16 17.5 23.5" stroke="#6BCBA5"/>
+    </g></svg><i>19 · nav</i></span>
+      <span class="chip"><svg viewBox="0 0 32 32" width="14" height="14" aria-hidden="true"><g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 8.5 15.5 16 8 23.5" stroke="#FBFBFA"/>
+      <path d="M17.5 8.5 25 16 17.5 23.5" stroke="#6BCBA5"/>
+    </g></svg><i>14 · favicon</i></span>
+      <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 8.5 15.5 16 8 23.5" stroke="#FBFBFA"/>
+      <path d="M17.5 8.5 25 16 17.5 23.5" stroke="#6BCBA5"/>
+    </g></svg><i>on light</i></span>
+    </div>
+    <h3>Flow · stroked</h3><p>Angled strokes rather than filled triangles. Same gesture, but the texture reads as a mark instead of an interface glyph.</p><code>docs/brand/mark-flow-stroke.svg</code>
+  </article>
+  <article class="card">
+    <div class="stage"><svg viewBox="0 0 32 32" width="96" height="96" aria-hidden="true"><path d="M11.5 6.5 21 16 11.5 25.5" fill="none" stroke="#FBFBFA" stroke-width="3.4"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 12 11 16 7 20Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="2.6" stroke-linejoin="round"/></svg></div>
+    <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M11.5 6.5 21 16 11.5 25.5" fill="none" stroke="#FBFBFA" stroke-width="3.4"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 12 11 16 7 20Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="2.6" stroke-linejoin="round"/></svg><span class="word">Requit</span></div>
+    <div class="sizes">
+      <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M11.5 6.5 21 16 11.5 25.5" fill="none" stroke="#FBFBFA" stroke-width="3.4"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 12 11 16 7 20Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="2.6" stroke-linejoin="round"/></svg><i>32</i></span>
+      <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M11.5 6.5 21 16 11.5 25.5" fill="none" stroke="#FBFBFA" stroke-width="3.4"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 12 11 16 7 20Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="2.6" stroke-linejoin="round"/></svg><i>19 · nav</i></span>
+      <span class="chip"><svg viewBox="0 0 32 32" width="14" height="14" aria-hidden="true"><path d="M11.5 6.5 21 16 11.5 25.5" fill="none" stroke="#FBFBFA" stroke-width="3.4"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 12 11 16 7 20Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="2.6" stroke-linejoin="round"/></svg><i>14 · favicon</i></span>
+      <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M11.5 6.5 21 16 11.5 25.5" fill="none" stroke="#FBFBFA" stroke-width="3.4"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 12 11 16 7 20Z" fill="#6BCBA5" stroke="#6BCBA5" stroke-width="2.6" stroke-linejoin="round"/></svg><i>on light</i></span>
+    </div>
+    <h3>Flow · nested</h3><p>One chevron carried inside the other. Keeps the direction, loses the pair-of-triangles read entirely.</p><code>docs/brand/mark-flow-nest.svg</code>
+  </article></div></body></html>

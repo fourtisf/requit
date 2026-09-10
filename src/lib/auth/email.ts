@@ -31,6 +31,9 @@ function htmlBody(code: string): string {
   return `<!doctype html>
 <html><body style="margin:0;padding:32px 16px;background:#08090A;font-family:-apple-system,Segoe UI,system-ui,sans-serif;color:#FBFBFA">
   <div style="max-width:440px;margin:0 auto">
+    <!-- Wordmark only, no logo. Gmail strips inline SVG, and a hosted PNG
+         would need an absolute URL that only exists once the site is
+         deployed. Revisit after the VPS is live. -->
     <p style="font-size:15px;font-weight:600;letter-spacing:-.03em;margin:0 0 28px">${BRAND.name}</p>
     <p style="font-size:14px;color:#9C9E9C;margin:0 0 14px">Your sign-in code:</p>
     <p style="font-family:ui-monospace,monospace;font-size:34px;font-weight:600;letter-spacing:.12em;margin:0 0 18px">${formatOtpForDisplay(code)}</p>
