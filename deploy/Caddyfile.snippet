@@ -1,0 +1,41 @@
+# Requit behind Caddy.
+#
+# Use this instead of deploy/nginx.conf when the box already runs Caddy — which
+# is the case on 31.97.57.242, where Caddy has owned :80 and :443 since before
+# Requit existed. Two web servers cannot share those ports, and the one that is
+# already serving live traffic is not the one that moves.
+#
+# Install:
+#   cat deploy/Caddyfile.snippet >> /etc/caddy/Caddyfile
+#   caddy validate --config /etc/caddy/Caddyfile
+#   systemctl reload caddy
+#
+# Caddy issues and renews the certificate itself. Do not run certbot.
+
+www.requit.xyz {
+	# One host for the session cookie. A cookie set on the apex is invisible on
+	# www, so a member who lands on the wrong one appears signed out.
+	redir https://requit.xyz{uri} permanent
+}
+
+requit.xyz {
+	encode zstd gzip
+
+	# Evidence uploads for disputes (Phase 3). Everything else is small.
+	request_body {
+		max_size 12MB
+	}
+
+	reverse_proxy 127.0.0.1:3001 {
+		# src/lib/request-ip.ts reads cf-connecting-ip, true-client-ip,
+		# x-real-ip, then the first hop of x-forwarded-for. Caddy sets
+		# X-Forwarded-For on its own; X-Real-IP is set here so the rate limiter
+		# has one unambiguous source rather than a list it has to parse.
+		header_up X-Real-IP {remote_host}
+	}
+
+	log {
+		output file /var/log/caddy/requit.log
+		format json
+	}
+}

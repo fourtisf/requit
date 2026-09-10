@@ -79,6 +79,13 @@ PORT="${PORT:-3000}"
 
 # Nginx cannot read the environment, so its upstream is a literal. If PORT moves
 # and nginx does not, the site 502s while every process looks healthy.
+CADDYFILE="/etc/caddy/Caddyfile"
+if [ -f "$CADDYFILE" ] && grep -q "requit" "$CADDYFILE" \
+   && ! grep -q "127.0.0.1:${PORT}" "$CADDYFILE"; then
+  echo "    WARNING: $CADDYFILE does not proxy to 127.0.0.1:${PORT}" >&2
+  echo "    fix it there, then: systemctl reload caddy" >&2
+fi
+
 NGINX_CONF="/etc/nginx/sites-available/requit"
 if [ -f "$NGINX_CONF" ] && ! grep -q "127.0.0.1:${PORT};" "$NGINX_CONF"; then
   echo "    WARNING: $NGINX_CONF does not point at 127.0.0.1:${PORT}" >&2

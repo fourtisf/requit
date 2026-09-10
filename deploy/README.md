@@ -91,7 +91,29 @@ pm2 startup   # then run the line it prints, so PM2 survives a reboot
 pm2 save
 ```
 
-## 5. Nginx and TLS
+## 5a. If the box already runs Caddy (or anything else on :80/:443)
+
+Check before installing nginx:
+
+```bash
+ss -lntp | grep -E ':80 |:443 '
+```
+
+If something already owns those ports, **do not stop it and do not remove it**
+— it is serving live traffic. Two web servers cannot share a port, and the one
+that got there first is not the one that moves. Add Requit to the existing
+server instead:
+
+```bash
+cat deploy/Caddyfile.snippet >> /etc/caddy/Caddyfile
+caddy validate --config /etc/caddy/Caddyfile
+systemctl reload caddy
+```
+
+Caddy issues and renews the certificate itself — skip certbot entirely. Then
+skip to step 7.
+
+## 5b. Nginx and TLS
 
 ```bash
 sudo cp deploy/nginx.conf /etc/nginx/sites-available/requit
