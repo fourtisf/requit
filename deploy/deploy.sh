@@ -12,6 +12,8 @@
 set -Eeuo pipefail
 
 APP_DIR="${APP_DIR:-/var/www/requit}"
+# Override for a branch that is not yet merged:
+#   BRANCH=claude/new-session-jwxsku ./deploy/deploy.sh
 BRANCH="${BRANCH:-main}"
 
 cd "$APP_DIR"
@@ -28,9 +30,13 @@ git checkout "$BRANCH"
 git reset --hard "origin/$BRANCH"
 
 echo "==> Installing exactly what the lockfile says"
-# `npm ci` and not `npm install`: a deploy must never resolve a different tree
-# than the one that was tested. postinstall runs prisma generate.
-npm ci --omit=dev --include=dev
+# `npm ci`, not `npm install`: a deploy must never resolve a different tree than
+# the one that was tested. postinstall runs prisma generate.
+#
+# devDependencies are installed on purpose. The build needs them — typescript,
+# tailwind, the Next plugin — and we build on the server rather than shipping a
+# prebuilt tree. Do not add --omit=dev here; the build will fail.
+npm ci
 
 echo "==> Applying migrations"
 # `migrate deploy` only applies committed migrations. It never generates one and
