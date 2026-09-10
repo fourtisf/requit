@@ -2,28 +2,30 @@
 <html lang="en"><head><meta charset="utf-8">
 <title>Requit — logo candidates</title>
 <style>
-  :root {
-    --bg:#08090A; --bg2:#0C0D0F; --bd:rgba(255,255,255,.075); --bd2:rgba(255,255,255,.13);
-    --fg:#FBFBFA; --fg2:#9C9E9C; --fg3:#6A6D6B; --fg4:#434645; --ac:#95E0C1;
-  }
+  :root { --bg:#08090A; --bg2:#0C0D0F; --bd:rgba(255,255,255,.075);
+           --fg:#FBFBFA; --fg2:#9C9E9C; --fg4:#434645; }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--fg);font:16px/1.55 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
+  body{background:var(--bg);color:var(--fg);
+       font:16px/1.55 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
        letter-spacing:-.011em;padding:56px 40px 72px;
        background-image:radial-gradient(900px 460px at 50% -12%,rgba(107,203,165,.10),transparent 64%)}
-  header{max-width:1180px;margin:0 auto 40px}
+  header,section{max-width:1180px;margin-inline:auto}
   h1{font-size:32px;font-weight:600;letter-spacing:-.042em}
-  .sub{color:var(--fg2);font-size:14.5px;margin-top:10px;max-width:70ch;font-weight:300}
-  .grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px}
+  .sub{color:var(--fg2);font-size:14.5px;margin-top:10px;max-width:72ch;font-weight:300}
+  section{margin-top:44px}
+  h2{font-size:12.5px;font-weight:600;color:#95E0C1;letter-spacing:.015em}
+  .note{color:var(--fg2);font-size:13px;margin-top:5px;max-width:70ch;font-weight:300}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px;margin-top:16px}
   .card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));
         border-radius:16px;padding:22px;box-shadow:inset 0 0 0 1px var(--bd)}
-  .stage{height:132px;display:grid;place-items:center;background:var(--bg2);border-radius:11px;
-         box-shadow:inset 0 0 0 1px var(--bd)}
-  .lockup{display:flex;align-items:center;gap:9px;margin-top:14px;padding:11px 13px;border-radius:9px;
-          background:rgba(255,255,255,.026);box-shadow:inset 0 0 0 1px var(--bd)}
+  .stage{height:132px;display:grid;place-items:center;background:var(--bg2);
+         border-radius:11px;box-shadow:inset 0 0 0 1px var(--bd)}
+  .lockup{display:flex;align-items:center;gap:9px;margin-top:14px;padding:11px 13px;
+          border-radius:9px;background:rgba(255,255,255,.026);box-shadow:inset 0 0 0 1px var(--bd)}
   .word{font-size:15px;font-weight:600;letter-spacing:-.035em}
   .sizes{display:flex;gap:7px;margin-top:9px}
-  .chip{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;padding:11px 4px;border-radius:9px;
-        background:rgba(255,255,255,.026);box-shadow:inset 0 0 0 1px var(--bd)}
+  .chip{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;padding:11px 4px;
+        border-radius:9px;background:rgba(255,255,255,.026);box-shadow:inset 0 0 0 1px var(--bd)}
   .chip.light{background:#F4F5F3;box-shadow:inset 0 0 0 1px rgba(0,0,0,.09)}
   .chip.light svg [stroke="#FBFBFA"]{stroke:#14171A}
   .chip.light svg [fill="#FBFBFA"]{fill:#14171A}
@@ -32,13 +34,31 @@
   h3{font-size:15.5px;font-weight:600;letter-spacing:-.025em;margin-top:16px}
   .card p{color:var(--fg2);font-size:12.5px;line-height:1.55;margin-top:6px;font-weight:300}
   code{display:block;margin-top:12px;font-family:ui-monospace,monospace;font-size:10.5px;color:var(--fg4)}
+  .type{max-width:1180px;margin:44px auto 0;padding:34px;border-radius:16px;
+        background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));
+        box-shadow:inset 0 0 0 1px var(--bd)}
+  .type h2{color:var(--fg);font-size:15.5px;letter-spacing:-.025em}
+  .wm{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;margin-top:24px}
+  .wm-box{padding:24px 28px 32px;border-radius:11px;background:var(--bg2);
+          box-shadow:inset 0 0 0 1px var(--bd)}
+  .wm-box.light{background:#F4F5F3;color:#14171A}
+  .wm-l{font-size:52px;font-weight:600;letter-spacing:-.055em;line-height:1}
+  .wm-s{font-size:21px;font-weight:600;letter-spacing:-.04em;line-height:1}
+  .q{position:relative;display:inline-block}
+  .q::after{content:"";position:absolute;left:.055em;bottom:-.26em;width:.60em;height:.085em;
+            border-radius:99px;background:#6BCBA5}
+  .caveat{margin-top:22px;padding:13px 15px;border-radius:9px;font-size:12px;line-height:1.55;
+          color:#E8C68B;background:rgba(232,198,139,.08);
+          box-shadow:inset 0 0 0 1px rgba(232,198,139,.2);max-width:78ch}
 </style></head>
 <body>
   <header>
     <h1>Logo candidates</h1>
-    <p class="sub">Same palette as the prototype, one accent each. Shown at 88px, as a lockup, and at 19px — the size in the nav, which is where most marks fall apart. The light-background column is the one that decides whether a mark can go on an invoice.</p>
+    <p class="sub">Same palette as the prototype, one accent each. Every mark is shown at 88px,
+    as a lockup, at 19px — the size in the nav, where most marks fall apart — and on a light
+    background, which is what decides whether it can go on an invoice.</p>
   </header>
-  <div class="grid">
+  <section><h2>Line</h2><p class="note">Built from strokes. Lighter on the page, and the register most software brands sit in.</p><div class="grid">
     <article class="card">
       <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3">
     <path d="M10 8.5v15" stroke="#FBFBFA"/>
@@ -46,34 +66,28 @@
     <path d="M22 8.5v15" stroke="#FBFBFA"/>
     <path d="M6.75 23.25 25.25 8.75" stroke="#6BCBA5"/>
   </g></svg></div>
-      <div class="lockup">
-        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3">
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3">
     <path d="M10 8.5v15" stroke="#FBFBFA"/>
     <path d="M16 8.5v15" stroke="#FBFBFA"/>
     <path d="M22 8.5v15" stroke="#FBFBFA"/>
     <path d="M6.75 23.25 25.25 8.75" stroke="#6BCBA5"/>
-  </g></svg><span class="word">Requit</span>
-      </div>
-      <div class="sizes">
-        <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3">
+  </g></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3">
     <path d="M10 8.5v15" stroke="#FBFBFA"/>
     <path d="M16 8.5v15" stroke="#FBFBFA"/>
     <path d="M22 8.5v15" stroke="#FBFBFA"/>
     <path d="M6.75 23.25 25.25 8.75" stroke="#6BCBA5"/>
-  </g></svg><i>32</i></span>
-        <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3">
+  </g></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3">
     <path d="M10 8.5v15" stroke="#FBFBFA"/>
     <path d="M16 8.5v15" stroke="#FBFBFA"/>
     <path d="M22 8.5v15" stroke="#FBFBFA"/>
     <path d="M6.75 23.25 25.25 8.75" stroke="#6BCBA5"/>
-  </g></svg><i>19 · nav</i></span>
-        <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3">
+  </g></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3">
     <path d="M10 8.5v15" stroke="#FBFBFA"/>
     <path d="M16 8.5v15" stroke="#FBFBFA"/>
     <path d="M22 8.5v15" stroke="#FBFBFA"/>
     <path d="M6.75 23.25 25.25 8.75" stroke="#6BCBA5"/>
-  </g></svg><i>on light</i></span>
-      </div>
+  </g></svg><i>on light</i></span></div>
       <h3>Tally</h3>
       <p>A count kept in the open. The one thing the product sells is that its numbers are real.</p>
       <code>docs/brand/mark-tally.svg</code>
@@ -83,28 +97,22 @@
     <circle cx="16" cy="16" r="9.5" stroke="#FBFBFA" stroke-dasharray="35 24.7" transform="rotate(-88 16 16)"/>
     <circle cx="16" cy="16" r="9.5" stroke="#6BCBA5" stroke-dasharray="16 43.7" transform="rotate(130 16 16)"/>
   </g></svg></div>
-      <div class="lockup">
-        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-width="3.5" stroke-linecap="round">
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-width="3.5" stroke-linecap="round">
     <circle cx="16" cy="16" r="9.5" stroke="#FBFBFA" stroke-dasharray="35 24.7" transform="rotate(-88 16 16)"/>
     <circle cx="16" cy="16" r="9.5" stroke="#6BCBA5" stroke-dasharray="16 43.7" transform="rotate(130 16 16)"/>
-  </g></svg><span class="word">Requit</span>
-      </div>
-      <div class="sizes">
-        <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="3.5" stroke-linecap="round">
+  </g></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="3.5" stroke-linecap="round">
     <circle cx="16" cy="16" r="9.5" stroke="#FBFBFA" stroke-dasharray="35 24.7" transform="rotate(-88 16 16)"/>
     <circle cx="16" cy="16" r="9.5" stroke="#6BCBA5" stroke-dasharray="16 43.7" transform="rotate(130 16 16)"/>
-  </g></svg><i>32</i></span>
-        <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.5" stroke-linecap="round">
+  </g></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.5" stroke-linecap="round">
     <circle cx="16" cy="16" r="9.5" stroke="#FBFBFA" stroke-dasharray="35 24.7" transform="rotate(-88 16 16)"/>
     <circle cx="16" cy="16" r="9.5" stroke="#6BCBA5" stroke-dasharray="16 43.7" transform="rotate(130 16 16)"/>
-  </g></svg><i>19 · nav</i></span>
-        <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.5" stroke-linecap="round">
+  </g></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.5" stroke-linecap="round">
     <circle cx="16" cy="16" r="9.5" stroke="#FBFBFA" stroke-dasharray="35 24.7" transform="rotate(-88 16 16)"/>
     <circle cx="16" cy="16" r="9.5" stroke="#6BCBA5" stroke-dasharray="16 43.7" transform="rotate(130 16 16)"/>
-  </g></svg><i>on light</i></span>
-      </div>
+  </g></svg><i>on light</i></span></div>
       <h3>Margin</h3>
-      <p>Where the money actually splits: most of it to the member, the rest keeps the company running. §2, drawn.</p>
+      <p>Where the money actually splits: most to the member, the rest keeps the company running.</p>
       <code>docs/brand/mark-margin.svg</code>
     </article>
     <article class="card">
@@ -112,26 +120,20 @@
     <path d="M6.5 16.25 13 22.75" stroke="#FBFBFA"/>
     <path d="M13 22.75 25.5 8" stroke="#6BCBA5"/>
   </g></svg></div>
-      <div class="lockup">
-        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M6.5 16.25 13 22.75" stroke="#FBFBFA"/>
     <path d="M13 22.75 25.5 8" stroke="#6BCBA5"/>
-  </g></svg><span class="word">Requit</span>
-      </div>
-      <div class="sizes">
-        <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+  </g></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M6.5 16.25 13 22.75" stroke="#FBFBFA"/>
     <path d="M13 22.75 25.5 8" stroke="#6BCBA5"/>
-  </g></svg><i>32</i></span>
-        <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+  </g></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M6.5 16.25 13 22.75" stroke="#FBFBFA"/>
     <path d="M13 22.75 25.5 8" stroke="#6BCBA5"/>
-  </g></svg><i>19 · nav</i></span>
-        <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+  </g></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M6.5 16.25 13 22.75" stroke="#FBFBFA"/>
     <path d="M13 22.75 25.5 8" stroke="#6BCBA5"/>
-  </g></svg><i>on light</i></span>
-      </div>
+  </g></svg><i>on light</i></span></div>
       <h3>Confirm</h3>
       <p>Payment releases on the network's callback, not on a progress bar. The long arm carries past the tick.</p>
       <code>docs/brand/mark-confirm.svg</code>
@@ -142,30 +144,24 @@
     <path d="M7 16h18" stroke="#FBFBFA" opacity=".4"/>
     <path d="M14 22h11" stroke="#6BCBA5"/>
   </g></svg></div>
-      <div class="lockup">
-        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round">
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round">
     <path d="M7 10h18" stroke="#FBFBFA"/>
     <path d="M7 16h18" stroke="#FBFBFA" opacity=".4"/>
     <path d="M14 22h11" stroke="#6BCBA5"/>
-  </g></svg><span class="word">Requit</span>
-      </div>
-      <div class="sizes">
-        <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round">
+  </g></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round">
     <path d="M7 10h18" stroke="#FBFBFA"/>
     <path d="M7 16h18" stroke="#FBFBFA" opacity=".4"/>
     <path d="M14 22h11" stroke="#6BCBA5"/>
-  </g></svg><i>32</i></span>
-        <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round">
+  </g></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round">
     <path d="M7 10h18" stroke="#FBFBFA"/>
     <path d="M7 16h18" stroke="#FBFBFA" opacity=".4"/>
     <path d="M14 22h11" stroke="#6BCBA5"/>
-  </g></svg><i>19 · nav</i></span>
-        <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round">
+  </g></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round">
     <path d="M7 10h18" stroke="#FBFBFA"/>
     <path d="M7 16h18" stroke="#FBFBFA" opacity=".4"/>
     <path d="M14 22h11" stroke="#6BCBA5"/>
-  </g></svg><i>on light</i></span>
-      </div>
+  </g></svg><i>on light</i></span></div>
       <h3>Statement</h3>
       <p>Two lines of record and a total, right-aligned the way a ledger closes.</p>
       <code>docs/brand/mark-statement.svg</code>
@@ -175,26 +171,20 @@
     <path d="M10.5 24V8h6.25a5 5 0 0 1 0 10H10.5" stroke="#FBFBFA"/>
     <path d="M16.25 18 22 24" stroke="#6BCBA5"/>
   </g></svg></div>
-      <div class="lockup">
-        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
     <path d="M10.5 24V8h6.25a5 5 0 0 1 0 10H10.5" stroke="#FBFBFA"/>
     <path d="M16.25 18 22 24" stroke="#6BCBA5"/>
-  </g></svg><span class="word">Requit</span>
-      </div>
-      <div class="sizes">
-        <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  </g></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
     <path d="M10.5 24V8h6.25a5 5 0 0 1 0 10H10.5" stroke="#FBFBFA"/>
     <path d="M16.25 18 22 24" stroke="#6BCBA5"/>
-  </g></svg><i>32</i></span>
-        <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  </g></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
     <path d="M10.5 24V8h6.25a5 5 0 0 1 0 10H10.5" stroke="#FBFBFA"/>
     <path d="M16.25 18 22 24" stroke="#6BCBA5"/>
-  </g></svg><i>19 · nav</i></span>
-        <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  </g></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
     <path d="M10.5 24V8h6.25a5 5 0 0 1 0 10H10.5" stroke="#FBFBFA"/>
     <path d="M16.25 18 22 24" stroke="#6BCBA5"/>
-  </g></svg><i>on light</i></span>
-      </div>
+  </g></svg><i>on light</i></span></div>
       <h3>Monogram</h3>
       <p>An R with the leg carried out in the accent. Survives being stamped on anything.</p>
       <code>docs/brand/mark-monogram.svg</code>
@@ -204,57 +194,155 @@
     <rect x="5.5" y="5.5" width="16" height="16" rx="4.8" fill="none" stroke="#FBFBFA" stroke-width="3"/>
     <rect x="13" y="13" width="13.5" height="13.5" rx="4.2" fill="#6BCBA5"/>
   </g></svg></div>
-      <div class="lockup">
-        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g>
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><g>
     <rect x="5.5" y="5.5" width="16" height="16" rx="4.8" fill="none" stroke="#FBFBFA" stroke-width="3"/>
     <rect x="13" y="13" width="13.5" height="13.5" rx="4.2" fill="#6BCBA5"/>
-  </g></svg><span class="word">Requit</span>
-      </div>
-      <div class="sizes">
-        <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g>
+  </g></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><g>
     <rect x="5.5" y="5.5" width="16" height="16" rx="4.8" fill="none" stroke="#FBFBFA" stroke-width="3"/>
     <rect x="13" y="13" width="13.5" height="13.5" rx="4.2" fill="#6BCBA5"/>
-  </g></svg><i>32</i></span>
-        <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g>
+  </g></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g>
     <rect x="5.5" y="5.5" width="16" height="16" rx="4.8" fill="none" stroke="#FBFBFA" stroke-width="3"/>
     <rect x="13" y="13" width="13.5" height="13.5" rx="4.2" fill="#6BCBA5"/>
-  </g></svg><i>19 · nav</i></span>
-        <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g>
+  </g></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><g>
     <rect x="5.5" y="5.5" width="16" height="16" rx="4.8" fill="none" stroke="#FBFBFA" stroke-width="3"/>
     <rect x="13" y="13" width="13.5" height="13.5" rx="4.2" fill="#6BCBA5"/>
-  </g></svg><i>on light</i></span>
-      </div>
+  </g></svg><i>on light</i></span></div>
       <h3>Reconcile</h3>
       <p>Two records laid over each other until they agree — what the treasury dashboard does every day.</p>
       <code>docs/brand/mark-reconcile.svg</code>
     </article>
     <article class="card">
-      <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><defs><linearGradient id="tile_aGrad" x1="0" y1="0" x2=".62" y2="1">
+      <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><defs><linearGradient id="tileGradtilebig" x1="0" y1="0" x2=".62" y2="1">
       <stop offset="0" stop-color="#fff"/><stop offset=".58" stop-color="#A9E7CD"/><stop offset="1" stop-color="#3E9878"/>
     </linearGradient></defs>
-    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tile_aGrad)"/></svg></div>
-      <div class="lockup">
-        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><defs><linearGradient id="tile_bGrad" x1="0" y1="0" x2=".62" y2="1">
+    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tileGradtilebig)"/></svg></div>
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><defs><linearGradient id="tileGradtilelock" x1="0" y1="0" x2=".62" y2="1">
       <stop offset="0" stop-color="#fff"/><stop offset=".58" stop-color="#A9E7CD"/><stop offset="1" stop-color="#3E9878"/>
     </linearGradient></defs>
-    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tile_bGrad)"/></svg><span class="word">Requit</span>
-      </div>
-      <div class="sizes">
-        <span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><defs><linearGradient id="tile_cGrad" x1="0" y1="0" x2=".62" y2="1">
+    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tileGradtilelock)"/></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><defs><linearGradient id="tileGradtile32" x1="0" y1="0" x2=".62" y2="1">
       <stop offset="0" stop-color="#fff"/><stop offset=".58" stop-color="#A9E7CD"/><stop offset="1" stop-color="#3E9878"/>
     </linearGradient></defs>
-    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tile_cGrad)"/></svg><i>32</i></span>
-        <span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><defs><linearGradient id="tile_dGrad" x1="0" y1="0" x2=".62" y2="1">
+    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tileGradtile32)"/></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><defs><linearGradient id="tileGradtile19" x1="0" y1="0" x2=".62" y2="1">
       <stop offset="0" stop-color="#fff"/><stop offset=".58" stop-color="#A9E7CD"/><stop offset="1" stop-color="#3E9878"/>
     </linearGradient></defs>
-    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tile_dGrad)"/></svg><i>19 · nav</i></span>
-        <span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><defs><linearGradient id="tile_eGrad" x1="0" y1="0" x2=".62" y2="1">
+    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tileGradtile19)"/></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><defs><linearGradient id="tileGradtileL" x1="0" y1="0" x2=".62" y2="1">
       <stop offset="0" stop-color="#fff"/><stop offset=".58" stop-color="#A9E7CD"/><stop offset="1" stop-color="#3E9878"/>
     </linearGradient></defs>
-    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tile_eGrad)"/></svg><i>on light</i></span>
-      </div>
+    <rect x="4" y="4" width="24" height="24" rx="6.8" fill="url(#tileGradtileL)"/></svg><i>on light</i></span></div>
       <h3>Tile (current)</h3>
       <p>The prototype's mark, unchanged. Here so the others are judged against something.</p>
       <code>docs/brand/mark-tile.svg</code>
-    </article></div>
+    </article></div></section><section><h2>Mass</h2><p class="note">Built from solid form and negative space. Survives being shrunk, embossed, or printed in one colour.</p><div class="grid">
+    <article class="card">
+      <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M18.4 6a7.6 7.6 0 1 0 15.2 0a7.6 7.6 0 1 0 -15.2 0Z"/>
+    <circle cx="26" cy="6" r="4.4" fill="#6BCBA5"/></svg></div>
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M18.4 6a7.6 7.6 0 1 0 15.2 0a7.6 7.6 0 1 0 -15.2 0Z"/>
+    <circle cx="26" cy="6" r="4.4" fill="#6BCBA5"/></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M18.4 6a7.6 7.6 0 1 0 15.2 0a7.6 7.6 0 1 0 -15.2 0Z"/>
+    <circle cx="26" cy="6" r="4.4" fill="#6BCBA5"/></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M18.4 6a7.6 7.6 0 1 0 15.2 0a7.6 7.6 0 1 0 -15.2 0Z"/>
+    <circle cx="26" cy="6" r="4.4" fill="#6BCBA5"/></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M18.4 6a7.6 7.6 0 1 0 15.2 0a7.6 7.6 0 1 0 -15.2 0Z"/>
+    <circle cx="26" cy="6" r="4.4" fill="#6BCBA5"/></svg><i>on light</i></span></div>
+      <h3>Notch</h3>
+      <p>The cut we take, taken out of the mark itself. Negative space does the work, so it holds at any size.</p>
+      <code>docs/brand/mark-notch.svg</code>
+    </article>
+    <article class="card">
+      <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><rect x="10.5" y="5" width="11" height="5.5" rx="2.75" fill="#FBFBFA" opacity=".45"/>
+    <rect x="8" y="12.75" width="16" height="5.75" rx="2.875" fill="#FBFBFA"/>
+    <rect x="5.5" y="20.75" width="21" height="6" rx="3" fill="#6BCBA5"/></svg></div>
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><rect x="10.5" y="5" width="11" height="5.5" rx="2.75" fill="#FBFBFA" opacity=".45"/>
+    <rect x="8" y="12.75" width="16" height="5.75" rx="2.875" fill="#FBFBFA"/>
+    <rect x="5.5" y="20.75" width="21" height="6" rx="3" fill="#6BCBA5"/></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><rect x="10.5" y="5" width="11" height="5.5" rx="2.75" fill="#FBFBFA" opacity=".45"/>
+    <rect x="8" y="12.75" width="16" height="5.75" rx="2.875" fill="#FBFBFA"/>
+    <rect x="5.5" y="20.75" width="21" height="6" rx="3" fill="#6BCBA5"/></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><rect x="10.5" y="5" width="11" height="5.5" rx="2.75" fill="#FBFBFA" opacity=".45"/>
+    <rect x="8" y="12.75" width="16" height="5.75" rx="2.875" fill="#FBFBFA"/>
+    <rect x="5.5" y="20.75" width="21" height="6" rx="3" fill="#6BCBA5"/></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><rect x="10.5" y="5" width="11" height="5.5" rx="2.75" fill="#FBFBFA" opacity=".45"/>
+    <rect x="8" y="12.75" width="16" height="5.75" rx="2.875" fill="#FBFBFA"/>
+    <rect x="5.5" y="20.75" width="21" height="6" rx="3" fill="#6BCBA5"/></svg><i>on light</i></span></div>
+      <h3>Stack</h3>
+      <p>Payouts landing, widest at the bottom. Reads as accumulation rather than as a chart.</p>
+      <code>docs/brand/mark-stack.svg</code>
+    </article>
+    <article class="card">
+      <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><path d="M16 16 L24.67 9.23 A11 11 0 1 1 7.83 8.64 Z" fill="#FBFBFA"/>
+    <path d="M16 16 L9.23 7.33 A11 11 0 0 1 23.36 7.83 Z" fill="#6BCBA5"/></svg></div>
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M16 16 L24.67 9.23 A11 11 0 1 1 7.83 8.64 Z" fill="#FBFBFA"/>
+    <path d="M16 16 L9.23 7.33 A11 11 0 0 1 23.36 7.83 Z" fill="#6BCBA5"/></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 16 L24.67 9.23 A11 11 0 1 1 7.83 8.64 Z" fill="#FBFBFA"/>
+    <path d="M16 16 L9.23 7.33 A11 11 0 0 1 23.36 7.83 Z" fill="#6BCBA5"/></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M16 16 L24.67 9.23 A11 11 0 1 1 7.83 8.64 Z" fill="#FBFBFA"/>
+    <path d="M16 16 L9.23 7.33 A11 11 0 0 1 23.36 7.83 Z" fill="#6BCBA5"/></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M16 16 L24.67 9.23 A11 11 0 1 1 7.83 8.64 Z" fill="#FBFBFA"/>
+    <path d="M16 16 L9.23 7.33 A11 11 0 0 1 23.36 7.83 Z" fill="#6BCBA5"/></svg><i>on light</i></span></div>
+      <h3>Aperture</h3>
+      <p>One disc, one wedge, drawn at the size the margin actually is. Widened until the accent still exists at 19px.</p>
+      <code>docs/brand/mark-aperture.svg</code>
+    </article>
+    <article class="card">
+      <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M9.5 11.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z M9.5 17.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z"/>
+    <rect x="9.5" y="17.25" width="7.5" height="3.5" rx="1.75" fill="#6BCBA5"/></svg></div>
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M9.5 11.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z M9.5 17.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z"/>
+    <rect x="9.5" y="17.25" width="7.5" height="3.5" rx="1.75" fill="#6BCBA5"/></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M9.5 11.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z M9.5 17.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z"/>
+    <rect x="9.5" y="17.25" width="7.5" height="3.5" rx="1.75" fill="#6BCBA5"/></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M9.5 11.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z M9.5 17.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z"/>
+    <rect x="9.5" y="17.25" width="7.5" height="3.5" rx="1.75" fill="#6BCBA5"/></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path fill-rule="evenodd" fill="#FBFBFA" d="M11 4H21A7 7 0 0 1 28 11V21A7 7 0 0 1 21 28H11A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z M9.5 11.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z M9.5 17.25h13a1.75 1.75 0 0 1 0 3.5h-13a1.75 1.75 0 0 1 0-3.5Z"/>
+    <rect x="9.5" y="17.25" width="7.5" height="3.5" rx="1.75" fill="#6BCBA5"/></svg><i>on light</i></span></div>
+      <h3>Slot</h3>
+      <p>A ledger cut into the tile. The last line is the total, and it is the one that carries the colour.</p>
+      <code>docs/brand/mark-slot.svg</code>
+    </article>
+    <article class="card">
+      <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><path fill="#FBFBFA" d="M16 5a11 11 0 0 0 0 22a11 11 0 0 0 4.2-.84V5.84A11 11 0 0 0 16 5Z"/>
+    <path fill="#6BCBA5" d="M22.6 6.95a11 11 0 0 1 0 18.1Z"/></svg></div>
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path fill="#FBFBFA" d="M16 5a11 11 0 0 0 0 22a11 11 0 0 0 4.2-.84V5.84A11 11 0 0 0 16 5Z"/>
+    <path fill="#6BCBA5" d="M22.6 6.95a11 11 0 0 1 0 18.1Z"/></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path fill="#FBFBFA" d="M16 5a11 11 0 0 0 0 22a11 11 0 0 0 4.2-.84V5.84A11 11 0 0 0 16 5Z"/>
+    <path fill="#6BCBA5" d="M22.6 6.95a11 11 0 0 1 0 18.1Z"/></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path fill="#FBFBFA" d="M16 5a11 11 0 0 0 0 22a11 11 0 0 0 4.2-.84V5.84A11 11 0 0 0 16 5Z"/>
+    <path fill="#6BCBA5" d="M22.6 6.95a11 11 0 0 1 0 18.1Z"/></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path fill="#FBFBFA" d="M16 5a11 11 0 0 0 0 22a11 11 0 0 0 4.2-.84V5.84A11 11 0 0 0 16 5Z"/>
+    <path fill="#6BCBA5" d="M22.6 6.95a11 11 0 0 1 0 18.1Z"/></svg><i>on light</i></span></div>
+      <h3>Half</h3>
+      <p>A coin cut on a chord rather than through the centre. Simple to stamp — but see the note below.</p>
+      <code>docs/brand/mark-half.svg</code>
+    </article>
+    <article class="card">
+      <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><path fill="#FBFBFA" d="M11 4h5v24h-5A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z"/>
+    <path fill="#6BCBA5" d="M17.5 4H21a7 7 0 0 1 7 7v10a7 7 0 0 1-7 7h-3.5Z"/></svg></div>
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path fill="#FBFBFA" d="M11 4h5v24h-5A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z"/>
+    <path fill="#6BCBA5" d="M17.5 4H21a7 7 0 0 1 7 7v10a7 7 0 0 1-7 7h-3.5Z"/></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path fill="#FBFBFA" d="M11 4h5v24h-5A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z"/>
+    <path fill="#6BCBA5" d="M17.5 4H21a7 7 0 0 1 7 7v10a7 7 0 0 1-7 7h-3.5Z"/></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path fill="#FBFBFA" d="M11 4h5v24h-5A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z"/>
+    <path fill="#6BCBA5" d="M17.5 4H21a7 7 0 0 1 7 7v10a7 7 0 0 1-7 7h-3.5Z"/></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path fill="#FBFBFA" d="M11 4h5v24h-5A7 7 0 0 1 4 21V11A7 7 0 0 1 11 4Z"/>
+    <path fill="#6BCBA5" d="M17.5 4H21a7 7 0 0 1 7 7v10a7 7 0 0 1-7 7h-3.5Z"/></svg><i>on light</i></span></div>
+      <h3>Pill</h3>
+      <p>The same tile, cut through. Two halves that only mean anything together.</p>
+      <code>docs/brand/mark-pill.svg</code>
+    </article>
+    <article class="card">
+      <div class="stage"><svg viewBox="0 0 32 32" width="88" height="88" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg></div>
+      <div class="lockup"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg><span class="word">Requit</span></div>
+      <div class="sizes"><span class="chip"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg><i>32</i></span><span class="chip"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg><i>19 · nav</i></span><span class="chip light"><svg viewBox="0 0 32 32" width="19" height="19" aria-hidden="true"><path d="M7.5 7.5 16 16 7.5 24.5Z" fill="#FBFBFA"/>
+    <path d="M17 7.5 25.5 16 17 24.5Z" fill="#6BCBA5"/></svg><i>on light</i></span></div>
+      <h3>Flow</h3>
+      <p>Outside money in, your money out — §2's first and last arrow. See the note below.</p>
+      <code>docs/brand/mark-flow.svg</code>
+    </article></div></section>
+  <section class="type">
+    <h2>A direction, not a mark: let the name carry it</h2>
+    <p class="note">Requit is one of the few names with a descender sitting in the middle of it.
+    Carrying the <b>q</b> into the accent gives an identity nobody else can use, and it needs no
+    symbol at all — which removes the whole problem of a mark that has to read at 19px.</p>
+    <div class="wm">
+      <div class="wm-box"><div class="wm-l">Re<span class="q">q</span>uit</div></div>
+      <div class="wm-box light"><div class="wm-l">Re<span class="q">q</span>uit</div></div>
+      <div class="wm-box"><div class="wm-s">Re<span class="q">q</span>uit</div></div>
+    </div>
+    <p class="caveat">Approximated in CSS with a system sans — judge the idea, not the execution.
+    A real wordmark is drawn: the q's descender itself thickens and turns, rather than having a
+    bar parked underneath it. That needs outlining from a licensed typeface.</p>
+  </section>
 </body></html>

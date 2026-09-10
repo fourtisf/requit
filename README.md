@@ -58,11 +58,20 @@ cd /var/www/requit && ./deploy/deploy.sh
 
 ## Brand assets
 
-Logo candidates live in [`docs/brand/`](docs/brand/) as SVG, with
-`preview.html` showing each at 88px, as a lockup, at 19px (the nav size, where
-marks fall apart), and on a light background (the one that decides whether it
-can go on an invoice). Nothing is wired in yet — the app still uses the
-prototype's gradient tile.
+Fourteen logo candidates live in [`docs/brand/`](docs/brand/) as SVG, in two
+sets: **Line** (built from strokes) and **Mass** (built from solid form and
+negative space). `preview.html` shows each at 88px, as a lockup, at 19px — the
+nav size, where marks fall apart — and on a light background, which is what
+decides whether it can go on an invoice.
+
+The SVG files are the source of truth. Edit one and rebuild the sheet:
+
+```bash
+python3 docs/brand/build.py
+```
+
+Nothing is wired in — the app still uses the prototype's gradient tile, and
+§14 puts the choice with ALFA.
 
 ---
 

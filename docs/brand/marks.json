@@ -1,0 +1,29 @@
+{
+  "sets": [
+    {
+      "name": "Line",
+      "note": "Built from strokes. Lighter on the page, and the register most software brands sit in."
+    },
+    {
+      "name": "Mass",
+      "note": "Built from solid form and negative space. Survives being shrunk, embossed, or printed in one colour."
+    }
+  ],
+  "marks": {
+    "tally":     { "set": 0, "title": "Tally",          "idea": "A count kept in the open. The one thing the product sells is that its numbers are real." },
+    "margin":    { "set": 0, "title": "Margin",         "idea": "Where the money actually splits: most to the member, the rest keeps the company running." },
+    "confirm":   { "set": 0, "title": "Confirm",        "idea": "Payment releases on the network's callback, not on a progress bar. The long arm carries past the tick." },
+    "statement": { "set": 0, "title": "Statement",      "idea": "Two lines of record and a total, right-aligned the way a ledger closes." },
+    "monogram":  { "set": 0, "title": "Monogram",       "idea": "An R with the leg carried out in the accent. Survives being stamped on anything." },
+    "reconcile": { "set": 0, "title": "Reconcile",      "idea": "Two records laid over each other until they agree — what the treasury dashboard does every day." },
+    "tile":      { "set": 0, "title": "Tile (current)", "idea": "The prototype's mark, unchanged. Here so the others are judged against something." },
+
+    "notch":     { "set": 1, "title": "Notch",     "idea": "The cut we take, taken out of the mark itself. Negative space does the work, so it holds at any size." },
+    "stack":     { "set": 1, "title": "Stack",     "idea": "Payouts landing, widest at the bottom. Reads as accumulation rather than as a chart." },
+    "aperture":  { "set": 1, "title": "Aperture",  "idea": "One disc, one wedge, drawn at the size the margin actually is. Widened until the accent still exists at 19px." },
+    "slot":      { "set": 1, "title": "Slot",      "idea": "A ledger cut into the tile. The last line is the total, and it is the one that carries the colour." },
+    "half":      { "set": 1, "title": "Half",      "idea": "A coin cut on a chord rather than through the centre. Simple to stamp — but see the note below." },
+    "pill":      { "set": 1, "title": "Pill",      "idea": "The same tile, cut through. Two halves that only mean anything together." },
+    "flow":      { "set": 1, "title": "Flow",      "idea": "Outside money in, your money out — §2's first and last arrow. See the note below." }
+  }
+}
