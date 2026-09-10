@@ -1,0 +1,303 @@
+// Requit — data model.
+//
+// Sections 1 and 2 below map 1:1 onto HANDOFF.md §3. Do not "tidy" them: the
+// unique constraints are load-bearing (they are the dedupe and anti-multi-account
+// guards, not hints). Section 3 holds the models Auth.js requires; it is additive.
+//
+// Phase 5 models (Distribution, SnapshotHolder, VaultLedger) are specified in
+// HANDOFF.md §9 and MUST NOT be migrated until the legal gate clears.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// 1. People, wallets, devices
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  handle      String   @unique
+  countryCode String   @db.Char(2)
+  createdAt   DateTime @default(now())
+
+  riskTier      RiskTier  @default(NEW)
+  publicPayouts Boolean   @default(true) // shows handle on the proof table
+  suspendedAt   DateTime?
+  suspendReason String?
+
+  wallets     Wallet[]
+  rewards     Reward[]
+  withdrawals Withdrawal[]
+  disputes    Dispute[]
+  devices     Device[]
+
+  // Auth.js additions — see section 3.
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  @@index([countryCode])
+  @@index([riskTier])
+}
+
+enum RiskTier {
+  NEW // 72h withdrawal hold
+  STANDARD // 24h hold
+  TRUSTED // instant
+  FLAGGED // manual review on every withdrawal
+}
+
+model Wallet {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  chain      Chain
+  address    String
+  verifiedAt DateTime?
+  isPayout   Boolean   @default(false)
+
+  withdrawals Withdrawal[]
+
+  @@unique([chain, address]) // one wallet, one account — anti multi-account
+  @@index([userId])
+}
+
+enum Chain {
+  SOLANA
+  BASE
+}
+
+model Device {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  fingerprint String
+  ipHash      String
+  vpnScore    Int?
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  @@index([fingerprint])
+  @@index([ipHash])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 2. Supply, rewards, money
+// ─────────────────────────────────────────────────────────────
+
+model Offer {
+  id               String        @id @default(cuid())
+  network          Network
+  networkOfferId   String
+  name             String
+  description      String?
+  category         OfferCategory
+  countries        String[] // ISO-2, empty = all
+  devices          String[] // ios | android | desktop
+  advertiserPays   Decimal       @db.Decimal(10, 4) // NEVER expose via public API
+  userPays         Decimal       @db.Decimal(10, 4) // what we show
+  requiresPurchase Boolean       @default(false)
+  purchaseAmount   Decimal?      @db.Decimal(10, 2)
+  deadlineDays     Int?
+  isActive         Boolean       @default(true)
+  lastSeenAt       DateTime      @default(now())
+
+  tiers OfferTier[]
+
+  @@unique([network, networkOfferId])
+  @@index([isActive, category])
+}
+
+enum Network {
+  CPX
+  LOOTABLY
+  TIMEWALL
+  TOROX
+}
+
+enum OfferCategory {
+  SURVEY
+  GAME
+  APP
+  SIGNUP
+  MICROTASK
+  SHOPPING
+}
+
+model OfferTier {
+  id          String  @id @default(cuid())
+  offerId     String
+  offer       Offer   @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  sequence    Int
+  label       String // "Board level 32"
+  userPays    Decimal @db.Decimal(10, 4)
+  completions Int     @default(0)
+  starts      Int     @default(0)
+  // completionRate is DERIVED: completions / starts. Never store a manual number.
+
+  @@unique([offerId, sequence])
+}
+
+model Reward {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  offerId        String?
+  network        Network
+  networkTxnId   String // idempotency key
+  tierLabel      String?
+  amount         Decimal      @db.Decimal(10, 4)
+  advertiserPaid Decimal      @db.Decimal(10, 4)
+  status         RewardStatus @default(PENDING)
+  availableAt    DateTime?
+  reversedAt     DateTime?
+  countryCode    String       @db.Char(2)
+  rawPayload     Json
+
+  createdAt DateTime @default(now())
+
+  @@unique([network, networkTxnId]) // hard dedupe
+  @@index([userId, status])
+  @@index([createdAt])
+}
+
+enum RewardStatus {
+  PENDING
+  AVAILABLE
+  REVERSED
+  WITHHELD
+}
+
+model Withdrawal {
+  id            String           @id @default(cuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id])
+  walletId      String
+  wallet        Wallet           @relation(fields: [walletId], references: [id])
+  chain         Chain
+  amount        Decimal          @db.Decimal(10, 4)
+  status        WithdrawalStatus @default(REQUESTED)
+  txHash        String?
+  failureReason String?
+  requestedAt   DateTime         @default(now())
+  settledAt     DateTime?
+
+  idempotencyKey String @unique
+
+  @@index([userId])
+  @@index([status])
+  @@index([settledAt])
+}
+
+enum WithdrawalStatus {
+  REQUESTED
+  HELD
+  APPROVED
+  SENDING
+  SETTLED
+  FAILED
+}
+
+model Dispute {
+  id            String          @id @default(cuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id])
+  offerId       String?
+  network       Network
+  claimedAmount Decimal         @db.Decimal(10, 4)
+  evidenceUrls  String[]
+  status        DisputeStatus   @default(SUBMITTED)
+  statusNote    String?
+  firstReplyAt  DateTime?
+  escalatedAt   DateTime?
+  resolvedAt    DateTime?
+  outcome       DisputeOutcome?
+  createdAt     DateTime        @default(now())
+
+  @@index([status])
+  @@index([userId])
+}
+
+enum DisputeStatus {
+  SUBMITTED
+  ACKNOWLEDGED
+  ESCALATED
+  AWAITING_NETWORK
+  RESOLVED
+}
+
+enum DisputeOutcome {
+  PAID
+  REJECTED_BY_ADVERTISER
+  EXPIRED
+  WITHDRAWN
+}
+
+model NetworkInvoice {
+  id          String    @id @default(cuid())
+  network     Network
+  periodStart DateTime
+  periodEnd   DateTime
+  amountDue   Decimal   @db.Decimal(12, 2)
+  amountPaid  Decimal?  @db.Decimal(12, 2)
+  paidAt      DateTime?
+
+  @@unique([network, periodStart])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 3. Auth.js — additive, required by @auth/prisma-adapter
+//
+// Not in HANDOFF.md §3 because §3 describes the product model, but the adapter
+// cannot function without these. User gains only `emailVerified`, `name`, `image`
+// and the two back-relations above; `name` and `image` exist for the optional
+// Google provider and are never shown publicly — the proof table uses `handle`.
+// ─────────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+
+  @@index([userId])
+}
+
+// Holds the hashed email OTP. Auth.js consumes the row on first use, which is
+// what makes the code single-use.
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

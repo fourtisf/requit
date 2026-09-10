@@ -1,0 +1,22 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+
+.env
+.env.local
+.env.*.local
+!.env.example
+
+*.log
+npm-debug.log*
+.DS_Store
+*.pem
+next-env.d.ts
+tsconfig.tsbuildinfo
+.vercel
+
+# redis dump, if a local server is started from the project root
+dump.rdb

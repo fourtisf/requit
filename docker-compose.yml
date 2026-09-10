@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: requit-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: requit
+      POSTGRES_PASSWORD: requit
+      POSTGRES_DB: requit
+    ports:
+      - "5432:5432"
+    volumes:
+      - requit-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U requit -d requit"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: requit-redis
+    restart: unless-stopped
+    # BullMQ requires eviction to be disabled: a queue whose jobs can be evicted
+    # silently loses postback and payout work.
+    command: ["redis-server", "--maxmemory-policy", "noeviction", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - requit-redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  requit-pgdata:
+  requit-redisdata:

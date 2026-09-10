@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  check:
+    name: Typecheck, lint, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # postinstall runs `prisma generate`, which the typecheck depends on.
+      - run: npm ci
+
+      - run: npm run typecheck
+
+      - run: npm run lint
+
+      - run: npm test
+
+  database:
+    name: Migrations and seed
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: requit
+          POSTGRES_PASSWORD: requit
+          POSTGRES_DB: requit
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U requit -d requit"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://requit:requit@localhost:5432/requit?schema=public
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Create the shadow database
+        run: psql "$DATABASE_URL" -c 'create database requit_shadow'
+
+      # Catches the case where schema.prisma was edited but no migration was
+      # generated — the drift that turns into a failed production deploy.
+      - name: Fail on schema drift
+        run: >-
+          npx prisma migrate diff
+          --from-migrations prisma/migrations
+          --to-schema-datamodel prisma/schema.prisma
+          --shadow-database-url postgresql://requit:requit@localhost:5432/requit_shadow?schema=public
+          --exit-code
+
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+
+      - run: npm run db:seed
+
+      # The seed is written to be re-runnable. If it is not, a developer who runs
+      # it twice gets a unique-constraint crash instead of a working database.
+      - name: Seed is idempotent
+        run: npm run db:seed
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      # `next build` reads env at module scope in a few places; these are dummies
+      # and never reach a running server.
+      - name: Build
+        env:
+          DATABASE_URL: postgresql://requit:requit@localhost:5432/requit?schema=public
+          REDIS_URL: redis://localhost:6379
+          AUTH_SECRET: ci-build-only-not-a-real-secret
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+        run: npm run build

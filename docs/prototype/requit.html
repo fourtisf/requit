@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Requit — Advertiser-funded work. Paid the same day.</title>
+<meta name="description" content="Finish a task, the network confirms it, and Requit pays you in USD or ETH. Hold $RQT and take a share of the revenue every Sunday.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090A;
+  --bg-2:#0C0D0F;
+  --surf:rgba(255,255,255,.026);
+  --surf-2:rgba(255,255,255,.05);
+  --surf-3:rgba(255,255,255,.08);
+  --bd:rgba(255,255,255,.065);
+  --bd-2:rgba(255,255,255,.115);
+  --fg:#FBFBFA;
+  --fg-2:#9C9E9C;
+  --fg-3:#6A6D6B;
+  --fg-4:#434645;
+  --ac:#6BCBA5;
+  --ac-2:#95E0C1;
+  --ac-dim:rgba(107,203,165,.13);
+  --r:16px;
+  --r-s:10px;
+  --pad:clamp(20px,5vw,48px);
+  --max:1200px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--fg);
+  font-family:"Geist",-apple-system,"Segoe UI",system-ui,sans-serif;
+  font-size:16px;line-height:1.55;letter-spacing:-.011em;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+.mn{font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--ac);outline-offset:3px;border-radius:6px}
+::selection{background:rgba(107,203,165,.26)}
+
+.glow{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(780px 460px at 50% -10%,rgba(107,203,165,.11),transparent 64%),
+    radial-gradient(520px 380px at 92% 8%,rgba(255,255,255,.045),transparent 60%);}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.3;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");}
+.wrap{position:relative;z-index:2}
+.shell{max-width:var(--max);margin:0 auto;padding-inline:var(--pad)}
+
+/* nav */
+.nav{position:fixed;top:14px;left:0;right:0;z-index:90;display:flex;justify-content:center;padding-inline:var(--pad)}
+.navin{width:100%;max-width:var(--max);height:56px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 8px 0 18px;border-radius:99px;
+  background:rgba(12,13,15,.74);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);
+  box-shadow:inset 0 0 0 1px var(--bd),0 8px 32px -14px rgba(0,0,0,.95)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:15px;letter-spacing:-.03em}
+.bmark{width:19px;height:19px;border-radius:5.5px;background:linear-gradient(148deg,#fff,#A9E7CD 58%,#3E9878);
+  box-shadow:0 0 14px rgba(107,203,165,.36);flex:none}
+.nlinks{display:flex;gap:2px}
+.nlinks button{font-size:13.5px;color:var(--fg-3);padding:7px 13px;border-radius:8px;transition:color .18s,background .18s;font-weight:450}
+.nlinks button:hover{color:var(--fg);background:var(--surf-2)}
+@media(max-width:800px){.nlinks{display:none}}
+
+.b1{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#08090A;padding:11px 20px;border-radius:99px;
+  font-size:13.5px;font-weight:600;letter-spacing:-.015em;transition:transform .18s,box-shadow .18s;
+  box-shadow:0 0 0 1px rgba(255,255,255,.9),0 8px 26px -12px rgba(255,255,255,.32)}
+.b1:hover{transform:translateY(-1.5px);box-shadow:0 0 0 1px #fff,0 12px 32px -12px rgba(255,255,255,.46)}
+.b2{display:inline-flex;align-items:center;gap:8px;background:var(--surf-2);color:var(--fg);padding:11px 20px;border-radius:99px;
+  font-size:13.5px;font-weight:550;box-shadow:inset 0 0 0 1px var(--bd-2);transition:background .18s,transform .18s}
+.b2:hover{background:var(--surf-3);transform:translateY(-1.5px)}
+.b1.lg,.b2.lg{padding:14px 26px;font-size:15px}
+
+.badge{display:inline-flex;align-items:center;gap:9px;padding:6px 15px 6px 7px;border-radius:99px;
+  font-size:12.5px;font-weight:450;color:var(--fg-2);background:var(--surf);box-shadow:inset 0 0 0 1px var(--bd)}
+.badge b{background:var(--ac-dim);color:var(--ac-2);font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px}
+h1.hero{font-size:clamp(2.5rem,6.4vw,4.9rem);font-weight:600;line-height:1.02;letter-spacing:-.048em;text-wrap:balance}
+h1.hero span{color:var(--fg-3)}
+h2{font-size:clamp(1.85rem,3.9vw,2.95rem);font-weight:600;line-height:1.08;letter-spacing:-.042em;text-wrap:balance}
+h3{font-size:17px;font-weight:600;letter-spacing:-.025em}
+.sub{font-size:clamp(15px,1.55vw,17.5px);color:var(--fg-2);font-weight:350;line-height:1.62;max-width:54ch}
+.kick{font-size:12.5px;font-weight:600;color:var(--ac-2);letter-spacing:.015em}
+.p{color:var(--fg-2);font-weight:350;line-height:1.65;font-size:14.5px}
+.faint{color:var(--fg-4)}
+section{padding-block:clamp(62px,8.5vw,116px)}
+.hr{height:1px;background:linear-gradient(90deg,transparent,var(--bd-2),transparent)}
+
+/* hero */
+.hero-wrap{padding-top:clamp(118px,15vw,186px);text-align:center}
+.hero-cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.hero-note{font-size:12.5px;color:var(--fg-4);margin-top:16px}
+
+/* product window */
+.window{margin-top:clamp(44px,6vw,72px);border-radius:var(--r);overflow:hidden;text-align:left;
+  background:linear-gradient(180deg,#131417,#0A0B0D);
+  box-shadow:inset 0 0 0 1px var(--bd-2),0 60px 120px -50px rgba(0,0,0,1),0 0 90px -42px rgba(107,203,165,.3)}
+.wbar{display:flex;align-items:center;gap:12px;padding:11px 15px;border-bottom:1px solid var(--bd);background:rgba(255,255,255,.02)}
+.wdots{display:flex;gap:6px}
+.wdots i{width:9px;height:9px;border-radius:50%;background:var(--surf-3);display:block}
+.wurl{flex:1;font-size:12px;color:var(--fg-4);background:var(--surf);border-radius:6px;padding:5px 11px;
+  box-shadow:inset 0 0 0 1px var(--bd);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.wbody{padding:clamp(14px,2vw,22px);display:grid;grid-template-columns:1.15fr 1fr;gap:12px}
+@media(max-width:820px){.wbody{grid-template-columns:1fr}}
+
+.pane{border-radius:var(--r-s);background:var(--surf);box-shadow:inset 0 0 0 1px var(--bd);overflow:hidden}
+.ph{display:flex;align-items:center;gap:9px;padding:11px 14px;border-bottom:1px solid var(--bd);font-size:12px;color:var(--fg-3)}
+.ph .sp{margin-left:auto}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--ac);flex:none;box-shadow:0 0 9px var(--ac);animation:pl 2.1s ease-in-out infinite}
+@keyframes pl{0%,100%{opacity:1}50%{opacity:.3}}
+.feed{height:clamp(210px,26vw,252px);overflow:hidden;position:relative}
+.feed::after{content:"";position:absolute;left:0;right:0;bottom:0;height:44px;background:linear-gradient(transparent,#0C0D0F);pointer-events:none}
+.fr{display:grid;grid-template-columns:20px 1fr auto;gap:11px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);animation:sl .4s ease-out}
+@keyframes sl{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.fg1{font-size:13px;line-height:1}
+.ft{font-size:12.5px;font-weight:450;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs{font-size:11px;color:var(--fg-4);margin-top:1px}
+.fa{font-size:12.5px;font-weight:600;color:var(--ac-2);text-align:right;white-space:nowrap}
+
+.bal{padding:16px 16px 14px;border-bottom:1px solid var(--bd)}
+.bal-l{font-size:11.5px;color:var(--fg-4)}
+.bal-v{font-size:clamp(28px,3.4vw,38px);font-weight:600;letter-spacing:-.05em;line-height:1.05;margin-top:5px}
+.bal-s{font-size:11.5px;color:var(--fg-3);margin-top:6px}
+.mini{padding:13px 16px 15px}
+.mini-r{display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:6px 0}
+.mini-r span:first-child{color:var(--fg-4)}
+.prog{height:4px;background:var(--surf-2);border-radius:3px;overflow:hidden;margin:11px 0 8px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),#B8EBD6);border-radius:3px;width:68%}
+
+/* strip */
+.strip{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.track{display:flex;gap:50px;width:max-content;animation:tk 36s linear infinite}
+.track span{font-size:13px;font-weight:450;color:var(--fg-4);white-space:nowrap;letter-spacing:-.012em}
+@keyframes tk{to{transform:translateX(-50%)}}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);border-radius:var(--r);overflow:hidden;
+  box-shadow:inset 0 0 0 1px var(--bd)}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stats>div{background:var(--bg-2);padding:24px 22px}
+.sn{font-size:29px;font-weight:600;letter-spacing:-.05em;line-height:1}
+.sl{font-size:12.5px;color:var(--fg-3);margin-top:8px}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:clamp(32px,4vw,52px)}
+.cell{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));border-radius:var(--r);
+  padding:clamp(18px,2.2vw,26px);box-shadow:inset 0 0 0 1px var(--bd);position:relative;overflow:hidden;
+  transition:box-shadow .25s,transform .25s}
+.cell:hover{box-shadow:inset 0 0 0 1px var(--bd-2);transform:translateY(-2px)}
+.c6{grid-column:span 6}.c4{grid-column:span 4}.c3{grid-column:span 3}.c2{grid-column:span 2}
+@media(max-width:900px){.c4,.c3,.c2{grid-column:span 6}}
+.cell h3{margin-bottom:8px}
+.cell .p{font-size:13.5px}
+
+.tier{display:flex;gap:10px;align-items:center;padding:10px 13px;border-radius:9px;background:var(--surf);
+  box-shadow:inset 0 0 0 1px var(--bd);font-size:12.5px}
+.tier+.tier{margin-top:6px}
+.tier .lv{color:var(--fg-3);flex:1}
+.tier .pc{color:var(--fg-4);font-size:11.5px;width:52px;text-align:right}
+.tier .am{font-weight:600;width:58px;text-align:right}
+.tier.dead{opacity:.42}
+.tier.dead .am{color:var(--fg-3);text-decoration:line-through}
+.tier.pick{box-shadow:inset 0 0 0 1px rgba(107,203,165,.34);background:var(--ac-dim)}
+.tier.pick .am{color:var(--ac-2)}
+
+.sbox{padding:14px;border-radius:9px;background:var(--surf);box-shadow:inset 0 0 0 1px var(--bd);position:relative}
+.sbox::before{content:"";position:absolute;top:0;left:0;right:0;height:1.5px;border-radius:9px 9px 0 0}
+.sa::before{background:linear-gradient(90deg,#fff,transparent 75%)}
+.sb::before{background:linear-gradient(90deg,var(--ac),transparent 75%)}
+.slab{font-size:11.5px;font-weight:600;margin-bottom:7px}
+.sa .slab{color:#fff}.sb .slab{color:var(--ac-2)}
+.stx{font-size:12px;color:var(--fg-3);line-height:1.5}
+
+.splitv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+@media(max-width:520px){.splitv{grid-template-columns:1fr}}
+.pctbig{font-size:34px;font-weight:600;letter-spacing:-.05em;line-height:1}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.chip{font-size:11.5px;font-weight:450;color:var(--fg-3);padding:4px 11px;border-radius:99px;background:var(--surf);
+  box-shadow:inset 0 0 0 1px var(--bd)}
+.chip.amber{color:#E8C68B;background:rgba(232,198,139,.1);box-shadow:inset 0 0 0 1px rgba(232,198,139,.24)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:clamp(32px,4vw,52px)}
+@media(max-width:960px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.steps{grid-template-columns:1fr}}
+.step{padding:clamp(19px,2.3vw,26px);border-radius:var(--r);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));box-shadow:inset 0 0 0 1px var(--bd)}
+.stepn{width:29px;height:29px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:12.5px;font-weight:600;color:var(--ac-2);background:var(--ac-dim);box-shadow:inset 0 0 0 1px rgba(107,203,165,.26)}
+
+/* compare */
+.cmp{border-radius:var(--r);overflow:hidden;box-shadow:inset 0 0 0 1px var(--bd);margin-top:clamp(28px,4vw,46px)}
+.crow{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:1px;background:var(--bd)}
+.crow>div{background:var(--bg-2);padding:15px 18px;font-size:13.5px}
+.crow.head>div{background:rgba(255,255,255,.03);font-weight:600;font-size:12.5px;color:var(--fg-3)}
+.crow.head>div:last-child{color:var(--fg)}
+.crow>div:first-child{color:var(--fg-3)}
+.crow>div:nth-child(2){color:var(--fg-4)}
+.crow>div:last-child{color:var(--fg);font-weight:500}
+@media(max-width:720px){
+  .crow{grid-template-columns:1fr}
+  .crow>div:first-child{font-weight:600;color:var(--fg);padding-bottom:4px}
+  .crow.head{display:none}
+  .crow>div:nth-child(2)::before{content:"Elsewhere — ";color:var(--fg-4)}
+  .crow>div:last-child::before{content:"Requit — ";color:var(--ac-2)}
+}
+
+/* faq */
+.faq{margin-top:clamp(28px,4vw,44px);max-width:820px}
+.q{border-bottom:1px solid var(--bd)}
+.q:first-child{border-top:1px solid var(--bd)}
+.q summary{cursor:pointer;padding:18px 34px 18px 0;font-size:15.5px;font-weight:500;letter-spacing:-.02em;position:relative;list-style:none}
+.q summary::-webkit-details-marker{display:none}
+.q summary::after{content:"";position:absolute;right:6px;top:26px;width:9px;height:9px;
+  border-right:1.5px solid var(--fg-3);border-bottom:1.5px solid var(--fg-3);transform:rotate(45deg);transition:transform .2s}
+.q[open] summary::after{transform:rotate(-135deg);top:29px}
+.q .p{padding:0 0 20px;max-width:72ch}
+
+/* cta */
+.cta{position:relative;border-radius:22px;padding:clamp(38px,6vw,74px) clamp(24px,4vw,48px);text-align:center;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.058),rgba(255,255,255,.014));box-shadow:inset 0 0 0 1px var(--bd-2)}
+.cta::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(620px 300px at 50% 0%,rgba(107,203,165,.2),transparent 68%)}
+.cta>*{position:relative;z-index:2}
+
+footer{border-top:1px solid var(--bd);padding-block:44px 36px;margin-top:clamp(48px,7vw,86px)}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:28px}
+@media(max-width:760px){.fgrid{grid-template-columns:1fr 1fr;gap:26px}}
+footer a{display:block;font-size:13.5px;color:var(--fg-3);padding-block:5px;transition:color .16s}
+footer a:hover{color:var(--fg)}
+.fh{font-size:12.5px;font-weight:600;color:var(--fg);margin-bottom:8px}
+.legal{font-size:12px;color:var(--fg-4);margin-top:30px;max-width:96ch;line-height:1.6}
+
+/* ── proof table ── */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-weight:500;font-size:11.5px;color:var(--fg-4);padding:0 14px 11px 0;border-bottom:1px solid var(--bd)}
+.tbl td{padding:12px 14px 12px 0;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--fg-2)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td:first-child,.tbl th:first-child{padding-left:2px}
+.tbl .amt{color:var(--fg);font-weight:600}
+.tbl .hash{color:var(--fg-4);font-size:11.5px}
+.tbl .hash:hover{color:var(--ac-2)}
+.tbl th:last-child,.tbl td:last-child{text-align:right;padding-right:2px}
+.ok{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ac-2)}
+.ok::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ac);flex:none}
+.scroll{overflow-x:auto;margin-inline:-2px;padding-inline:2px}
+.scroll table{min-width:520px}
+
+/* ── country checker ── */
+.chk{display:grid;grid-template-columns:1fr 1.25fr;gap:12px;margin-top:clamp(28px,4vw,44px)}
+@media(max-width:820px){.chk{grid-template-columns:1fr}}
+.chk-l{padding:clamp(20px,2.4vw,28px);border-radius:var(--r);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));box-shadow:inset 0 0 0 1px var(--bd)}
+select{width:100%;margin-top:16px;background:var(--bg-2);color:var(--fg);font:inherit;font-size:14.5px;
+  padding:12px 14px;border-radius:var(--r-s);box-shadow:inset 0 0 0 1px var(--bd-2);cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236A6D6B' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center}
+select:hover{box-shadow:inset 0 0 0 1px var(--fg-4)}
+.chk-r{padding:clamp(20px,2.4vw,28px);border-radius:var(--r);background:var(--bg-2);box-shadow:inset 0 0 0 1px var(--bd)}
+.chk-top{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--bd)}
+.chk-n{font-size:38px;font-weight:600;letter-spacing:-.05em;line-height:1}
+.chk-c{font-size:13.5px;color:var(--fg-2);margin-left:auto}
+.chk-row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.chk-row:last-of-type{border-bottom:0}
+.chk-row span:first-child{color:var(--fg-4)}
+.chk-warn{margin-top:14px;padding:12px 14px;border-radius:var(--r-s);font-size:12.5px;line-height:1.5;
+  color:#E8C68B;background:rgba(232,198,139,.08);box-shadow:inset 0 0 0 1px rgba(232,198,139,.2)}
+
+/* ── team ── */
+.team{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:clamp(28px,4vw,44px)}
+@media(max-width:860px){.team{grid-template-columns:1fr}}
+.tm{padding:clamp(20px,2.4vw,26px);border-radius:var(--r);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));box-shadow:inset 0 0 0 1px var(--bd)}
+.mono-av{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:15px;font-weight:600;
+  letter-spacing:-.03em;color:var(--ink,#08090A);background:linear-gradient(148deg,#fff,#A9E7CD 60%,#3E9878);margin-bottom:15px}
+.tm h3{margin-bottom:3px}
+.tm .role{font-size:12.5px;color:var(--ac-2);margin-bottom:10px}
+.tm .p{font-size:13px}
+.tm .links{display:flex;gap:14px;margin-top:14px;padding-top:13px;border-top:1px solid var(--bd)}
+.tm .links a{font-size:12px;color:var(--fg-3)}
+.tm .links a:hover{color:var(--fg)}
+.corp{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);border-radius:var(--r);
+  overflow:hidden;box-shadow:inset 0 0 0 1px var(--bd);margin-top:12px}
+@media(max-width:760px){.corp{grid-template-columns:1fr 1fr}}
+.corp>div{background:var(--bg-2);padding:18px 20px}
+.corp dt{font-size:11.5px;color:var(--fg-4);margin-bottom:5px}
+.corp dd{font-size:13.5px;font-weight:500}
+
+/* ── SLA ── */
+.sla{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);border-radius:var(--r);
+  overflow:hidden;box-shadow:inset 0 0 0 1px var(--bd);margin-top:16px}
+@media(max-width:700px){.sla{grid-template-columns:1fr 1fr}}
+.sla>div{background:var(--bg-2);padding:18px 18px 20px}
+.sla .v{font-size:23px;font-weight:600;letter-spacing:-.045em;line-height:1}
+.sla .k{font-size:11.5px;color:var(--fg-3);margin-top:7px;line-height:1.4}
+
+/* ── changelog ── */
+.log{border-top:1px solid var(--bd);margin-top:clamp(26px,4vw,40px)}
+.log-r{display:grid;grid-template-columns:104px 1fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--bd);align-items:baseline}
+@media(max-width:560px){.log-r{grid-template-columns:1fr;gap:4px}}
+.log-d{font-size:12px;color:var(--fg-4)}
+.log-t{font-size:13.5px;color:var(--fg-2)}
+.log-t b{color:var(--fg);font-weight:550}
+
+.rv{opacity:0;transform:translateY(18px);transition:opacity .75s ease,transform .75s cubic-bezier(.2,.7,.3,1)}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .rv{opacity:1!important;transform:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="glow"></div><div class="grain"></div>
+<div class="wrap">
+
+<nav class="nav">
+  <div class="navin">
+    <a class="brand" href="#top"><span class="bmark"></span>Requit</a>
+    <div class="nlinks">
+      <button onclick="jump('proof')">Proof</button>
+      <button onclick="jump('earn')">Earning</button>
+      <button onclick="jump('vault')">$RQT</button>
+      <button onclick="jump('team')">Team</button>
+    </div>
+    <a class="b1" href="#start">Start earning</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<div class="shell hero-wrap" id="top">
+  <span class="badge rv"><b>Live</b> 41,209 members across 147 countries</span>
+  <h1 class="hero rv" style="margin-top:24px">Work that pays<br><span>the same day.</span></h1>
+  <p class="sub rv" style="margin:24px auto 0;text-align:center">Finish an advertiser-funded task, the network confirms it, and the money is in your wallet. No deposit, no invoice, no thirty-day wait.</p>
+  <div class="hero-cta rv">
+    <a class="b1 lg" href="#start">Start earning free</a>
+    <button class="b2 lg" onclick="jump('how')">See how the money moves</button>
+  </div>
+  <p class="hero-note rv">No deposit · No token required · Withdraw from $10</p>
+
+  <div class="window rv">
+    <div class="wbar">
+      <div class="wdots"><i></i><i></i><i></i></div>
+      <div class="wurl">requit.com/dashboard</div>
+    </div>
+    <div class="wbody">
+      <div class="pane">
+        <div class="ph"><span class="pulse"></span> Payouts clearing now <span class="sp mn" id="clock">—</span></div>
+        <div class="feed" id="feed" role="log" aria-live="polite" aria-label="Live payouts"></div>
+      </div>
+      <div class="pane">
+        <div class="bal">
+          <div class="bal-l">Available to withdraw</div>
+          <div class="bal-v mn" id="balv">$86.40</div>
+          <div class="bal-s">Solana · USDC · verified wallet</div>
+        </div>
+        <div class="mini">
+          <div class="mini-r"><span>Pending confirmation</span><span class="mn">$31.75</span></div>
+          <div class="mini-r"><span>Earned this week</span><span class="mn">$52.10</span></div>
+          <div class="mini-r"><span>Vault rank</span><span class="mn">34 / 50</span></div>
+          <div class="prog"><i></i></div>
+          <div style="font-size:11.5px;color:var(--fg-3)">$18.90 more holds your top-50 place before Sunday.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STRIP ═══ -->
+<section style="padding-block:clamp(38px,5vw,62px)">
+  <p class="shell" style="text-align:center;font-size:12.5px;color:var(--fg-4);margin-bottom:26px">Inventory from four independent offer networks</p>
+  <div class="strip"><div class="track">
+    <span>CPX Research</span><span>Lootably</span><span>TimeWall</span><span>Torox</span><span>Surveys</span><span>App trials</span><span>Game milestones</span><span>Signups</span><span>Microtasks</span><span>Shopping</span>
+    <span>CPX Research</span><span>Lootably</span><span>TimeWall</span><span>Torox</span><span>Surveys</span><span>App trials</span><span>Game milestones</span><span>Signups</span><span>Microtasks</span><span>Shopping</span>
+  </div></div>
+</section>
+
+<div class="shell"><div class="hr"></div></div>
+
+<!-- ═══ PROOF ═══ -->
+<section id="proof" class="shell">
+  <span class="kick rv">Proof of payment</span>
+  <h2 class="rv" style="margin-top:12px;max-width:20ch">Every withdrawal is on a public chain.</h2>
+  <p class="sub rv" style="margin-top:16px">You should not take our word for any of this. Each payout below is a real transaction — open the hash, check the amount, check the date. Nothing here can be edited after the fact.</p>
+
+  <div class="stats rv" style="margin-top:clamp(28px,4vw,44px)">
+    <div><div class="sn mn">$1,284,660</div><div class="sl">paid out to date</div></div>
+    <div><div class="sn mn">$31,908</div><div class="sl">paid in the last 7 days</div></div>
+    <div><div class="sn mn">4,127</div><div class="sl">withdrawals settled</div></div>
+    <div><div class="sn mn">0</div><div class="sl">withdrawals refused</div></div>
+  </div>
+
+  <div class="cell c6 rv" style="margin-top:12px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+      <h3>Latest withdrawals</h3>
+      <span class="faint" style="font-size:12px;margin-left:auto">Updated continuously · last 12 shown</span>
+    </div>
+    <div class="scroll">
+      <table class="tbl">
+        <thead><tr><th>Settled</th><th>Member</th><th>Rail</th><th>Transaction</th><th>Amount</th></tr></thead>
+        <tbody id="wtb"></tbody>
+      </table>
+    </div>
+    <p class="p" style="font-size:12.5px;color:var(--fg-4);margin-top:16px">Member handles are shown with permission and can be hidden in your settings. Amounts and hashes are always public — a payout you cannot verify is not proof of anything.</p>
+  </div>
+</section>
+
+<!-- ═══ HOW ═══ -->
+<section id="how" class="shell">
+  <span class="kick rv">Follow the money</span>
+  <h2 class="rv" style="margin-top:12px;max-width:20ch">Outside money in. Your money out.</h2>
+  <p class="sub rv" style="margin-top:16px">Nothing here is funded by members, deposits, or token sales. The money enters at step one, and it comes from companies buying customers.</p>
+  <div class="steps">
+    <div class="step rv"><div class="stepn">1</div><h3 style="margin-top:15px">An advertiser buys a customer</h3><p class="p" style="margin-top:8px">A studio or app pays an offer network for a verified action — an install, a signup, a level reached.</p></div>
+    <div class="step rv"><div class="stepn">2</div><h3 style="margin-top:15px">You complete it</h3><p class="p" style="margin-top:8px">Reward, eligibility, deadline and any purchase requirement are on screen before you start. Never after.</p></div>
+    <div class="step rv"><div class="stepn">3</div><h3 style="margin-top:15px">The network confirms</h3><p class="p" style="margin-top:8px">Payment releases on the provider's callback, not on a progress bar. Usually minutes, sometimes days.</p></div>
+    <div class="step rv"><div class="stepn">4</div><h3 style="margin-top:15px">Requit keeps a margin</h3><p class="p" style="margin-top:8px">The gap between what the advertiser pays and what you're paid. It runs the company and fills the vault.</p></div>
+  </div>
+  <div class="stats rv" style="margin-top:12px">
+    <div><div class="sn mn">$1.28M</div><div class="sl">paid out to date</div></div>
+    <div><div class="sn mn">6h 12m</div><div class="sl">median time to payout</div></div>
+    <div><div class="sn mn">147</div><div class="sl">countries served</div></div>
+    <div><div class="sn mn">$10</div><div class="sl">withdrawal minimum</div></div>
+  </div>
+</section>
+
+<!-- ═══ EARNING ═══ -->
+<section id="earn" class="shell">
+  <span class="kick rv">Earning</span>
+  <h2 class="rv" style="margin-top:12px;max-width:22ch">We show you the number you'll actually hit.</h2>
+  <p class="sub rv" style="margin-top:16px">Every other reward site advertises the maximum. Almost nobody reaches it. We publish the tier a median free player really gets to, and mark the ones that are out of reach.</p>
+
+  <div class="bento">
+    <div class="cell c4 rv">
+      <h3>The tier table, before you start</h3>
+      <p class="p">A game offer pays per milestone, not as a lump sum. Here is a real one, with the completion rate on every tier.</p>
+      <div style="margin-top:16px">
+        <div class="tier"><span class="lv">Board level 5</span><span class="pc mn">84%</span><span class="am mn">$1.20</span></div>
+        <div class="tier"><span class="lv">Board level 12</span><span class="pc mn">61%</span><span class="am mn">$3.40</span></div>
+        <div class="tier pick"><span class="lv">Board level 32</span><span class="pc mn">11%</span><span class="am mn">$16.00</span></div>
+        <div class="tier dead"><span class="lv">Board level 42</span><span class="pc mn">2%</span><span class="am mn">$74.00</span></div>
+        <div class="tier dead"><span class="lv">Board level 71</span><span class="pc mn">0.1%</span><span class="am mn">$485.00</span></div>
+      </div>
+      <div class="chiprow">
+        <span class="chip">21-day limit</span>
+        <span class="chip">~22h to level 32</span>
+        <span class="chip amber">Purchase helps, not required</span>
+      </div>
+    </div>
+
+    <div class="cell c2 rv">
+      <h3>An honest hourly rate</h3>
+      <p class="p">Surveys land around $2–6 an hour if you qualify. Game offers are worse per hour than the banner suggests. We would rather you know that now than after three weeks.</p>
+      <div class="sbox sa" style="margin-top:16px">
+        <div class="slab">What this is good for</div>
+        <div class="stx">Converting idle time into cash. A commute, a queue, a second screen.</div>
+      </div>
+      <div class="sbox sb" style="margin-top:8px">
+        <div class="slab">What it is not</div>
+        <div class="stx">A salary. If you need real income, your hours are worth more elsewhere.</div>
+      </div>
+    </div>
+
+    <div class="cell c2 rv">
+      <h3>Purchase offers, flagged</h3>
+      <p class="p">Some advertisers only pay on a deposit or in-app purchase. Those carry an amber label with the exact amount, and we never recommend spending to chase a milestone.</p>
+    </div>
+
+    <div class="cell c2 rv">
+      <h3>Paid where you want it</h3>
+      <p class="p">USD on Solana, or ETH on Base. Verify each wallet with a free signed message and pick the destination at withdrawal.</p>
+      <div class="chiprow" style="margin-top:16px"><span class="chip">USDC · Solana</span><span class="chip">ETH · Base</span><span class="chip">From $10</span></div>
+    </div>
+
+    <div class="cell c2 rv">
+      <h3>Disputes with a status</h3>
+      <p class="p">When an offer doesn't track, you file once and watch it move. Some never resolve, and we say that out loud rather than leaving you refreshing an inbox.</p>
+    </div>
+
+    <div class="cell c6 rv">
+      <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+        <h3>The dispute commitment</h3>
+        <span class="faint" style="font-size:12px;margin-left:auto">Rolling 90-day average, updated weekly</span>
+      </div>
+      <p class="p" style="margin-top:8px">These are the numbers we hold ourselves to. When we miss them, the miss shows up here first.</p>
+      <div class="sla">
+        <div><div class="v mn">&lt; 24h</div><div class="k">First human reply to a ticket</div></div>
+        <div><div class="v mn">&lt; 48h</div><div class="k">Escalated to the offer network</div></div>
+        <div><div class="v mn">9 days</div><div class="k">Median time to a final answer</div></div>
+        <div><div class="v mn">71%</div><div class="k">Disputes that end in payment</div></div>
+      </div>
+      <p class="p" style="font-size:12.5px;color:var(--fg-4);margin-top:14px">That last figure is not 100% and never will be. When an advertiser refuses a conversion, the network cannot force it and neither can we. Publishing 71% is more use to you than claiming a number nobody hits.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AVAILABILITY ═══ -->
+<section id="where" class="shell">
+  <span class="kick rv">Availability</span>
+  <h2 class="rv" style="margin-top:12px;max-width:22ch">Check what's there before you sign up.</h2>
+  <p class="sub rv" style="margin-top:16px">Inventory is not the same everywhere. Advertisers buy customers in specific markets, so a country with strong survey demand can have almost no game offers, and the reverse. Pick yours and see the real picture.</p>
+
+  <div class="chk rv">
+    <div class="chk-l">
+      <h3>Where are you?</h3>
+      <p class="p" style="margin-top:7px;font-size:13.5px">No account needed. This reads the same eligibility rules your dashboard would.</p>
+      <label for="cty" style="position:absolute;left:-9999px">Select your country</label>
+      <select id="cty">
+        <option value="us">United States</option>
+        <option value="gb">United Kingdom</option>
+        <option value="ca">Canada</option>
+        <option value="au">Australia</option>
+        <option value="de">Germany</option>
+        <option value="fr">France</option>
+        <option value="pl">Poland</option>
+        <option value="br">Brazil</option>
+        <option value="mx">Mexico</option>
+        <option value="ph">Philippines</option>
+        <option value="id">Indonesia</option>
+        <option value="in">India</option>
+        <option value="vn">Vietnam</option>
+        <option value="ng">Nigeria</option>
+      </select>
+      <p class="p" style="margin-top:14px;font-size:12.5px;color:var(--fg-4)">Counts move hourly with advertiser budgets. Treat them as a snapshot, not a guarantee.</p>
+    </div>
+    <div class="chk-r">
+      <div class="chk-top">
+        <div>
+          <div class="bal-l">Offers eligible for you</div>
+          <div class="chk-n mn" id="c-n">276</div>
+        </div>
+        <div class="chk-c" id="c-name">United States</div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="chk-row"><span>Networks live here</span><span id="c-net">4 of 4</span></div>
+        <div class="chk-row"><span>Survey qualify rate</span><span class="mn" id="c-q">44%</span></div>
+        <div class="chk-row"><span>Typical survey pay</span><span class="mn" id="c-s">$1.20 – $9.00</span></div>
+        <div class="chk-row"><span>Best realistic game tier</span><span class="mn" id="c-g">$74.00</span></div>
+        <div class="chk-row"><span>Payout rails</span><span id="c-r">Solana · Base</span></div>
+      </div>
+      <div class="chk-warn" id="c-w">The highest pay per offer anywhere, and the lowest qualify rate. Expect to get screened out often. The ones you land are worth several times an equivalent offer elsewhere.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ VAULT ═══ -->
+<section id="vault" class="shell">
+  <span class="kick rv">$RQT</span>
+  <h2 class="rv" style="margin-top:12px;max-width:20ch">A share of the revenue, every Sunday.</h2>
+  <p class="sub rv" style="margin-top:16px">Half the company's weekly margin buys $RQT on the open market. Those tokens go out the same day — half to holders, half to the week's most productive workers. You never need the token to earn.</p>
+
+  <div class="bento">
+    <div class="cell c3 rv" style="display:flex;flex-direction:column;justify-content:space-between">
+      <div>
+        <div class="pctbig mn">50 / 50</div>
+        <h3 style="margin-top:14px">Split two ways</h3>
+        <p class="p" style="margin-top:6px">Holders are paid pro-rata on verified balances at the snapshot block. Workers are the top 50 by confirmed rewards that week, token or no token.</p>
+      </div>
+      <div class="splitv">
+        <div class="sbox sa"><div class="slab">Holders</div><div class="stx">Minimum 100,000 $RQT in a wallet you've verified.</div></div>
+        <div class="sbox sb"><div class="slab">Workers</div><div class="stx">Top 50 by rewards. No holding required.</div></div>
+      </div>
+    </div>
+
+    <div class="cell c3 rv">
+      <h3>This week's vault</h3>
+      <p class="p">The vault only holds what the business earned. In a slow week the number is small, and we publish it anyway.</p>
+      <div style="margin-top:16px">
+        <div class="mini-r" style="padding:9px 0;border-bottom:1px solid var(--bd)"><span>Task margin</span><span class="mn">$14,908</span></div>
+        <div class="mini-r" style="padding:9px 0;border-bottom:1px solid var(--bd)"><span>Share of trading fee</span><span class="mn">$3,494</span></div>
+        <div class="mini-r" style="padding:9px 0;border-bottom:1px solid var(--bd)"><span>Total to distribute</span><span class="mn" style="color:var(--ac-2);font-weight:600">$18,402</span></div>
+        <div class="mini-r" style="padding:9px 0"><span>Next snapshot</span><span class="mn">Sun 20:00 UTC</span></div>
+      </div>
+      <div class="chiprow"><span class="chip">37 of 37 weeks run</span><span class="chip">Block and tx published</span></div>
+    </div>
+
+    <div class="cell c6 rv" style="display:flex;gap:26px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:270px">
+        <h3>The token has no allocation, and no sale</h3>
+        <p class="p" style="margin-top:8px">The whole supply went into a locked pool at launch. No presale, no team tranche, no vesting cliff. Requit buys in the same pool as everyone else from one public wallet, and every buy is published. We have never sold $RQT to a member and there is no mechanism to.</p>
+      </div>
+      <div style="flex:1;min-width:270px">
+        <div class="sbox" style="padding:18px">
+          <div class="mini-r" style="padding:5px 0"><span>Supply</span><span class="mn">913,933,092.56</span></div>
+          <div class="mini-r" style="padding:5px 0"><span>Burned</span><span class="mn">86,066,907.43 · 8.6%</span></div>
+          <div class="mini-r" style="padding:5px 0"><span>Team allocation</span><span class="mn">None</span></div>
+          <div class="mini-r" style="padding:5px 0"><span>Presale</span><span class="mn">None</span></div>
+          <div class="mini-r" style="padding:5px 0"><span>Network</span><span class="mn">Base · WETH pair</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cell c6 rv" style="margin-top:12px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px">
+      <h3>Every distribution, published</h3>
+      <span class="faint" style="font-size:12px;margin-left:auto">37 weeks · none paused</span>
+    </div>
+    <p class="p" style="margin-bottom:18px">Snapshot block, the buy transaction, and the payout transaction for each week. If a week were skipped it would be missing from this table, and you would see it.</p>
+    <div class="scroll">
+      <table class="tbl">
+        <thead><tr><th>Week</th><th>Vault</th><th>$RQT bought</th><th>Snapshot block</th><th>Transactions</th></tr></thead>
+        <tbody>
+          <tr><td>37 · Sep 7</td><td class="amt mn">$18,402</td><td class="mn">2,140,880</td><td class="mn hash">#38,204,911</td><td><a class="hash mn" href="#">buy ↗ · dist ↗</a></td></tr>
+          <tr><td>36 · Aug 31</td><td class="amt mn">$16,970</td><td class="mn">2,008,113</td><td class="mn hash">#37,902,466</td><td><a class="hash mn" href="#">buy ↗ · dist ↗</a></td></tr>
+          <tr><td>35 · Aug 24</td><td class="amt mn">$21,338</td><td class="mn">2,559,401</td><td class="mn hash">#37,598,102</td><td><a class="hash mn" href="#">buy ↗ · dist ↗</a></td></tr>
+          <tr><td>34 · Aug 17</td><td class="amt mn">$9,704</td><td class="mn">1,180,220</td><td class="mn hash">#37,291,845</td><td><a class="hash mn" href="#">buy ↗ · dist ↗</a></td></tr>
+          <tr><td>33 · Aug 10</td><td class="amt mn">$12,455</td><td class="mn">1,497,338</td><td class="mn hash">#36,988,270</td><td><a class="hash mn" href="#">buy ↗ · dist ↗</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="p" style="font-size:12.5px;color:var(--fg-4);margin-top:16px">Week 34 was a bad week — $9,704, less than half of week 35. It stays on the table. A ledger that only shows good weeks is marketing, not a ledger.</p>
+  </div>
+
+  <p class="p rv" style="margin-top:20px;font-size:13px;color:var(--fg-4);max-width:88ch">Distributions depend on task volume and trading volume. They are discretionary, and Requit may reduce, pause or end the program with notice. $RQT is volatile and can lose all of its value. Nothing on this page is investment advice or an offer of securities in any jurisdiction.</p>
+</section>
+
+<!-- ═══ TEAM ═══ -->
+<section id="team" class="shell">
+  <span class="kick rv">Who runs this</span>
+  <h2 class="rv" style="margin-top:12px;max-width:20ch">Real names, on the record.</h2>
+  <p class="sub rv" style="margin-top:16px">Most reward platforms are run by nobody in particular. If something goes wrong there is no one to hold responsible, and everybody involved knows it. We would rather be findable.</p>
+
+  <div class="team">
+    <div class="tm rv">
+      <div class="mono-av">AF</div>
+      <h3>[Founder name]</h3>
+      <div class="role">Founder · product</div>
+      <p class="p">Runs product, partnerships and the reward policy. Answers the support inbox personally when it backs up.</p>
+      <div class="links"><a href="#">X ↗</a><a href="#">LinkedIn ↗</a><a href="#">Telegram ↗</a></div>
+    </div>
+    <div class="tm rv">
+      <div class="mono-av">MC</div>
+      <h3>[Engineer name]</h3>
+      <div class="role">Engineering</div>
+      <p class="p">Builds and runs the platform: network integrations, the payout pipeline, and the weekly snapshot job.</p>
+      <div class="links"><a href="#">GitHub ↗</a><a href="#">X ↗</a></div>
+    </div>
+    <div class="tm rv">
+      <div class="mono-av">SU</div>
+      <h3>Support</h3>
+      <div class="role">Disputes · verification</div>
+      <p class="p">A human reads every missing-reward ticket and takes it to the network. No bot closes a dispute here.</p>
+      <div class="links"><a href="#">support@requit.com</a></div>
+    </div>
+  </div>
+
+  <dl class="corp rv">
+    <div><dt>Registered entity</dt><dd>[Company name], Inc.</dd></div>
+    <div><dt>Jurisdiction</dt><dd>Delaware, United States</dd></div>
+    <div><dt>Company number</dt><dd class="mn">[0000000]</dd></div>
+    <div><dt>Support hours</dt><dd>9–6 ET, Mon–Fri</dd></div>
+  </dl>
+  <p class="p rv" style="font-size:12.5px;color:var(--fg-4);margin-top:14px">The team wallet <span class="mn">0x0000…0000</span> bought $RQT in the open pool at launch, at the same price as everyone else. It has never sold. Any change to that position is announced here before it happens, not after.</p>
+</section>
+
+<!-- ═══ COMPARE ═══ -->
+<section id="compare" class="shell">
+  <span class="kick rv">The difference</span>
+  <h2 class="rv" style="margin-top:12px;max-width:18ch">Two ways to run a reward site.</h2>
+  <div class="cmp rv">
+    <div class="crow head"><div></div><div>Elsewhere</div><div>Requit</div></div>
+    <div class="crow"><div>Price on a game offer</div><div>The unreachable maximum</div><div>The tier people reach</div></div>
+    <div class="crow"><div>Completion rates</div><div>Never shown</div><div>Published per tier</div></div>
+    <div class="crow"><div>Purchase requirements</div><div>In the fine print</div><div>Flagged before you open it</div></div>
+    <div class="crow"><div>When an offer fails</div><div>A support black hole</div><div>A dispute with a status</div></div>
+    <div class="crow"><div>Withdrawal</div><div>Gift cards and thresholds</div><div>USD or ETH, from $10</div></div>
+    <div class="crow"><div>Where the upside goes</div><div>To the operator</div><div>Half back to workers and holders</div></div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section class="shell">
+  <span class="kick rv">Questions</span>
+  <h2 class="rv" style="margin-top:12px">Straight answers.</h2>
+  <div class="faq rv">
+    <details class="q"><summary>How much can I actually earn?</summary><p class="p">Surveys land around $2–6 an hour when you qualify, and you will sometimes be screened out after five minutes with nothing. Game offers pay more in total but worse per hour, because the deepest tier is usually out of reach inside the deadline. We publish the real completion rate so you can judge before you commit three weeks.</p></details>
+    <details class="q"><summary>Do I need $RQT to earn?</summary><p class="p">No. Tasks pay USD or ETH to anyone eligible. Holding the token adds a second lane. It never gates the first one and it never improves your task rates.</p></details>
+    <details class="q"><summary>What if an offer doesn't track?</summary><p class="p">File a dispute with the offer name, date and your screenshots. We forward it to the network and show you the status. Most resolve in 5–14 days. Some don't, which is why we tell you to always start from the Requit link and keep evidence as you go.</p></details>
+    <details class="q"><summary>Why do some offers require a purchase?</summary><p class="p">Certain advertisers only pay on a deposit or in-app purchase. Those are labeled in amber with the exact amount before you open them. We don't treat them as defaults and we don't recommend spending to chase a milestone — that's how the offer stops being work and starts being a cost.</p></details>
+    <details class="q"><summary>Which wallets do I need?</summary><p class="p">Either or both. A Solana wallet receives USD. An EVM wallet on Base receives ETH, holds $RQT and is what the Sunday snapshot reads. Linking signs a free message that cannot move funds or approve spending.</p></details>
+    <details class="q"><summary>Is $RQT an investment?</summary><p class="p">No. It is a volatile token on a public pool. Distributions depend on volume, are discretionary, and can be paused. It can lose all of its value. Requit does not sell it and does not give investment advice.</p></details>
+  </div>
+</section>
+
+<!-- ═══ CHANGELOG ═══ -->
+<section class="shell" style="padding-block:clamp(48px,6vw,80px)">
+  <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap">
+    <span class="kick rv">Shipping</span>
+    <a class="faint rv" href="#" style="font-size:12.5px;margin-left:auto">Full changelog ↗</a>
+  </div>
+  <h2 class="rv" style="margin-top:12px;font-size:clamp(1.5rem,2.6vw,2rem)">Recent work.</h2>
+  <div class="log rv">
+    <div class="log-r"><span class="log-d mn">Sep 5, 2026</span><span class="log-t"><b>Completion rates on every game tier.</b> Pulled from our own members' results, not the advertiser's estimate.</span></div>
+    <div class="log-r"><span class="log-d mn">Aug 28, 2026</span><span class="log-t"><b>Base payouts live.</b> ETH withdrawals now settle in under two minutes, down from roughly forty.</span></div>
+    <div class="log-r"><span class="log-d mn">Aug 19, 2026</span><span class="log-t"><b>Dispute status tracking.</b> Every ticket now shows where it sits and who is holding it.</span></div>
+    <div class="log-r"><span class="log-d mn">Aug 11, 2026</span><span class="log-t"><b>Purchase-required offers relabeled.</b> The exact amount now appears before you open an offer, not inside it.</span></div>
+    <div class="log-r"><span class="log-d mn">Aug 2, 2026</span><span class="log-t"><b>Week 34 shortfall explained.</b> A network held payment for nine days. We covered the vault from reserves and published the gap.</span></div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section id="start" class="shell">
+  <div class="cta rv">
+    <h2 style="max-width:17ch;margin-inline:auto">Your first payout starts with a free account.</h2>
+    <p class="sub" style="margin:18px auto 0;text-align:center;max-width:46ch">See what's available where you live, finish one task, and withdraw from $10. No deposit, and no token required.</p>
+    <div class="hero-cta" style="margin-top:28px">
+      <a class="b1 lg" href="#top">Start earning free</a>
+      <button class="b2 lg" onclick="jump('vault')">Read the token page</button>
+    </div>
+  </div>
+</section>
+
+<footer class="shell">
+  <div class="fgrid">
+    <div>
+      <a class="brand" href="#top" style="padding:0"><span class="bmark"></span>Requit</a>
+      <p class="p" style="margin-top:12px;font-size:13px;max-width:34ch">Advertiser-funded work, paid in stablecoins. A prototype build.</p>
+    </div>
+    <div><div class="fh">Product</div><a href="#how">How it works</a><a href="#earn">Earning</a><a href="#compare">Why us</a></div>
+    <div><div class="fh">Token</div><a href="#vault">$RQT</a><a href="#vault">The vault</a><a href="#">Distributions</a></div>
+    <div><div class="fh">Legal</div><a href="#">Terms</a><a href="#">Reward policy</a><a href="#">Privacy</a></div>
+  </div>
+  <p class="legal">Prototype — all figures, balances and transactions on this page are placeholders. CPX Research, Lootably, TimeWall and Torox are independent offer providers, not sponsors or employers, and are named to illustrate the integration model only. A listed reward is payment for completing every required milestone; it is not guaranteed income. $RQT is a community token traded on a public pool. It is not an investment product, distributions are discretionary, and it can lose all of its value.</p>
+</footer>
+
+</div>
+
+<script>
+function jump(id){var e=document.getElementById(id);if(e)e.scrollIntoView({behavior:'smooth',block:'start'})}
+
+/* reveal */
+(function(){
+  var els=document.querySelectorAll(".rv");
+  if(!("IntersectionObserver" in window)){els.forEach(function(e){e.classList.add("in")});return}
+  var io=new IntersectionObserver(function(en){
+    en.forEach(function(x){if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}});
+  },{rootMargin:"0px 0px -6% 0px",threshold:.04});
+  els.forEach(function(e,i){e.style.transitionDelay=Math.min(i*45,220)+"ms";io.observe(e)});
+})();
+
+/* proof table */
+(function(){
+  var W=[
+    ["Sep 7","m.calloway","USD · Solana",186.40],["Sep 7","hollis_r","ETH · Base",212.05],
+    ["Sep 7","devonwright","USD · Solana",94.60],["Sep 6","k.novak","USD · Solana",128.90],
+    ["Sep 6","sarahbeck","ETH · Base",164.15],["Sep 6","t_okafor","USD · Solana",97.30],
+    ["Sep 5","jules.m","USD · Solana",73.75],["Sep 5","verakowalski","ETH · Base",158.40],
+    ["Sep 5","n.hartley","USD · Solana",52.10],["Sep 4","juno_costa","ETH · Base",305.60],
+    ["Sep 4","hanna_pw","USD · Solana",71.85],["Sep 4","reid_ellery","USD · Solana",144.20]
+  ];
+  var b=document.getElementById("wtb");if(!b)return;
+  function hx(){var c="0123456789abcdef",s="0x";for(var i=0;i<6;i++)s+=c[Math.floor(Math.random()*16)];
+    var e="";for(var j=0;j<4;j++)e+=c[Math.floor(Math.random()*16)];return s+"\u2026"+e}
+  var h="";
+  for(var i=0;i<W.length;i++){
+    h+='<tr><td>'+W[i][0]+'</td><td>'+W[i][1]+'</td><td>'+W[i][2]+'</td>'+
+       '<td><a class="hash mn" href="#">'+hx()+' \u2197</a></td>'+
+       '<td class="amt mn">$'+W[i][3].toFixed(2)+'</td></tr>';
+  }
+  b.innerHTML=h;
+})();
+
+/* country checker */
+(function(){
+  var D={
+    us:["United States",276,"4 of 4","44%","$1.20 – $9.00","$74.00","Solana · Base",
+      "The highest pay per offer anywhere, and the lowest qualify rate. Expect to get screened out often. The ones you land are worth several times an equivalent offer elsewhere."],
+    gb:["United Kingdom",241,"4 of 4","49%","$1.00 – $7.50","$61.00","Solana · Base",
+      "High value per completion, fewer offers overall. Treat this market as quality over volume."],
+    ca:["Canada",219,"4 of 4","51%","$1.00 – $7.20","$58.00","Solana · Base",
+      "Rates track close to the US with a slightly better qualify rate. Game inventory is thinner."],
+    au:["Australia",196,"4 of 4","50%","$1.10 – $7.80","$63.00","Solana · Base",
+      "Strong rates, smallest catalog of the English-speaking markets. Offers here sell out faster than most."],
+    de:["Germany",228,"4 of 4","46%","$1.10 – $8.00","$68.00","Solana · Base",
+      "Strong rates. Several advertisers run stricter identity checks here before releasing a reward."],
+    fr:["France",211,"4 of 4","47%","$0.95 – $6.90","$54.00","Solana · Base",
+      "Solid survey supply and mid-tier game offers. Deadlines here tend to be shorter than average."],
+    pl:["Poland",254,"4 of 4","57%","$0.70 – $4.60","$38.00","Solana · Base",
+      "A good middle market: real volume and mid-tier rates on both surveys and games."],
+    br:["Brazil",364,"4 of 4","63%","$0.60 – $3.80","$27.00","Solana · Base",
+      "Strong on both lanes. Game offers here pay better than anywhere outside Europe and North America."],
+    mx:["Mexico",298,"4 of 4","60%","$0.55 – $3.40","$23.00","Solana · Base",
+      "Balanced inventory. Deposit-required offers show up more often here, so read the amber labels carefully."],
+    ph:["Philippines",341,"4 of 4","66%","$0.45 – $3.10","$18.00","Solana · Base",
+      "One of the best markets on the platform for survey volume. Game offers are thinner because fewer studios buy installs here."],
+    id:["Indonesia",312,"4 of 4","61%","$0.40 – $2.60","$16.00","Solana · Base",
+      "Deep survey inventory, but advertisers pay less per completion than in North America or Western Europe. The honest expectation is $1.50–4 an hour."],
+    in:["India",408,"4 of 4","54%","$0.25 – $1.90","$11.00","Solana · Base",
+      "The highest offer count anywhere and the lowest pay per offer. Screen-out rates are also the highest, so expect unpaid minutes."],
+    vn:["Vietnam",287,"4 of 4","58%","$0.35 – $2.40","$14.50","Solana · Base",
+      "Steady survey supply. Several game advertisers block this market outright for fraud reasons, which we cannot override."],
+    ng:["Nigeria",184,"3 of 4","47%","$0.20 – $1.60","$8.00","Solana · Base",
+      "Thin inventory and one network offline. Many advertisers geo-block this market. We show you that instead of filling the page with offers you cannot start."]
+  };
+  var sel=document.getElementById("cty");if(!sel)return;
+  var f={n:"c-n",name:"c-name",net:"c-net",q:"c-q",s:"c-s",g:"c-g",r:"c-r",w:"c-w"};
+  function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v}
+  function draw(){
+    var d=D[sel.value];if(!d)return;
+    set(f.name,d[0]);set(f.n,d[1]);set(f.net,d[2]);set(f.q,d[3]);
+    set(f.s,d[4]);set(f.g,d[5]);set(f.r,d[6]);set(f.w,d[7]);
+  }
+  sel.addEventListener("change",draw);
+  draw();
+})();
+
+/* hero: ledger streams, balance ticks up */
+(function(){
+  var P=[
+    ["\uD83C\uDDFA\uD83C\uDDF8","Survey · consumer panel","CPX Research",6.40],
+    ["\uD83C\uDDEC\uD83C\uDDE7","Game · reached tier 3","Torox",28.00],
+    ["\uD83C\uDDE8\uD83C\uDDE6","App trial · fintech","Lootably",5.20],
+    ["\uD83C\uDDE9\uD83C\uDDEA","Microtask · verified review","TimeWall",1.40],
+    ["\uD83C\uDDE6\uD83C\uDDFA","Game · reached tier 2","Torox",14.50],
+    ["\uD83C\uDDFA\uD83C\uDDF8","Survey · media habits","CPX Research",4.10],
+    ["\uD83C\uDDEB\uD83C\uDDF7","Signup · streaming trial","Lootably",7.80],
+    ["\uD83C\uDDF5\uD83C\uDDF1","Game · reached tier 4","Torox",38.00],
+    ["\uD83C\uDDEC\uD83C\uDDE7","Survey · retail panel","CPX Research",3.90],
+    ["\uD83C\uDDEA\uD83C\uDDF8","App trial · mobility","Lootably",4.60],
+    ["\uD83C\uDDE8\uD83C\uDDE6","Microtask · timed page","TimeWall",0.75],
+    ["\uD83C\uDDFA\uD83C\uDDF8","Game · reached tier 5","Torox",74.00],
+    ["\uD83C\uDDF3\uD83C\uDDF1","Survey · finance panel","CPX Research",5.30],
+    ["\uD83C\uDDE7\uD83C\uDDF7","Signup · language app","Lootably",6.10],
+    ["\uD83C\uDDEE\uD83C\uDDF9","Survey · travel panel","CPX Research",3.40],
+    ["\uD83C\uDDE9\uD83C\uDDEA","Game · reached tier 3","Torox",31.00]
+  ];
+  var rails=["USD · Solana","ETH · Base"];
+  var feed=document.getElementById("feed"),clock=document.getElementById("clock"),balv=document.getElementById("balv");
+  if(!feed) return;
+  var i=0,bal=86.40;
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function money(n){return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+  function stamp(){var d=new Date();
+    return ("0"+d.getUTCHours()).slice(-2)+":"+("0"+d.getUTCMinutes()).slice(-2)+":"+("0"+d.getUTCSeconds()).slice(-2)+" UTC"}
+  function push(){
+    var p=P[i%P.length];i++;
+    var r=document.createElement("div");r.className="fr";
+    r.innerHTML='<span class="fg1">'+p[0]+'</span>'+
+      '<div style="min-width:0"><div class="ft">'+p[1]+'</div><div class="fs">'+p[2]+' · '+rails[i%2]+'</div></div>'+
+      '<div class="fa mn">+'+money(p[3])+'</div>';
+    feed.prepend(r);
+    while(feed.children.length>7) feed.removeChild(feed.lastChild);
+  }
+  for(var k=0;k<7;k++) push();
+  if(clock) clock.textContent=stamp();
+  if(reduce) return;
+  setInterval(function(){
+    push();
+    bal+= Math.round((Math.random()*2.4+0.4)*100)/100;
+    if(balv) balv.textContent=money(bal);
+  },2700);
+  setInterval(function(){if(clock)clock.textContent=stamp()},1000);
+})();
+</script>
+</body>
+</html>
