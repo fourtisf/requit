@@ -2,45 +2,51 @@
 
 ## X profile picture
 
-Upload **`x-avatar-mint.png`** or **`x-avatar-light.png`** at 1000×1000. X crops
-to a circle and downsamples.
+Upload **`x-avatar-black-big.png`** at 1000×1000. X crops to a circle and
+downsamples.
 
-Open `preview-x.html` to see every option at the sizes X actually renders — 112,
-48, 32 and 24 — across its three themes.
+Two alternatives if you want a different feel:
 
-### What the test showed
+- **`x-avatar-black-mono.png`** — no accent at all, white chevrons only.
+  The most restrained of the set and the highest contrast at 24px.
+- **`x-avatar-black-hair.png`** — same black ground with a white outline, if
+  you want the circle to have a hard boundary.
 
-X renders the avatar at 24–48px almost everywhere except the profile page, and
-its default theme is pure black. That combination decides this, not how the
-image looks at full size:
+Open `preview-x-black.html` to compare them at the sizes X actually renders —
+112, 48, 32 and 24 — across its three themes.
+
+### What the black test showed
+
+X's default theme is **pure #000000**, which is the same black an avatar is
+made of. So the whole problem with a black avatar is giving the circle an edge
+in the one place it has none.
 
 | Option | Verdict |
 |---|---|
-| **Mint** | Works at every size on every theme. Loudest in a timeline. |
-| **Light** | Works everywhere too, and reads calmer than Mint. |
-| Plate | **Fails on Dark** — a near-black circle on a black background has no edge at any size. Fine on Light and Dim. |
-| Ring | The hairline helps at 112px and is gone by 32px. Same failure as Plate. |
-| Bleed | Strong large, but the two chevrons start to merge by 24px. |
+| **Black · large** | Reads at every size on every theme. The mark carries it, so the circle edge does not have to. |
+| **Black · mono** | Same, with no accent. Cleanest at 24px. |
+| **Black · outline** | A defined boundary at all sizes. Louder than it sounds. |
+| Black | Fine, but quiet — the near-black edge is nearly invisible at 24px. |
+| Black · ring | The ring dominates by 32px and starts reading as a spinner. |
+| **True black** | Avoid. On Dark the circle vanishes completely and the chevrons float with no avatar around them. |
 
-Plate and Ring are kept because they are correct on Light and Dim — but X's
-default is Dark, so neither should be the one that ships.
+The ground is `#08090A`, not `#000000`, on purpose — see the last row.
+
+The chevron gap is also wider in every black variant than in the app mark. At
+24px the original one-unit gap was under a pixel and the two shapes closed into
+a single blob.
+
+### Earlier set
+
+`x-avatar-mint`, `x-avatar-light`, `x-avatar-plate`, `x-avatar-ring` and
+`x-avatar-bleed` are the first pass, compared in `preview-x.html`. Kept for
+reference.
 
 ## Regenerating
 
-`render.html` holds the source of every tile. Edit it, then:
-
-```bash
-node -e '
-const { chromium } = require("playwright");
-(async () => {
-  const b = await chromium.launch();
-  const p = await b.newPage({ viewport: { width: 1000, height: 1000 } });
-  await p.goto("file://" + process.cwd() + "/render.html");
-  for (const id of ["plate", "mint", "light", "ring", "bleed"])
-    await (await p.$("#" + id)).screenshot({ path: `x-avatar-${id}.png` });
-  await b.close();
-})();'
-```
+`render-black.html` and `render.html` hold the source of every tile. Edit one,
+then screenshot each `.tile` element at 1000×1000 — see the git history of this
+folder for the exact snippet.
 
 ## Not made yet
 
