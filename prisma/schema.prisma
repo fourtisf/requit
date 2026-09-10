@@ -4,6 +4,9 @@
 // unique constraints are load-bearing (they are the dedupe and anti-multi-account
 // guards, not hints). Section 3 holds the models Auth.js requires; it is additive.
 //
+// Section 4 holds fields for features requested after the handoff was written
+// (referral, notification preferences). They are NOT in §3 — see the note there.
+//
 // DEVIATIONS FROM §3 — every one, listed. No column in §3 was changed or dropped.
 //   1. Wallet.withdrawals / Withdrawal.wallet — §3 gives Withdrawal a `walletId`
 //      but no relation. Prisma cannot express the foreign key without both
@@ -12,6 +15,11 @@
 //   2. User.emailVerified, User.name, User.image and the accounts/sessions
 //      back-relations — required by @auth/prisma-adapter. See section 3.
 //   3. Account, Session, VerificationToken — required by @auth/prisma-adapter.
+//   4. User referral + notification fields (marked "section 4" inline) — a
+//      product addition requested after the handoff. Referral in particular has
+//      fraud implications §7 cares about: it is the classic multi-account
+//      vector, so the anti-abuse rules live in src/lib/referral.ts and were
+//      written at the same time, not deferred.
 //
 // Known gap, deliberately left as §3 specifies: there is no index serving the
 // job that flips Reward PENDING -> AVAILABLE (it filters on status and
@@ -52,6 +60,25 @@ model User {
   disputes    Dispute[]
   devices     Device[]
 
+  // ── Referral (section 4) ──
+  referralCode String    @unique
+  referredById String?
+  referredBy   User?     @relation("Referrals", fields: [referredById], references: [id])
+  referrals    User[]    @relation("Referrals")
+  referredAt   DateTime?
+  // Captured at signup so a self-referral can be refused. Real device
+  // fingerprinting is §7 work and lands in Phase 1; this is the weaker check
+  // that is available today.
+  signupIpHash String?
+
+  // ── Notification preferences (section 4) ──
+  // These govern NOTIFICATIONS only. The sign-in code is transactional: it is
+  // the account's only credential and is never suppressed by a preference.
+  notifyRewards     Boolean @default(true)
+  notifyWithdrawals Boolean @default(true)
+  notifyDisputes    Boolean @default(true)
+  unsubscribeToken  String  @unique
+
   // Auth.js additions — see section 3.
   emailVerified DateTime?
   name          String?
@@ -61,6 +88,7 @@ model User {
 
   @@index([countryCode])
   @@index([riskTier])
+  @@index([referredById])
 }
 
 enum RiskTier {

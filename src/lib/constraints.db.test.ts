@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Prisma } from "@prisma/client";
-import { prisma, resetDatabase } from "@/test/db";
+import { makeUser, prisma, resetDatabase } from "@/test/db";
 
 /**
  * HANDOFF.md §13 turns on three unique constraints. They are not hints, and a
@@ -9,19 +9,13 @@ import { prisma, resetDatabase } from "@/test/db";
  */
 const UNIQUE_VIOLATION = "P2002";
 
-async function makeUser(email: string, handle: string) {
-  return prisma.user.create({
-    data: { email, handle, countryCode: "GB" },
-  });
-}
-
 beforeEach(async () => {
   await resetDatabase();
 });
 
 describe("Reward (network, networkTxnId)", () => {
   it("is what makes a replayed postback credit nothing", async () => {
-    const user = await makeUser("ada@example.com", "ada");
+    const user = await makeUser({ email: "ada@example.com", handle: "ada" });
     const reward = {
       userId: user.id,
       network: "TOROX" as const,
@@ -41,7 +35,7 @@ describe("Reward (network, networkTxnId)", () => {
   });
 
   it("scopes the dedupe per network — two networks may reuse an id", async () => {
-    const user = await makeUser("ada@example.com", "ada");
+    const user = await makeUser({ email: "ada@example.com", handle: "ada" });
     const base = {
       userId: user.id,
       networkTxnId: "txn-1",
@@ -60,8 +54,8 @@ describe("Reward (network, networkTxnId)", () => {
 
 describe("Wallet (chain, address)", () => {
   it("stops one wallet being attached to two accounts", async () => {
-    const first = await makeUser("ada@example.com", "ada");
-    const second = await makeUser("reid@example.com", "reid");
+    const first = await makeUser({ email: "ada@example.com", handle: "ada" });
+    const second = await makeUser({ email: "reid@example.com", handle: "reid" });
     const address = "0x71C7656EC7ab88b098defB751B7401B5f6d8976F";
 
     await prisma.wallet.create({ data: { userId: first.id, chain: "BASE", address } });
@@ -72,7 +66,7 @@ describe("Wallet (chain, address)", () => {
   });
 
   it("treats the same string on two chains as two wallets", async () => {
-    const user = await makeUser("ada@example.com", "ada");
+    const user = await makeUser({ email: "ada@example.com", handle: "ada" });
     const address = "0x71C7656EC7ab88b098defB751B7401B5f6d8976F";
 
     await prisma.wallet.create({ data: { userId: user.id, chain: "BASE", address } });
@@ -84,7 +78,7 @@ describe("Wallet (chain, address)", () => {
 
 describe("Withdrawal.idempotencyKey", () => {
   it("is what stops a double-clicked button producing two payouts", async () => {
-    const user = await makeUser("ada@example.com", "ada");
+    const user = await makeUser({ email: "ada@example.com", handle: "ada" });
     const wallet = await prisma.wallet.create({
       data: { userId: user.id, chain: "SOLANA", address: "9xQeWvG816bUx9EPa2rP1kQ4nJ8oTvBcYqk3ZmHt1Rdz" },
     });

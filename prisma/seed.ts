@@ -9,7 +9,9 @@
  * must come from real activity — seeded ones have a way of surviving to
  * production and the whole trust proposition rests on every figure being real.
  */
+import { randomUUID } from "node:crypto";
 import { PrismaClient, Network, OfferCategory, RiskTier, Chain } from "@prisma/client";
+import { generateReferralCode } from "../src/lib/referral";
 import { Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -95,6 +97,8 @@ async function main(): Promise<void> {
         countryCode: user.countryCode,
         riskTier: user.riskTier,
         emailVerified: new Date(),
+        referralCode: generateReferralCode(),
+        unsubscribeToken: randomUUID(),
       },
     });
   }

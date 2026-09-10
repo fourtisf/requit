@@ -25,6 +25,7 @@ Where they disagree, ask. Do not pick one.
 |---|---|---|
 | 0 | Next.js + Prisma + Redis + Auth.js, CI | ✅ done |
 | 0.1 | Hardening: route gate, CSP, suspension, health, alerting, DB tests | ✅ done |
+| 0.2 | Member surfaces: settings, referral, notifications, leaderboard, statement | ✅ done |
 | 1 | Offer ingestion and postbacks (staging only) | not started |
 | — | **Gate: ALFA approves staging before Phase 2** | |
 | 2 | Wallets and withdrawals | not started |
@@ -95,6 +96,38 @@ Postgres, the integration suite, a schema-drift check, and a production build.
 
 ---
 
+## Member surfaces (Phase 0.2)
+
+Added after the handoff was written. Four of the five sit on top of Phase 1 data,
+so they are built and tested against the real queries and currently render the
+honest empty state — never a seeded number.
+
+| Surface | State today |
+|---|---|
+| `/settings` | **Live.** `publicPayouts`, email preferences, country. The prototype's proof table promises "can be hidden in your settings"; this is that page. |
+| `/referrals` | **Live.** Your code, your link, and everyone credited to you. The commission rate is not set — see below. |
+| Notifications | **Plumbing live**, events land in Phases 1–2. Preferences, one-click unsubscribe and `List-Unsubscribe` headers all work now. |
+| `/leaderboard` | Real query, empty until there are confirmed rewards. |
+| `/history` + CSV | Real query, empty until there is activity. |
+| Withdrawal ladder | **Live** on the dashboard, driven by the same `TIER_RULES` table the payout pipeline will read. |
+
+**Referral attribution is why this could not wait.** A referral that is not
+captured at signup can never be backfilled — the visitor is gone. The graph is
+recorded from now on; what a referral pays can be decided later, and the page
+says so rather than inventing a rate.
+
+**Referral is a fraud vector, so the rules shipped with it** (`src/lib/referral.ts`).
+A refused referral never blocks the signup — the account is created uncredited.
+Blocking on a heuristic this weak would lock out flatmates and office networks.
+Today it refuses an unknown code, a suspended referrer, and a signup from the
+same source as the referrer's own. Device fingerprinting is §7 and lands in
+Phase 1; add the check there.
+
+**Payment rails stay crypto-only** — Solana USDC and Base ETH, per §6.2. Local
+rails and gift cards were considered and deliberately not built.
+
+---
+
 ## Security posture
 
 Phase 0 has no money in it, but the surfaces that will carry money are built now
@@ -119,8 +152,11 @@ and are cheaper to get right before there are more pages.
 - **Redis has two connections.** `redis()` is BullMQ's and must keep
   `maxRetriesPerRequest: null`; that setting makes commands *queue* during an
   outage instead of failing, which on a request path is an indefinite hang.
-  `kv()` is the request-path connection and fails within about a second.
-  Anything serving an HTTP request uses `kv()`.
+  `kv()` is the request-path connection and fails within about a second, via
+  `commandTimeout` rather than by disabling the offline queue — disabling it
+  also rejects commands issued while the socket is still opening, which fails
+  the first sign-in after every restart. Anything serving an HTTP request uses
+  `kv()`.
 
 ---
 
@@ -166,6 +202,11 @@ src/
     queue.ts          One queue per failure domain (HANDOFF.md §2)
     rate-limit.ts     Fixed-window limiter. Fails closed.
     alert.ts          Telegram alerting. Never throws into its caller.
+    referral.ts       Code format and the anti-abuse attribution rules
+    notify.ts         Notification email. Never the sign-in code.
+    risk.ts           The §6.1 hold ladder — one table, UI and payouts share it
+    leaderboard.ts    Top workers by confirmed rewards (also feeds §9)
+    statement.ts      A member's own auditable record, and its CSV
     auth/
       session-payload.ts  What /api/auth/session is allowed to publish
   test/               Test harness — unit env fixture, DB reset helper

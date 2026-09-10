@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { REFERRAL_COOKIE, REFERRAL_COOKIE_MAX_AGE_SECONDS } from "@/lib/referral-cookie";
 
 /**
  * Two jobs, both of which have to happen before a page renders.
@@ -13,6 +14,10 @@ import { NextResponse, type NextRequest } from "next/server";
  *    so a script-src without a nonce means falling back to 'unsafe-inline',
  *    which is not a policy at all. Next reads the nonce out of the CSP header on
  *    the request and stamps it onto the scripts it emits.
+ *
+ * 3. Parking a ?ref= code. Someone arrives on a shared link and signs up
+ *    minutes or days later, on a different page. The code has to survive that
+ *    gap, and the cookie is the only thing that does.
  */
 const PROTECTED = ["/dashboard", "/settings", "/withdraw", "/tasks", "/disputes"];
 
@@ -38,7 +43,27 @@ export function middleware(request: NextRequest): NextResponse {
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("content-security-policy", contentSecurityPolicy(nonce));
+  captureReferral(request, response);
   return response;
+}
+
+function captureReferral(request: NextRequest, response: NextResponse): void {
+  const code = request.nextUrl.searchParams.get("ref")?.trim();
+  if (!code) return;
+
+  // First link wins. Overwriting would let anyone hijack an existing referral by
+  // getting the visitor to click one more link before they sign up.
+  if (request.cookies.has(REFERRAL_COOKIE)) return;
+
+  // Length-capped because it is attacker-supplied and goes into a cookie; the
+  // real format check is normaliseReferralCode at signup.
+  response.cookies.set(REFERRAL_COOKIE, code.slice(0, 32), {
+    maxAge: REFERRAL_COOKIE_MAX_AGE_SECONDS,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
 }
 
 function contentSecurityPolicy(nonce: string): string {

@@ -40,11 +40,19 @@ export function kv(): IORedis {
 
   const connection = new IORedis(serverEnv().REDIS_URL, {
     maxRetriesPerRequest: 1,
-    commandTimeout: 1_000,
     connectTimeout: 1_000,
-    // Without this, commands issued while the socket is down are buffered and
-    // resolve much later — which is the hang this connection exists to avoid.
-    enableOfflineQueue: false,
+
+    // `commandTimeout` is what bounds the wait, and its timer starts when the
+    // command is queued — so a command issued during an outage rejects after a
+    // second whether or not the socket ever opened.
+    commandTimeout: 1_000,
+
+    // The offline queue stays ON. Turning it off looks like the stricter
+    // choice, but it also rejects commands issued in the milliseconds between
+    // process start and the socket becoming ready — so the first sign-in after
+    // every deploy fails with "Stream isn't writeable". commandTimeout already
+    // covers the case that setting was meant to protect against.
+    enableOfflineQueue: true,
     enableReadyCheck: true,
   });
   connection.on("error", (error) => console.error("[redis:kv]", error.message));
