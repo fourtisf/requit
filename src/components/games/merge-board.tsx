@@ -42,7 +42,20 @@ function tileSize(value: number): string {
 
 type Round = { id: string; seed: number };
 
-export function MergeBoard({ personalBest }: { personalBest: number }) {
+/**
+ * `signedIn` false is a real mode, not a degraded one. A visitor can play the
+ * whole game; the only difference is that nothing is recorded, so there is no
+ * round to open on the server and no moves to submit. Putting a sign-in wall in
+ * front of the one thing on this site a stranger can actually try would waste
+ * it.
+ */
+export function MergeBoard({
+  personalBest,
+  signedIn,
+}: {
+  personalBest: number;
+  signedIn: boolean;
+}) {
   const game = useRef<Game | null>(null);
   const moves = useRef<Direction[]>([]);
   const round = useRef<Round | null>(null);
@@ -57,6 +70,19 @@ export function MergeBoard({ personalBest }: { personalBest: number }) {
     setStatus("loading");
     setError(null);
     setSaved(null);
+
+    if (!signedIn) {
+      // A guest's seed can come from the browser: with no row to write and no
+      // score to keep, there is nothing a chosen seed could win.
+      const seed = Math.floor(Math.random() * 2 ** 31);
+      round.current = null;
+      game.current = createGame(seed);
+      moves.current = [];
+      setState(game.current.state());
+      setStatus("playing");
+      return;
+    }
+
     try {
       const response = await fetch("/api/play/start", { method: "POST" });
       const payload = await response.json();
@@ -75,11 +101,15 @@ export function MergeBoard({ personalBest }: { personalBest: number }) {
       setError("Could not reach the server.");
       setStatus("idle");
     }
-  }, []);
+  }, [signedIn]);
 
   const finish = useCallback(async () => {
     const current = round.current;
-    if (!current) return;
+    if (!current) {
+      // Guest round. Nothing to submit, and the score stays on screen only.
+      setStatus("over");
+      return;
+    }
 
     setStatus("saving");
     try {
@@ -200,7 +230,7 @@ export function MergeBoard({ personalBest }: { personalBest: number }) {
 
       {status === "idle" ? (
         <div className="mt-5">
-          <Button onClick={begin}>Start a round</Button>
+          <Button onClick={begin}>{signedIn ? "Start a round" : "Play now"}</Button>
           <p className="mt-3 max-w-[44ch] text-[12.5px] leading-[1.6] text-fg-3">
             Swipe or use the arrow keys. Two tiles with the same number merge into one. Reach{" "}
             {TARGET} to win — the board carries on afterwards.
@@ -225,6 +255,15 @@ export function MergeBoard({ personalBest }: { personalBest: number }) {
             <p className="mt-1.5 text-[13px] text-fg-2">
               Scored <span className="mn text-ac-2">{saved}</span> — checked on the server against
               the moves you made.
+            </p>
+          ) : null}
+          {!signedIn ? (
+            <p className="mt-1.5 max-w-[44ch] text-[13px] leading-[1.6] text-fg-2">
+              Scored <span className="mn text-ac-2">{state?.score ?? 0}</span>, kept nowhere.{" "}
+              <a href="/signin" className="text-ac-2 underline underline-offset-4">
+                Sign in
+              </a>{" "}
+              and rounds are recorded against your account.
             </p>
           ) : null}
           <div className="mt-4">
