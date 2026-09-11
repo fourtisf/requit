@@ -88,6 +88,43 @@ export function easeOf(
   return { ease, entryRate: rate };
 }
 
+/**
+ * Light enough to finish in an evening, with nothing to pay up front.
+ *
+ * Two exclusions, and only two, because both are facts rather than opinions:
+ *
+ *   - Measured as hard. Fewer than MODERATE_RATE of the people who started it
+ *     cleared even its lowest tier, so calling it a task someone can finish is
+ *     not supportable.
+ *   - Requires a purchase. Whatever the effort, it is not light if it takes
+ *     your own money first.
+ *
+ * An offer nobody has measured stays in. We do not know that it is heavy, and
+ * dropping everything unproven would empty the list on the day the catalogue
+ * arrives — the filter would look broken, and the offers would never gather the
+ * starts that would prove them either way.
+ */
+export function isLight(offer: OfferView): boolean {
+  return offer.ease !== "hard" && !offer.requiresPurchase;
+}
+
+/**
+ * Partitions rather than filters, so the page can say what it is not showing.
+ *
+ * Silently hiding inventory from someone trying to earn money is the kind of
+ * thing that is defensible right up until they find out. The count goes on
+ * screen with a way to see them.
+ */
+export function splitLight(offers: readonly OfferView[]): {
+  light: OfferView[];
+  heavy: OfferView[];
+} {
+  const light: OfferView[] = [];
+  const heavy: OfferView[] = [];
+  for (const offer of offers) (isLight(offer) ? light : heavy).push(offer);
+  return { light, heavy };
+}
+
 /** "ease" leads with what people actually finish; "reward" with the biggest number. */
 export type OfferSort = "ease" | "reward";
 

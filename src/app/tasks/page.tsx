@@ -9,6 +9,7 @@ import {
   MIN_SAMPLES,
   offersFor,
   parseSort,
+  splitLight,
   type OfferSort,
   type OfferView,
   type TierView,
@@ -24,15 +25,22 @@ export const dynamic = "force-dynamic";
 export default async function TasksPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string }>;
+  searchParams: Promise<{ sort?: string; all?: string }>;
 }) {
   const user = await requireUser();
-  const sort = parseSort((await searchParams).sort);
-  const offers = await offersFor({ countryCode: user.countryCode, sort });
+  const params = await searchParams;
+  const sort = parseSort(params.sort);
+  const showEverything = params.all === "1";
 
-  // Only read when the page is about to be empty — the whole point of the
-  // block below is that it has somewhere to send people.
-  const empty = offers.length === 0 && user.countryCode !== UNKNOWN_COUNTRY;
+  const all = await offersFor({ countryCode: user.countryCode, sort });
+  const { light, heavy } = splitLight(all);
+  const offers = showEverything ? all : light;
+
+  // Keyed on the whole catalogue, not the filtered view. "Nothing live in your
+  // country" and "everything live in your country is heavy" are different
+  // facts, and offering to notify someone about the first when the second is
+  // true would be a promise we have already kept.
+  const empty = all.length === 0 && user.countryCode !== UNKNOWN_COUNTRY;
   const [alreadyWaiting, waiting] = empty
     ? await Promise.all([isWaiting(user.id, user.countryCode), waitingIn(user.countryCode)])
     : [false, 0];
@@ -55,7 +63,35 @@ export default async function TasksPage({
         reach each tier, and any purchase required.
       </p>
 
-      {offers.length > 1 ? <SortTabs current={sort} /> : null}
+      {offers.length > 1 ? <SortTabs current={sort} all={showEverything} /> : null}
+
+      {/* Never a silent filter. Hiding inventory from someone trying to earn
+          money is defensible right until they find out it happened, so the
+          count and the way back are on screen whenever anything is held back. */}
+      {!showEverything && heavy.length > 0 ? (
+        <p className="mt-3 text-[12.5px] leading-[1.6] text-fg-3">
+          {heavy.length} {heavy.length === 1 ? "task is" : "tasks are"} hidden — long grinds few
+          people finish, and ones that need a purchase first.{" "}
+          <Link
+            href={sort === "reward" ? "/tasks?sort=reward&all=1" : "/tasks?all=1"}
+            className="text-ac-2 underline underline-offset-4"
+          >
+            Show them anyway
+          </Link>
+        </p>
+      ) : null}
+
+      {showEverything ? (
+        <p className="mt-3 text-[12.5px] leading-[1.6] text-fg-3">
+          Showing everything, including tasks few people finish and tasks that need a purchase.{" "}
+          <Link
+            href={sort === "reward" ? "/tasks?sort=reward" : "/tasks"}
+            className="text-ac-2 underline underline-offset-4"
+          >
+            Back to light tasks
+          </Link>
+        </p>
+      ) : null}
 
       {user.countryCode === UNKNOWN_COUNTRY ? (
         <Card className="mt-7 max-w-[62ch]">
@@ -65,7 +101,7 @@ export default async function TasksPage({
             Set it in settings and this page fills in.
           </p>
         </Card>
-      ) : offers.length === 0 ? (
+      ) : all.length === 0 ? (
         <Card className="mt-7 max-w-[62ch]">
           <CardHeader title="Nothing live yet" />
           <p className="text-[13.5px] leading-[1.65] text-fg-2">
@@ -79,6 +115,22 @@ export default async function TasksPage({
             waiting={waiting}
           />
         </Card>
+      ) : offers.length === 0 ? (
+        <Card className="mt-7 max-w-[62ch]">
+          <CardHeader title="Nothing light right now" />
+          <p className="text-[13.5px] leading-[1.65] text-fg-2">
+            There {all.length === 1 ? "is one task" : `are ${all.length} tasks`} live in{" "}
+            {user.countryCode}, but every one of them is either a long grind that few people finish
+            or needs a purchase before it pays. Nothing is being kept from you — they are one click
+            away.
+          </p>
+          <Link
+            href={sort === "reward" ? "/tasks?sort=reward&all=1" : "/tasks?all=1"}
+            className="mt-4 inline-block text-[13.5px] text-ac-2 underline underline-offset-4"
+          >
+            Show them anyway
+          </Link>
+        </Card>
       ) : (
         <div className="mt-7 grid gap-3 lg:grid-cols-2">
           {offers.map((offer) => (
@@ -91,7 +143,7 @@ export default async function TasksPage({
           where someone is one settings change away from a full page and has even
           less idea what they are waiting for. An empty list that also explains
           nothing is the version of this page people leave and do not return to. */}
-      {offers.length === 0 ? (
+      {all.length === 0 ? (
         <section className="mt-10">
           <h2 className="text-[17px] font-semibold tracking-[-0.03em]">
             What a task will ask you to do
@@ -114,10 +166,14 @@ export default async function TasksPage({
  * The order of the list is a claim about the offers in it, so the page says
  * which claim it is making instead of quietly reordering itself.
  */
-function SortTabs({ current }: { current: OfferSort }) {
+function SortTabs({ current, all }: { current: OfferSort; all: boolean }) {
   const tabs: { value: OfferSort; label: string; href: Route }[] = [
-    { value: "ease", label: "Easiest first", href: "/tasks" },
-    { value: "reward", label: "Highest paying", href: "/tasks?sort=reward" },
+    { value: "ease", label: "Easiest first", href: all ? "/tasks?all=1" : "/tasks" },
+    {
+      value: "reward",
+      label: "Highest paying",
+      href: all ? "/tasks?sort=reward&all=1" : "/tasks?sort=reward",
+    },
   ];
 
   return (

@@ -5,9 +5,11 @@ import {
   DEAD_TIER_RATE,
   easeOf,
   EASY_RATE,
+  isLight,
   MIN_SAMPLES,
   MODERATE_RATE,
   parseSort,
+  splitLight,
   type OfferView,
   type TierView,
 } from "@/lib/offers";
@@ -113,5 +115,60 @@ describe("ordering the list", () => {
     expect(parseSort(undefined)).toBe("ease");
     expect(parseSort("reward")).toBe("reward");
     expect(parseSort("nonsense")).toBe("ease");
+  });
+});
+
+describe("keeping the list light", () => {
+  const offer = (over: Partial<OfferView>): OfferView => ({
+    id: "o",
+    network: "TOROX",
+    name: "o",
+    description: null,
+    category: "GAME",
+    userPays: "5",
+    requiresPurchase: false,
+    purchaseAmount: null,
+    deadlineDays: null,
+    devices: [],
+    tiers: [],
+    ease: null,
+    entryRate: null,
+    ...over,
+  });
+
+  it("drops the grinds people measurably do not finish", () => {
+    expect(isLight(offer({ ease: "hard" }))).toBe(false);
+    expect(isLight(offer({ ease: "moderate" }))).toBe(true);
+    expect(isLight(offer({ ease: "easy" }))).toBe(true);
+  });
+
+  it("drops anything that takes your own money first", () => {
+    // However quick it is, it is not light if you have to pay to start.
+    expect(isLight(offer({ ease: "easy", requiresPurchase: true }))).toBe(false);
+  });
+
+  it("keeps an offer nobody has measured", () => {
+    // We do not know it is heavy. Dropping every unproven offer would empty the
+    // list on the day the catalogue arrives, and those offers would never
+    // gather the starts that would prove them either way.
+    expect(isLight(offer({ ease: null }))).toBe(true);
+  });
+
+  it("partitions instead of filtering, so the page can say what it held back", () => {
+    const heavy = offer({ id: "heavy", ease: "hard" });
+    const paid = offer({ id: "paid", requiresPurchase: true });
+    const fine = offer({ id: "fine", ease: "easy" });
+
+    const split = splitLight([heavy, fine, paid]);
+    expect(split.light.map((o) => o.id)).toEqual(["fine"]);
+    expect(split.heavy.map((o) => o.id)).toEqual(["heavy", "paid"]);
+  });
+
+  it("loses nothing", () => {
+    // Every offer lands on exactly one side. An offer that fell out of both
+    // would vanish with no count to explain it.
+    const list = [offer({ id: "a", ease: "hard" }), offer({ id: "b" }), offer({ id: "c" })];
+    const { light, heavy } = splitLight(list);
+    expect(light.length + heavy.length).toBe(list.length);
   });
 });
