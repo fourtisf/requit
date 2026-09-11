@@ -1,3 +1,5 @@
+import Link from "next/link";
+import type { Route } from "next";
 import { requireUser } from "@/lib/session";
 import { AppNav } from "@/components/app-nav";
 import { Card, CardHeader } from "@/components/ui/card";
@@ -6,6 +8,8 @@ import { UNKNOWN_COUNTRY } from "@/lib/country";
 import {
   MIN_SAMPLES,
   offersFor,
+  parseSort,
+  type OfferSort,
   type OfferView,
   type TierView,
 } from "@/lib/offers";
@@ -17,18 +21,20 @@ import { TaskKindsGrid } from "@/components/task-kinds-grid";
 export const metadata = { title: "Tasks" };
 export const dynamic = "force-dynamic";
 
-export default async function TasksPage() {
+export default async function TasksPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string }>;
+}) {
   const user = await requireUser();
-  const offers = await offersFor({ countryCode: user.countryCode });
+  const sort = parseSort((await searchParams).sort);
+  const offers = await offersFor({ countryCode: user.countryCode, sort });
 
   // Only read when the page is about to be empty — the whole point of the
   // block below is that it has somewhere to send people.
   const empty = offers.length === 0 && user.countryCode !== UNKNOWN_COUNTRY;
   const [alreadyWaiting, waiting] = empty
-    ? await Promise.all([
-        isWaiting(user.id, user.countryCode),
-        waitingIn(user.countryCode),
-      ])
+    ? await Promise.all([isWaiting(user.id, user.countryCode), waitingIn(user.countryCode)])
     : [false, 0];
 
   return (
@@ -45,25 +51,27 @@ export default async function TasksPage() {
       </div>
 
       <p className="mt-2.5 max-w-[64ch] text-[13.5px] leading-[1.6] text-fg-2">
-        Everything you need to decide is here before you start: the reward, the
-        share of people who reach each tier, and any purchase required.
+        Everything you need to decide is here before you start: the reward, the share of people who
+        reach each tier, and any purchase required.
       </p>
+
+      {offers.length > 1 ? <SortTabs current={sort} /> : null}
 
       {user.countryCode === UNKNOWN_COUNTRY ? (
         <Card className="mt-7 max-w-[62ch]">
           <CardHeader title="We do not know your country" />
           <p className="text-[13.5px] leading-[1.65] text-fg-2">
-            Offers are matched by country, and we could not determine yours when
-            you signed up. Set it in settings and this page fills in.
+            Offers are matched by country, and we could not determine yours when you signed up.
+            Set it in settings and this page fills in.
           </p>
         </Card>
       ) : offers.length === 0 ? (
         <Card className="mt-7 max-w-[62ch]">
           <CardHeader title="Nothing live yet" />
           <p className="text-[13.5px] leading-[1.65] text-fg-2">
-            {BRAND.name} has no approved offer inventory for {user.countryCode}{" "}
-            right now. This is not a filter you can widen — when a network
-            approves us and sends offers for your country, they appear here.
+            {BRAND.name} has no approved offer inventory for {user.countryCode} right now. This is
+            not a filter you can widen — when a network approves us and sends offers for your
+            country, they appear here.
           </p>
           <NotifyMe
             countryCode={user.countryCode}
@@ -80,20 +88,18 @@ export default async function TasksPage() {
       )}
 
       {/* Shown whenever the list is empty — including the unknown-country case,
-          where someone is one settings change away from a full page and has
-          even less idea what they are waiting for. An empty list that also
-          explains nothing is the version of this page people leave and do not
-          come back to. */}
+          where someone is one settings change away from a full page and has even
+          less idea what they are waiting for. An empty list that also explains
+          nothing is the version of this page people leave and do not return to. */}
       {offers.length === 0 ? (
         <section className="mt-10">
           <h2 className="text-[17px] font-semibold tracking-[-0.03em]">
             What a task will ask you to do
           </h2>
           <p className="mt-2 max-w-[64ch] text-[13.5px] leading-[1.6] text-fg-2">
-            Six kinds, set by the advertiser. Which ones reach you depends on
-            your country and your device. The reward and the odds of reaching
-            each tier are on the task itself — they are the one thing we will
-            not describe in advance, because they change week to week.
+            Six kinds, set by the advertiser. Which ones reach you depends on your country and your
+            device. The reward and the odds of reaching each tier are on the task itself — they are
+            the one thing we will not describe in advance, because they change week to week.
           </p>
           <div className="mt-5">
             <TaskKindsGrid compact />
@@ -104,14 +110,53 @@ export default async function TasksPage() {
   );
 }
 
+/**
+ * The order of the list is a claim about the offers in it, so the page says
+ * which claim it is making instead of quietly reordering itself.
+ */
+function SortTabs({ current }: { current: OfferSort }) {
+  const tabs: { value: OfferSort; label: string; href: Route }[] = [
+    { value: "ease", label: "Easiest first", href: "/tasks" },
+    { value: "reward", label: "Highest paying", href: "/tasks?sort=reward" },
+  ];
+
+  return (
+    <div className="mt-5 flex flex-wrap items-center gap-1.5">
+      {tabs.map((tab) => (
+        <Link
+          key={tab.value}
+          href={tab.href}
+          aria-current={tab.value === current ? "page" : undefined}
+          className={
+            tab.value === current
+              ? "rounded-full bg-surf-2 px-[13px] py-[6px] text-[12.5px] font-medium text-fg shadow-[inset_0_0_0_1px_var(--color-bd-2)]"
+              : "rounded-full px-[13px] py-[6px] text-[12.5px] text-fg-3 transition-colors hover:bg-surf-2 hover:text-fg"
+          }
+        >
+          {tab.label}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Stated as a fact about people, not as a grade. "Easy" is a promise about how
+ * someone will find it; "most people finish it" is a measurement, and the
+ * measurement is the part we can stand behind.
+ */
+const EASE_LABEL = {
+  easy: "most people finish it",
+  moderate: "some people finish it",
+  hard: "few people finish it",
+} as const;
+
 function OfferCard({ offer }: { offer: OfferView }) {
   return (
     <Card>
       <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
         <div className="min-w-0 flex-1">
-          <h2 className="text-[17px] font-semibold tracking-[-0.025em]">
-            {offer.name}
-          </h2>
+          <h2 className="text-[17px] font-semibold tracking-[-0.025em]">{offer.name}</h2>
           {offer.description ? (
             <p className="mt-1.5 text-[13px] font-light leading-[1.6] text-fg-2">
               {offer.description}
@@ -125,16 +170,18 @@ function OfferCard({ offer }: { offer: OfferView }) {
 
       <ChipRow>
         <Chip>{offer.category.toLowerCase()}</Chip>
+        {offer.ease ? (
+          <Chip tone={offer.ease === "easy" ? "accent" : offer.ease === "hard" ? "amber" : "neutral"}>
+            {EASE_LABEL[offer.ease]}
+          </Chip>
+        ) : null}
         {offer.devices.map((device) => (
           <Chip key={device}>{device}</Chip>
         ))}
-        {offer.deadlineDays ? (
-          <Chip>{offer.deadlineDays}-day deadline</Chip>
-        ) : null}
+        {offer.deadlineDays ? <Chip>{offer.deadlineDays}-day deadline</Chip> : null}
         {offer.requiresPurchase ? (
           <Chip tone="amber">
-            purchase required
-            {offer.purchaseAmount ? ` · $${offer.purchaseAmount}` : ""}
+            purchase required{offer.purchaseAmount ? ` · $${offer.purchaseAmount}` : ""}
           </Chip>
         ) : null}
       </ChipRow>
@@ -160,9 +207,8 @@ function OfferCard({ offer }: { offer: OfferView }) {
       </a>
 
       <p className="mt-3 text-[11.5px] leading-[1.5] text-fg-4">
-        Open it from this button. Installing or signing up another way leaves
-        the network with no way to credit you, and nobody can recover it
-        afterwards.
+        Open it from this button. Installing or signing up another way leaves the network with no
+        way to credit you, and nobody can recover it afterwards.
       </p>
     </Card>
   );

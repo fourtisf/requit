@@ -36,22 +36,22 @@ export default function Home() {
                 the one thing that is not reachable by scrolling — the way in —
                 off the right edge. */}
             <span className="hidden gap-0.5 sm:flex">
-              {[
-                { href: "/#how", label: "How it works" },
-                { href: "/#tasks", label: "The work" },
-                { href: "/#timing", label: "Timing" },
-                { href: "/#product", label: "Product" },
-                { href: "/#faq", label: "Questions" },
-                { href: "/proof", label: "Proof" },
-              ].map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="rounded-lg px-[13px] py-[7px] text-[13.5px] text-fg-3 transition-colors hover:bg-surf-2 hover:text-fg"
-                >
-                  {link.label}
-                </a>
-              ))}
+            {[
+              { href: "/#how", label: "How it works" },
+              { href: "/#tasks", label: "The work" },
+              { href: "/#timing", label: "Timing" },
+              { href: "/#product", label: "Product" },
+              { href: "/#faq", label: "Questions" },
+              { href: "/proof", label: "Proof" },
+            ].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="rounded-lg px-[13px] py-[7px] text-[13.5px] text-fg-3 transition-colors hover:bg-surf-2 hover:text-fg"
+              >
+                {link.label}
+              </a>
+            ))}
             </span>
 
             {/* Top right is where people look for the contract address and the
@@ -81,19 +81,16 @@ export default function Home() {
 
       <main>
         <section className="shell pt-[clamp(56px,9vw,110px)]">
-          <Badge accent="Opening soon">
-            Accounts are open. Tasks are not yet live.
-          </Badge>
+          <Badge accent="Opening soon">Accounts are open. Tasks are not yet live.</Badge>
 
           <h1 className="mt-8 max-w-[18ch] text-[clamp(2.5rem,6.4vw,4.6rem)] font-semibold leading-[1.02] tracking-[-0.048em] text-balance">
-            Advertiser-funded work.{" "}
-            <span className="text-fg-3">Paid the same day.</span>
+            Advertiser-funded work. <span className="text-fg-3">Paid the same day.</span>
           </h1>
 
           <p className="mt-6 max-w-[56ch] text-[clamp(15px,1.55vw,17.5px)] font-light leading-[1.62] text-fg-2">
-            Finish a task, the offer network confirms it, and {BRAND.name} pays
-            you in USD or ETH from $10. The reward, the odds of reaching it, and
-            any purchase required are on screen before you start.
+            Finish a task, the offer network confirms it, and {BRAND.name} pays you in USD or ETH
+            from $10. The reward, the odds of reaching it, and any purchase required are on screen
+            before you start.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-2.5">
@@ -109,10 +106,9 @@ export default function Home() {
           </div>
 
           <p className="mt-5 max-w-[58ch] text-[12.5px] leading-[1.6] text-fg-4">
-            We are still being approved by the offer networks that supply the
-            work, so there is nothing to complete yet. Nothing on this page is a
-            figure we cannot show you the working for — which is why there are
-            no earnings numbers on it.
+            We are still being approved by the offer networks that supply the work, so there is
+            nothing to complete yet. Nothing on this page is a figure we cannot show you the
+            working for — which is why there are no earnings numbers on it.
           </p>
         </section>
 
@@ -131,10 +127,7 @@ export default function Home() {
             ticker at the top would tell visitors the token is the point, which
             is both untrue and the read that attracts exactly the wrong
             audience. */}
-        <section
-          id="community"
-          className="shell scroll-mt-16 pb-[clamp(20px,4vw,40px)]"
-        >
+        <section id="community" className="shell scroll-mt-16 pb-[clamp(20px,4vw,40px)]">
           <div className="grid gap-3 lg:grid-cols-[1.4fr_1fr]">
             <ContractAddress />
             <SocialCard />
@@ -152,8 +145,8 @@ export default function Home() {
                 Your first payout starts with a free account.
               </h2>
               <p className="mx-auto mt-4 max-w-[48ch] text-[14.5px] font-light leading-[1.65] text-fg-2">
-                No deposit, no subscription, nothing to buy. Create the account
-                now and you will be ready when the first offers go live.
+                No deposit, no subscription, nothing to buy. Create the account now and you will be
+                ready when the first offers go live.
               </p>
               <div className="mt-7 flex justify-center">
                 <ButtonLink href="/signin" size="lg">
