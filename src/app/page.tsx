@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +27,12 @@ export default function Home() {
       <header className="shell pt-12">
         <div className="flex flex-wrap items-center gap-4">
           <BrandLockup href="/" />
-          <nav className="ml-auto flex gap-0.5">
+          <nav className="ml-auto flex items-center gap-0.5">
+            {/* The section links are hidden on a phone. They are anchors to
+                content the reader scrolls past anyway, and at 400px they push
+                the one thing that is not reachable by scrolling — the way in —
+                off the right edge. */}
+            <span className="hidden gap-0.5 sm:flex">
             {[
               { href: "/#how", label: "How it works" },
               { href: "/#timing", label: "Timing" },
@@ -42,6 +48,17 @@ export default function Home() {
                 {link.label}
               </a>
             ))}
+            </span>
+
+            {/* Somebody who already has an account looks top right, which is
+                where every site puts this. Without it the only way in was the
+                hero button, and that reads as "make a second account". */}
+            <Link
+              href="/signin"
+              className="ml-1.5 rounded-lg bg-surf-2 px-[15px] py-[7px] text-[13.5px] font-medium text-fg shadow-[inset_0_0_0_1px_var(--color-bd-2)] transition-colors hover:bg-surf-3"
+            >
+              Sign in
+            </Link>
           </nav>
         </div>
       </header>

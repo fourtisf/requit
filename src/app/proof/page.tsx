@@ -40,7 +40,7 @@ export default async function ProofPage() {
       <main className="shell py-10">
         <header className="mb-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-bd pb-4">
           <BrandLockup href="/" />
-          <nav className="flex flex-wrap gap-4 text-[13.5px] text-fg-3">
+          <nav className="flex flex-1 flex-wrap items-center gap-4 text-[13.5px] text-fg-3">
             <Link href="/" className="transition-colors hover:text-fg">
               Home
             </Link>
@@ -49,6 +49,12 @@ export default async function ProofPage() {
             </Link>
             <Link href="/leaderboard" className="transition-colors hover:text-fg">
               Leaderboard
+            </Link>
+            <Link
+              href="/signin"
+              className="ml-auto rounded-lg bg-surf-2 px-[15px] py-[7px] font-medium text-fg shadow-[inset_0_0_0_1px_var(--color-bd-2)] transition-colors hover:bg-surf-3"
+            >
+              Sign in
             </Link>
           </nav>
         </header>
