@@ -19,6 +19,7 @@ import { createTransport } from "nodemailer";
 import { transportProblem, PROBLEM_DETAIL, redactTransport } from "../src/lib/auth/transport";
 import { BRAND } from "../src/lib/brand";
 import { setEnvKey } from "../src/lib/env-file";
+import { addressProblem } from "../src/lib/auth/address";
 
 const ENV_PATH = resolve(process.cwd(), ".env");
 
@@ -45,6 +46,22 @@ async function prompt(question: string, hidden: boolean): Promise<string> {
   return answer.trim();
 }
 
+/**
+ * Catches a pasted block being eaten by the prompts.
+ *
+ * This has now happened three times: a multi-line paste answers the first
+ * question with its own second line. Nothing in a hostname, a port or an email
+ * address contains a space, so a space is the tell — and refusing here is much
+ * cheaper than writing a connection string pointing at "pm2 reload requit-web".
+ */
+function looksPasted(value: string, field: string): boolean {
+  if (!/\s/.test(value)) return false;
+  console.error(`\n"${value}" is not a ${field}.`);
+  console.error("It looks like a pasted command was read as the answer.");
+  console.error("Run `npm run smtp` on its own, then type each answer and press Enter.\n");
+  return true;
+}
+
 async function main(): Promise<void> {
   if (!existsSync(ENV_PATH)) {
     console.error(`No .env at ${ENV_PATH}. Run this from the app directory.`);
@@ -52,10 +69,26 @@ async function main(): Promise<void> {
   }
 
   const host = (await prompt("SMTP host [smtp.hostinger.com]: ", false)) || "smtp.hostinger.com";
+  if (looksPasted(host, "hostname")) process.exit(1);
+  if (!/^[a-zA-Z0-9.-]+$/.test(host)) {
+    console.error(`"${host}" is not a hostname. Nothing was written.`);
+    process.exit(1);
+  }
+
   const port = (await prompt("Port [465]: ", false)) || "465";
+  if (!/^\d{1,5}$/.test(port)) {
+    console.error(`"${port}" is not a port number. Nothing was written.`);
+    process.exit(1);
+  }
+
   const user = await prompt("Mailbox address: ", false);
   if (!user) {
     console.error("No address given. Nothing was written.");
+    process.exit(1);
+  }
+  if (looksPasted(user, "mailbox address")) process.exit(1);
+  if (addressProblem(user)) {
+    console.error(`"${user}" is not a mailbox address. Nothing was written.`);
     process.exit(1);
   }
 
