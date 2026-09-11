@@ -11,6 +11,7 @@ import { PayoutTiming } from "@/components/marketing/payout-timing";
 import { Faq } from "@/components/marketing/faq";
 import { ContractAddress } from "@/components/contract-address";
 import { SocialCard } from "@/components/social-card";
+import { SocialNav } from "@/components/social-nav";
 
 /**
  * The public site.
@@ -49,6 +50,12 @@ export default function Home() {
               </a>
             ))}
             </span>
+
+            {/* Top right is where people look for these, and looking for them
+                and finding nothing is what makes a project look abandoned. They
+                stay visible on a phone: two 30px icons, unlike the section
+                anchors, cost nothing next to the sign-in button. */}
+            <SocialNav className="ml-1" />
 
             {/* Somebody who already has an account looks top right, which is
                 where every site puts this. Without it the only way in was the
@@ -110,7 +117,7 @@ export default function Home() {
             ticker at the top would tell visitors the token is the point, which
             is both untrue and the read that attracts exactly the wrong
             audience. */}
-        <section className="shell pb-[clamp(20px,4vw,40px)]">
+        <section id="community" className="shell scroll-mt-16 pb-[clamp(20px,4vw,40px)]">
           <div className="grid gap-3 lg:grid-cols-[1.4fr_1fr]">
             <ContractAddress />
             <SocialCard />
