@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { BrandLockup } from "@/components/ui/brand-mark";
 import { SiteFooter } from "@/components/site-footer";
 import { HowItWorks } from "@/components/marketing/how-it-works";
+import { ProductShots } from "@/components/marketing/product-shots";
 import { Comparison } from "@/components/marketing/comparison";
 import { PayoutTiming } from "@/components/marketing/payout-timing";
 import { Faq } from "@/components/marketing/faq";
@@ -29,6 +30,7 @@ export default function Home() {
             {[
               { href: "/#how", label: "How it works" },
               { href: "/#timing", label: "Timing" },
+              { href: "/#product", label: "Product" },
               { href: "/#faq", label: "Questions" },
               { href: "/proof", label: "Proof" },
             ].map((link) => (
@@ -82,6 +84,7 @@ export default function Home() {
         </div>
 
         <HowItWorks />
+        <ProductShots />
         <Comparison />
         <PayoutTiming />
         <Faq />
