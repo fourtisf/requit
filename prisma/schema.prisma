@@ -66,6 +66,7 @@ model User {
   disputes    Dispute[]
   devices     Device[]
   interests   CountryInterest[]
+  gameSessions GameSession[]
 
   // ── Referral (section 4) ──
   referralCode String    @unique
@@ -168,6 +169,36 @@ model Offer {
 
   @@unique([network, networkOfferId])
   @@index([isActive, category])
+}
+
+/**
+ * One round of one of our own games.
+ *
+ * The seed is generated here, on the server, and never accepted from the
+ * client. A player who chooses their own seed can pre-solve the board offline
+ * and submit a perfect game — and once a score is worth money, someone will.
+ *
+ * `score` is likewise never read from the browser. It is recomputed by
+ * replaying the submitted moves against this row's seed (lib/games/play.ts).
+ */
+model GameSession {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  game     String // slug, so a second game does not need a migration
+  seed     Int
+  score    Int    @default(0)
+  moves    Int    @default(0)
+  bestTile Int    @default(0)
+
+  startedAt DateTime  @default(now())
+  // Null while a round is in progress. Set once, by the first submission —
+  // a finished round cannot be resubmitted with a better move list.
+  endedAt   DateTime?
+
+  @@index([userId, startedAt])
+  @@index([game, score])
 }
 
 enum Network {

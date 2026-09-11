@@ -6,6 +6,7 @@ import { viewerIsAdmin } from "@/lib/admin/access";
 const LINKS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/tasks", label: "Tasks" },
+  { href: "/play", label: "Play" },
   { href: "/withdraw", label: "Withdraw" },
   { href: "/disputes", label: "Disputes" },
   { href: "/history", label: "History" },
