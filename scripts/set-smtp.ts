@@ -27,27 +27,81 @@ import { addressProblem } from "../src/lib/auth/address";
 
 const ENV_PATH = resolve(process.cwd(), ".env");
 
-async function prompt(question: string, hidden: boolean): Promise<string> {
+async function prompt(question: string): Promise<string> {
   const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-
-  if (!hidden) {
-    const answer = await new Promise<string>((done) => rl.question(question, done));
-    rl.close();
-    return answer.trim();
-  }
-
-  let muted = false;
-  const internal = rl as unknown as { _writeToOutput: (text: string) => void };
-  internal._writeToOutput = (text: string) => {
-    process.stdout.write(muted ? "*" : text);
-  };
-
-  process.stdout.write(question);
-  muted = true;
-  const answer = await new Promise<string>((done) => rl.question("", done));
+  const answer = await new Promise<string>((done) => rl.question(question, done));
   rl.close();
-  process.stdout.write("\n");
   return answer.trim();
+}
+
+/**
+ * Reads a password without echoing it, keeping the prompt on screen.
+ *
+ * readline cannot do this: overriding its _writeToOutput hook masks the
+ * characters but readline still emits its own line-clearing escapes on every
+ * keystroke, so the prompt label is wiped the moment the first key is pressed.
+ * Someone then stares at a bare asterisk with no idea what is being asked —
+ * which is what happened.
+ *
+ * Raw mode instead: we own the echo, so the prompt stays put.
+ */
+function promptHidden(question: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const input = process.stdin;
+    if (!input.isTTY) {
+      // Piped input, as in a test. Read the line plainly; there is no terminal
+      // to hide anything from.
+      const rl = createInterface({ input, output: process.stdout, terminal: false });
+      rl.question("", (answer) => {
+        rl.close();
+        resolve(answer.trim());
+      });
+      return;
+    }
+
+    process.stdout.write(question);
+    input.setRawMode(true);
+    input.resume();
+    input.setEncoding("utf8");
+
+    let value = "";
+
+    const done = (result: string | null) => {
+      input.setRawMode(false);
+      input.pause();
+      input.removeListener("data", onData);
+      process.stdout.write("\n");
+      if (result === null) reject(new Error("cancelled"));
+      else resolve(result.trim());
+    };
+
+    const onData = (chunk: string) => {
+      for (const char of chunk) {
+        switch (char) {
+          case "\r":
+          case "\n":
+            return done(value);
+          case "\u0003": // Ctrl+C
+            return done(null);
+          case "\u007f": // backspace
+          case "\b":
+            if (value.length > 0) {
+              value = value.slice(0, -1);
+              process.stdout.write("\b \b");
+            }
+            break;
+          default:
+            // Ignore other control characters rather than counting them.
+            if (char >= " ") {
+              value += char;
+              process.stdout.write("*");
+            }
+        }
+      }
+    };
+
+    input.on("data", onData);
+  });
 }
 
 /**
@@ -96,7 +150,7 @@ async function main(): Promise<void> {
   // The address may come as a bare argument, leaving the password as the only
   // thing that has to be typed at a prompt.
   const positional = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
-  const user = positional ?? (await prompt("Mailbox address: ", false));
+  const user = positional ?? (await prompt("Mailbox address: "));
   if (!user) {
     console.error("No address given. Nothing was written.");
     process.exit(1);
@@ -109,7 +163,7 @@ async function main(): Promise<void> {
 
   console.log(`\n  ${user} via ${host}:${port}`);
 
-  const password = await prompt(`  password for ${user}: `, true);
+  const password = await promptHidden(`  password for ${user}: `);
   if (!password) {
     // The exact failure this script exists to prevent.
     console.error("No password entered. Nothing was written.");
