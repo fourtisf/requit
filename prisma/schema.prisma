@@ -23,6 +23,9 @@
 //   5. AdminAction — the audit trail for operator writes. §6.1 routes FLAGGED
 //      withdrawals to a person and §7 requires a stated reason for every
 //      suspension; neither is answerable later without a record of who did it.
+//   6. CountryInterest — who is waiting for tasks where. A member in a country
+//      with no inventory currently hits a dead end, and §4.3's approval
+//      problem needs exactly this evidence of demand.
 //
 // Known gap, deliberately left as §3 specifies: there is no index serving the
 // job that flips Reward PENDING -> AVAILABLE (it filters on status and
@@ -62,6 +65,7 @@ model User {
   withdrawals Withdrawal[]
   disputes    Dispute[]
   devices     Device[]
+  interests   CountryInterest[]
 
   // ── Referral (section 4) ──
   referralCode String    @unique
@@ -377,4 +381,31 @@ model AdminAction {
 
   @@index([subjectId, createdAt])
   @@index([createdAt])
+}
+
+/**
+ * Who is waiting for tasks where.
+ * A member whose country has no live inventory currently reaches a dead end:
+ * the page says "nothing yet" and there is no way to tell them when that
+ * changes, so the signup is wasted. This records the intent, and the payout
+ * worker mails them when an offer for their country appears.
+ * It is also the evidence §4.3's approval problem needs. Networks want proof of
+ * traffic before they approve a publisher, and "412 people waiting in ID" is
+ * exactly that — collected before there is anything to send them to.
+ * countryCode is stored on the row rather than read from the User: someone who
+ * moves country should still be told about the place they asked about.
+ */
+model CountryInterest {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  countryCode String    @db.Char(2)
+  createdAt   DateTime  @default(now())
+  /**
+   * Set when we have told them tasks went live. Null means still waiting.
+   */
+  notifiedAt  DateTime?
+
+  @@unique([userId, countryCode]) // asking twice is the same ask
+  @@index([countryCode, notifiedAt])
 }

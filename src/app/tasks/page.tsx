@@ -5,6 +5,8 @@ import { Chip, ChipRow } from "@/components/ui/chip";
 import { UNKNOWN_COUNTRY } from "@/lib/country";
 import { MIN_SAMPLES, offersFor, type OfferView, type TierView } from "@/lib/offers";
 import { BRAND } from "@/lib/brand";
+import { NotifyMe } from "@/components/notify-me";
+import { isWaiting, waitingIn } from "@/lib/interest";
 
 export const metadata = { title: "Tasks" };
 export const dynamic = "force-dynamic";
@@ -12,6 +14,13 @@ export const dynamic = "force-dynamic";
 export default async function TasksPage() {
   const user = await requireUser();
   const offers = await offersFor({ countryCode: user.countryCode });
+
+  // Only read when the page is about to be empty — the whole point of the
+  // block below is that it has somewhere to send people.
+  const empty = offers.length === 0 && user.countryCode !== UNKNOWN_COUNTRY;
+  const [alreadyWaiting, waiting] = empty
+    ? await Promise.all([isWaiting(user.id, user.countryCode), waitingIn(user.countryCode)])
+    : [false, 0];
 
   return (
     <main className="shell py-10">
@@ -47,6 +56,11 @@ export default async function TasksPage() {
             not a filter you can widen — when a network approves us and sends offers for your
             country, they appear here.
           </p>
+          <NotifyMe
+            countryCode={user.countryCode}
+            alreadyWaiting={alreadyWaiting}
+            waiting={waiting}
+          />
         </Card>
       ) : (
         <div className="mt-7 grid gap-3 lg:grid-cols-2">

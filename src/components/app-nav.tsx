@@ -21,7 +21,11 @@ export async function AppNav({ current }: { current: string }) {
     <header className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-bd pb-4">
       <BrandLockup href="/dashboard" />
 
-      <nav className="flex flex-wrap gap-0.5">
+      {/* Scrolls rather than wraps. Eight links at 390px wrapped into two
+          ragged rows, which is the first thing a phone user saw after signing
+          in and read as unfinished. A single scrolling row keeps every link
+          reachable and the header one line tall at any width. */}
+      <nav className="-mx-1 flex gap-0.5 overflow-x-auto px-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {LINKS.map((link) => (
           <Link
             key={link.href}
@@ -29,8 +33,8 @@ export async function AppNav({ current }: { current: string }) {
             aria-current={current === link.href ? "page" : undefined}
             className={
               current === link.href
-                ? "rounded-lg bg-surf-2 px-[13px] py-[7px] text-[13.5px] text-fg"
-                : "rounded-lg px-[13px] py-[7px] text-[13.5px] text-fg-3 transition-colors hover:bg-surf-2 hover:text-fg"
+                ? "shrink-0 rounded-lg bg-surf-2 px-[13px] py-[7px] text-[13.5px] text-fg"
+                : "shrink-0 rounded-lg px-[13px] py-[7px] text-[13.5px] text-fg-3 transition-colors hover:bg-surf-2 hover:text-fg"
             }
           >
             {link.label}

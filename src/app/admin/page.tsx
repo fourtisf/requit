@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin/access";
+import { emailTransportConfigured } from "@/lib/auth/email";
+import { AdminForm } from "@/components/admin-form";
+import { testMailAction } from "@/app/admin/actions";
+import { demandByCountry } from "@/lib/interest";
+import { TableScroll, Th, Td } from "@/components/ui/table";
 import { liability, treasury } from "@/lib/admin/treasury";
 import { AdminNav } from "@/components/admin-nav";
 import { Card, CardHeader } from "@/components/ui/card";
@@ -11,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminOverviewPage() {
   await requireAdmin();
-  const figures = await treasury();
+  const [figures, demand] = await Promise.all([treasury(), demandByCountry()]);
   const owed = liability(figures);
   const covered = figures.receivable.sub(owed);
 
@@ -31,6 +36,45 @@ export default async function AdminOverviewPage() {
         <Stat value={money(figures.inFlight)} label="withdrawals in flight" />
         <Stat value={money(figures.receivable)} label="invoiced, unpaid" />
       </StatGrid>
+
+      <Card className="mt-3">
+        <CardHeader
+          title="Where people are waiting"
+          aside={demand.length > 0 ? `${demand.length} ${demand.length === 1 ? "country" : "countries"}` : "nobody yet"}
+        />
+        {demand.length === 0 ? (
+          <p className="max-w-[60ch] text-[13px] leading-[1.6] text-fg-3">
+            Nobody has asked to be told when tasks open in their country. The button that records
+            this only appears on an empty task list, so this stays empty until somebody signs up
+            somewhere we have no inventory.
+          </p>
+        ) : (
+          <>
+            <TableScroll>
+              <thead>
+                <tr>
+                  <Th>Country</Th>
+                  <Th>Waiting</Th>
+                  <Th>Already told</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {demand.map((row) => (
+                  <tr key={row.countryCode}>
+                    <Td className="mn">{row.countryCode}</Td>
+                    <Td className="mn">{row.waiting}</Td>
+                    <Td className="mn text-fg-3">{row.notified}</Td>
+                  </tr>
+                ))}
+              </tbody>
+            </TableScroll>
+            <p className="mt-4 max-w-[66ch] text-[12px] leading-[1.55] text-fg-4">
+              This is the evidence a network asks for before approving a publisher. It is a count
+              of real accounts that asked, not of visits.
+            </p>
+          </>
+        )}
+      </Card>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
         <Card>
@@ -55,6 +99,25 @@ export default async function AdminOverviewPage() {
               been confirmed. Members were not charged for it.
             </p>
           )}
+        </Card>
+
+        <Card>
+          <CardHeader
+            title="Sign-in email"
+            aside={emailTransportConfigured() ? "configured" : "not usable"}
+          />
+          <p className="max-w-[54ch] text-[13px] leading-[1.6] text-fg-2">
+            {emailTransportConfigured()
+              ? "The connection string is well formed. That does not prove the password is right — run the test."
+              : "EMAIL_SERVER is missing or malformed, so nobody can sign in. The test below says exactly which part is wrong."}
+          </p>
+          <AdminForm
+            action={testMailAction}
+            hidden={{}}
+            label="Opens a connection and authenticates. Sends nothing."
+            verb="Test the connection"
+            withReason={false}
+          />
         </Card>
 
         <Card>

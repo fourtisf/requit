@@ -19,6 +19,8 @@ export function AdminForm({
   label,
   verb,
   destructive,
+  /** Omit the reason box for actions that change nothing about a member. */
+  withReason = true,
   children,
 }: {
   action: Action;
@@ -26,6 +28,7 @@ export function AdminForm({
   label: string;
   verb: string;
   destructive?: boolean;
+  withReason?: boolean;
   children?: React.ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(action, EMPTY_FORM_STATE);
@@ -38,14 +41,16 @@ export function AdminForm({
 
       <label className="block text-[12.5px] text-fg-3">{label}</label>
       {children}
-      <textarea
-        name="reason"
-        required
-        minLength={8}
-        rows={2}
-        placeholder="Why — the member is shown this."
-        className="mt-2 w-full resize-y rounded-soft bg-surf px-3 py-2 text-[13px] text-fg shadow-[inset_0_0_0_1px_var(--color-bd)] outline-none placeholder:text-fg-4 focus:shadow-[inset_0_0_0_1px_var(--color-bd-2)]"
-      />
+      {withReason ? (
+        <textarea
+          name="reason"
+          required
+          minLength={8}
+          rows={2}
+          placeholder="Why — the member is shown this."
+          className="mt-2 w-full resize-y rounded-soft bg-surf px-3 py-2 text-[13px] text-fg shadow-[inset_0_0_0_1px_var(--color-bd)] outline-none placeholder:text-fg-4 focus:shadow-[inset_0_0_0_1px_var(--color-bd-2)]"
+        />
+      ) : null}
 
       <div className="mt-2.5 flex flex-wrap items-center gap-3">
         <Button

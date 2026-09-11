@@ -21,6 +21,7 @@ const TABLES = [
   "Offer",
   "NetworkInvoice",
   "AdminAction",
+  "CountryInterest",
   "User",
 ] as const;
 

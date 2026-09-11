@@ -17,6 +17,7 @@ import type { DisputeOutcome, DisputeStatus } from "@prisma/client";
 import { advanceDispute } from "@/lib/disputes";
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notify";
+import { verifyEmailTransport } from "@/lib/auth/email";
 
 /**
  * Every action re-checks admin.
@@ -167,4 +168,21 @@ export async function advanceDisputeAction(
   revalidatePath("/admin/disputes");
   revalidatePath("/disputes");
   return { error: null, done: "Moved. The member has been told." };
+}
+
+/**
+ * Opens a real SMTP connection and authenticates, sending nothing.
+ *
+ * Behind admin rather than on /api/health for two reasons: the error text names
+ * the host and the username, which has no business on an unauthenticated
+ * endpoint; and a handshake on every health probe means a connection on every
+ * deploy and every monitoring tick, which mail hosts rate-limit.
+ */
+export async function testMailAction(_prev: FormState, _form: FormData): Promise<FormState> {
+  await requireAdmin();
+
+  const result = await verifyEmailTransport();
+  return result.ok
+    ? { error: null, done: "Connected and authenticated. Sign-in codes will send." }
+    : { error: result.error, done: null };
 }

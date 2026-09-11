@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { kv } from "@/lib/redis";
+import { emailTransportConfigured } from "@/lib/auth/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -32,7 +33,7 @@ const SERVICE = "requit";
 const CHECK_TIMEOUT_MS = 2_000;
 
 export async function GET(): Promise<NextResponse> {
-  const checks = await Promise.all([
+  const critical = await Promise.all([
     timed("database", async () => {
       await prisma.$queryRaw`SELECT 1`;
     }),
@@ -41,7 +42,25 @@ export async function GET(): Promise<NextResponse> {
     }),
   ]);
 
-  const healthy = checks.every((check) => check.ok);
+  // Mail is reported but does not decide the status. The site serves fine
+  // without it; only sign-in breaks. Taking the instance out of rotation over a
+  // mail problem would turn a broken sign-in into a broken site.
+  //
+  // This is the shape check, which costs nothing. The real SMTP handshake is in
+  // the admin panel: running it on every probe would open a connection on every
+  // deploy and every monitoring tick, which mail hosts rate-limit.
+  const mailOk = emailTransportConfigured();
+  const mail: Check = {
+    name: "mail",
+    ok: mailOk,
+    latencyMs: 0,
+    // No host, no username, no error text. This endpoint is unauthenticated and
+    // the detail belongs where it can be acted on.
+    ...(mailOk ? {} : { error: "sign-in codes cannot be sent" }),
+  };
+
+  const healthy = critical.every((check) => check.ok);
+  const checks = [...critical, mail];
 
   return NextResponse.json(
     { service: SERVICE, status: healthy ? "ok" : "degraded", checks },

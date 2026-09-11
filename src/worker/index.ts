@@ -12,6 +12,7 @@ import "dotenv/config";
 import { Worker, type Job } from "bullmq";
 import { QUEUE, getQueue } from "@/lib/queue";
 import { prisma } from "@/lib/prisma";
+import { notifyLiveCountries } from "@/lib/interest";
 import { redis } from "@/lib/redis";
 import { alert } from "@/lib/alert";
 import { initSentry, Sentry } from "@/lib/observability";
@@ -42,6 +43,12 @@ const maintenance = new Worker(
         data: { status: "AVAILABLE" },
       });
       return { matured: count };
+    }
+
+    if (job.name === "notify-live-countries") {
+      // Batched, so one newly-opened country cannot put thousands of messages
+      // into the mail queue in a single tick.
+      return notifyLiveCountries();
     }
 
     throw new Error(`Unknown maintenance job: ${job.name}`);
@@ -82,6 +89,12 @@ async function main(): Promise<void> {
     "mature-rewards",
     { every: 60_000 },
     { name: "mature-rewards" },
+  );
+
+  await getQueue(QUEUE.maintenance).upsertJobScheduler(
+    "notify-live-countries",
+    { every: 5 * 60_000 },
+    { name: "notify-live-countries" },
   );
 
   await schedulePayoutJobs();
