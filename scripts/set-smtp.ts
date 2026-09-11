@@ -1,7 +1,11 @@
 /**
  * Writes EMAIL_SERVER into .env, correctly, and proves it works.
  *
- *   npm run smtp
+ *   npm run smtp -- team@requit.xyz
+ *
+ * Host and port default to Hostinger's and are flags, not questions
+ * (--host=, --port=). Only the password is ever typed at a prompt, because
+ * every question asked is another place for an answer to land in the wrong one.
  *
  * This exists because the shell one-liner it replaces kept failing in the same
  * way: `read -rsp ... P` consumes the NEXT LINE of a pasted block as the
@@ -68,20 +72,31 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const host = (await prompt("SMTP host [smtp.hostinger.com]: ", false)) || "smtp.hostinger.com";
-  if (looksPasted(host, "hostname")) process.exit(1);
+  // Host and port are flags, not questions. Three attempts were lost to an
+  // answer landing in the wrong prompt, and every question asked is another
+  // place for that to happen. Both defaults are right for Hostinger; anyone who
+  // needs different ones can pass them.
+  const flags = new Map<string, string>();
+  for (const arg of process.argv.slice(2)) {
+    const match = /^--([a-z]+)=(.+)$/.exec(arg);
+    if (match?.[1] && match[2]) flags.set(match[1], match[2]);
+  }
+
+  const host = flags.get("host") ?? "smtp.hostinger.com";
+  const port = flags.get("port") ?? "465";
   if (!/^[a-zA-Z0-9.-]+$/.test(host)) {
-    console.error(`"${host}" is not a hostname. Nothing was written.`);
+    console.error(`--host="${host}" is not a hostname. Nothing was written.`);
     process.exit(1);
   }
-
-  const port = (await prompt("Port [465]: ", false)) || "465";
   if (!/^\d{1,5}$/.test(port)) {
-    console.error(`"${port}" is not a port number. Nothing was written.`);
+    console.error(`--port="${port}" is not a port number. Nothing was written.`);
     process.exit(1);
   }
 
-  const user = await prompt("Mailbox address: ", false);
+  // The address may come as a bare argument, leaving the password as the only
+  // thing that has to be typed at a prompt.
+  const positional = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
+  const user = positional ?? (await prompt("Mailbox address: ", false));
   if (!user) {
     console.error("No address given. Nothing was written.");
     process.exit(1);
@@ -92,7 +107,9 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const password = await prompt("Mailbox password: ", true);
+  console.log(`\n  ${user} via ${host}:${port}`);
+
+  const password = await prompt(`  password for ${user}: `, true);
   if (!password) {
     // The exact failure this script exists to prevent.
     console.error("No password entered. Nothing was written.");
