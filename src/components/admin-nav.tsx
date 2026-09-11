@@ -5,6 +5,7 @@ import { BrandLockup } from "@/components/ui/brand-mark";
 const LINKS = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/withdrawals", label: "Withdrawals" },
+  { href: "/admin/disputes", label: "Disputes" },
   { href: "/admin/members", label: "Members" },
   { href: "/admin/audit", label: "Audit" },
 ] as const;

@@ -28,6 +28,7 @@ export default function Home() {
               { href: "/#how", label: "How it works" },
               { href: "/#timing", label: "Timing" },
               { href: "/#faq", label: "Questions" },
+              { href: "/proof", label: "Proof" },
             ].map((link) => (
               <a
                 key={link.href}

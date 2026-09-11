@@ -75,7 +75,7 @@ export default async function AdminOverviewPage() {
               label="Members flagged"
               count={figures.queues.flagged}
             />
-            <QueueRow href="/admin/audit" label="Disputes open" count={figures.queues.disputes} />
+            <QueueRow href="/admin/disputes" label="Disputes open" count={figures.queues.disputes} />
           </ul>
         </Card>
       </div>
@@ -106,7 +106,7 @@ function Row({
   );
 }
 
-function QueueRow({ href, label, count }: { href: "/admin/withdrawals" | "/admin/members" | "/admin/audit"; label: string; count: number }) {
+function QueueRow({ href, label, count }: { href: "/admin/withdrawals" | "/admin/members" | "/admin/disputes"; label: string; count: number }) {
   return (
     <li className="flex items-center justify-between gap-4 border-b border-bd py-2.5 last:border-b-0">
       <Link href={href} className="text-fg-2 transition-colors hover:text-fg">
