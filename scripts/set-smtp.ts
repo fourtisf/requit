@@ -117,6 +117,15 @@ async function main(): Promise<void> {
   }
   console.log(`  read ${password.length} characters.`);
 
+  // The line above the prompt is the one thing within easy reach of a mouse,
+  // and it has already been pasted in as the password once. No real password
+  // contains the address it belongs to or the host it authenticates against.
+  if (password.includes(user) || password.includes(host)) {
+    console.error("\nThat is the line this script printed, not a password.");
+    console.error("Type the mailbox password instead — it is not on screen.\n");
+    process.exit(1);
+  }
+
   // encodeURIComponent, not a hand-rolled escape: an @ or : in either half
   // silently breaks the URL, and a password is exactly where those appear.
   const scheme = port === "465" ? "smtps" : "smtp";
