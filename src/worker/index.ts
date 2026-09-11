@@ -11,6 +11,7 @@
 import "dotenv/config";
 import { Worker, type Job } from "bullmq";
 import { QUEUE, getQueue } from "@/lib/queue";
+import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { alert } from "@/lib/alert";
 import { initSentry, Sentry } from "@/lib/observability";
@@ -25,6 +26,18 @@ const maintenance = new Worker(
     if (job.name === "heartbeat") {
       return { at: new Date().toISOString() };
     }
+
+    if (job.name === "mature-rewards") {
+      // §4.2 step 5: a background job flips PENDING to AVAILABLE once
+      // availableAt passes. Nothing else may do it — a reward that matures on
+      // read would become available at different moments for different callers.
+      const { count } = await prisma.reward.updateMany({
+        where: { status: "PENDING", availableAt: { lte: new Date() } },
+        data: { status: "AVAILABLE" },
+      });
+      return { matured: count };
+    }
+
     throw new Error(`Unknown maintenance job: ${job.name}`);
   },
   { connection, concurrency: 1 },
@@ -59,6 +72,12 @@ async function main(): Promise<void> {
     { every: 60_000 },
     { name: "heartbeat" },
   );
+  await getQueue(QUEUE.maintenance).upsertJobScheduler(
+    "mature-rewards",
+    { every: 60_000 },
+    { name: "mature-rewards" },
+  );
+
   console.log("[worker] ready");
 }
 
