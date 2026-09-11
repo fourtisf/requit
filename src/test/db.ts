@@ -20,6 +20,7 @@ const TABLES = [
   "OfferTier",
   "Offer",
   "NetworkInvoice",
+  "AdminAction",
   "User",
 ] as const;
 

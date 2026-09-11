@@ -20,6 +20,9 @@
 //      fraud implications §7 cares about: it is the classic multi-account
 //      vector, so the anti-abuse rules live in src/lib/referral.ts and were
 //      written at the same time, not deferred.
+//   5. AdminAction — the audit trail for operator writes. §6.1 routes FLAGGED
+//      withdrawals to a person and §7 requires a stated reason for every
+//      suspension; neither is answerable later without a record of who did it.
 //
 // Known gap, deliberately left as §3 specifies: there is no index serving the
 // job that flips Reward PENDING -> AVAILABLE (it filters on status and
@@ -342,4 +345,36 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 4. Additions after the handoff — admin audit trail
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Every state change an operator makes by hand.
+ * §3 has no such model because §11 never names an admin panel — but §6.1 sends
+ * FLAGGED withdrawals "to a person", and §7 requires a stated reason for every
+ * suspension. Both of those are operator writes to a member's account, and an
+ * operator write with no record of who made it is the thing disputes cannot be
+ * resolved without.
+ * `actorEmail` is a string rather than a relation on purpose: the admin
+ * allowlist lives in the environment (see src/lib/admin/access.ts), so an
+ * operator need not be a member, and the record must survive the account being
+ * removed from the allowlist.
+ */
+model AdminAction {
+  id         String   @id @default(cuid())
+  actorEmail String
+  action     String // e.g. "suspend", "set-tier", "approve-withdrawal"
+  subjectId  String // the User, Withdrawal or Dispute acted on
+  reason     String
+  /**
+   * Before/after, for the fields this action changed.
+   */
+  detail     Json?
+  createdAt  DateTime @default(now())
+
+  @@index([subjectId, createdAt])
+  @@index([createdAt])
 }

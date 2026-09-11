@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
 import { BrandLockup } from "@/components/ui/brand-mark";
+import { viewerIsAdmin } from "@/lib/admin/access";
 
 const LINKS = [
   { href: "/dashboard", label: "Dashboard" },
@@ -11,7 +12,9 @@ const LINKS = [
   { href: "/settings", label: "Settings" },
 ] as const;
 
-export function AppNav({ current }: { current: string }) {
+export async function AppNav({ current }: { current: string }) {
+  const isAdmin = await viewerIsAdmin();
+
   return (
     <header className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-bd pb-4">
       <BrandLockup href="/dashboard" />
@@ -33,8 +36,17 @@ export function AppNav({ current }: { current: string }) {
         ))}
       </nav>
 
+      {isAdmin ? (
+        <Link
+          href="/admin"
+          className="mn ml-auto rounded-full bg-[rgba(232,198,139,.1)] px-[11px] py-1 text-[11.5px] text-amber shadow-[inset_0_0_0_1px_rgba(232,198,139,.24)] transition-colors hover:bg-[rgba(232,198,139,.16)]"
+        >
+          operator
+        </Link>
+      ) : null}
+
       <form
-        className="ml-auto"
+        className={isAdmin ? "" : "ml-auto"}
         action={async () => {
           "use server";
           await signOut({ redirectTo: "/" });

@@ -19,7 +19,10 @@ import { REFERRAL_COOKIE, REFERRAL_COOKIE_MAX_AGE_SECONDS } from "@/lib/referral
  *    minutes or days later, on a different page. The code has to survive that
  *    gap, and the cookie is the only thing that does.
  */
-const PROTECTED = ["/dashboard", "/settings", "/withdraw", "/tasks", "/disputes"];
+// /admin is here for the cheap redirect only. The real gate is requireAdmin()
+// in the page and again in every action — middleware runs on the edge and
+// cannot read the allowlist decision against a session.
+const PROTECTED = ["/dashboard", "/settings", "/withdraw", "/tasks", "/disputes", "/admin"];
 
 // Auth.js prefixes the cookie with __Secure- when it is issued over HTTPS.
 const SESSION_COOKIES = ["authjs.session-token", "__Secure-authjs.session-token"];
