@@ -154,6 +154,10 @@ model Offer {
   devices          String[] // ios | android | desktop
   advertiserPays   Decimal       @db.Decimal(10, 4) // NEVER expose via public API
   userPays         Decimal       @db.Decimal(10, 4) // what we show
+  // Where the click goes. Null until a feed supplies one; lib/networks/handoff.ts
+  // refuses the handoff rather than sending a member out on a link that cannot
+  // carry their id back.
+  trackingUrl      String?
   requiresPurchase Boolean       @default(false)
   purchaseAmount   Decimal?      @db.Decimal(10, 2)
   deadlineDays     Int?

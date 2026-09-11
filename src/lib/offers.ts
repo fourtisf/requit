@@ -1,6 +1,7 @@
 import type { OfferCategory, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { UNKNOWN_COUNTRY } from "@/lib/country";
+import { canHandOff } from "@/lib/networks/handoff";
 
 /**
  * Below this many starts a completion rate is noise. §4.4: "Display 'Not enough
@@ -52,6 +53,12 @@ export type OfferView = {
   deadlineDays: number | null;
   devices: string[];
   tiers: TierView[];
+  /**
+   * False when a click could not carry the member's id to the network. The
+   * button renders as unavailable rather than letting someone start work that
+   * could never be credited to them.
+   */
+  canStart: boolean;
   /** Null until the first tier has enough starts to mean anything. */
   ease: Ease | null;
   /** The first tier's completion rate, or null. Drives `ease` and the sort. */
@@ -194,6 +201,7 @@ export async function offersFor(filter: OfferFilter): Promise<OfferView[]> {
       description: true,
       category: true,
       userPays: true,
+      trackingUrl: true,
       requiresPurchase: true,
       purchaseAmount: true,
       deadlineDays: true,
@@ -237,6 +245,7 @@ export async function offersFor(filter: OfferFilter): Promise<OfferView[]> {
       purchaseAmount: offer.purchaseAmount?.toString() ?? null,
       deadlineDays: offer.deadlineDays,
       devices: offer.devices,
+      canStart: canHandOff(offer.network, offer.trackingUrl),
       tiers,
       ...easeOf(tiers),
     };

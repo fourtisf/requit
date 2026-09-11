@@ -18,6 +18,7 @@ import { BRAND } from "@/lib/brand";
 import { NotifyMe } from "@/components/notify-me";
 import { isWaiting, waitingIn } from "@/lib/interest";
 import { TaskKindsGrid } from "@/components/task-kinds-grid";
+import { HANDOFF_DETAIL, type HandoffFailure } from "@/lib/networks/handoff";
 
 export const metadata = { title: "Tasks" };
 export const dynamic = "force-dynamic";
@@ -25,12 +26,17 @@ export const dynamic = "force-dynamic";
 export default async function TasksPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string; all?: string }>;
+  searchParams: Promise<{ sort?: string; all?: string; unavailable?: string }>;
 }) {
   const user = await requireUser();
   const params = await searchParams;
   const sort = parseSort(params.sort);
   const showEverything = params.all === "1";
+  const unavailable = params.unavailable;
+  const unavailableDetail =
+    unavailable && unavailable in HANDOFF_DETAIL
+      ? HANDOFF_DETAIL[unavailable as HandoffFailure]
+      : null;
 
   const all = await offersFor({ countryCode: user.countryCode, sort });
   const { light, heavy } = splitLight(all);
@@ -62,6 +68,14 @@ export default async function TasksPage({
         Everything you need to decide is here before you start: the reward, the share of people who
         reach each tier, and any purchase required.
       </p>
+
+      {/* Sent back here by the start route. Saying which task and why beats a
+          silent bounce, which reads as a broken button. */}
+      {unavailableDetail ? (
+        <p className="mt-4 rounded-card px-[18px] py-3 text-[12.5px] leading-[1.6] text-amber surface-inset">
+          {unavailableDetail} Nothing was started, and nothing was counted against you.
+        </p>
+      ) : null}
 
       {offers.length > 1 ? <SortTabs current={sort} all={showEverything} /> : null}
 
@@ -254,18 +268,37 @@ function OfferCard({ offer }: { offer: OfferView }) {
         A plain link, not the client router: it leaves the site. The start is
         counted server-side on the way out, because that count is the
         denominator of every completion rate shown above.
-      */}
-      <a
-        href={`/api/offers/${offer.id}/start`}
-        className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-[11px] text-[13.5px] font-semibold text-bg shadow-[0_0_0_1px_rgba(255,255,255,.9)] transition-transform hover:-translate-y-px"
-      >
-        Open this task
-      </a>
 
-      <p className="mt-3 text-[11.5px] leading-[1.5] text-fg-4">
-        Open it from this button. Installing or signing up another way leaves the network with no
-        way to credit you, and nobody can recover it afterwards.
-      </p>
+        Unavailable is rendered as unavailable. The click would bounce straight
+        back, and a button that does nothing teaches people the site is broken.
+      */}
+      {offer.canStart ? (
+        <>
+          <a
+            href={`/api/offers/${offer.id}/start`}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-[11px] text-[13.5px] font-semibold text-bg shadow-[0_0_0_1px_rgba(255,255,255,.9)] transition-transform hover:-translate-y-px"
+          >
+            Open this task
+          </a>
+
+          <p className="mt-3 text-[11.5px] leading-[1.5] text-fg-4">
+            Open it from this button. Installing or signing up another way leaves the network with
+            no way to credit you, and nobody can recover it afterwards.
+          </p>
+        </>
+      ) : (
+        <>
+          <span className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-[11px] text-[13.5px] font-semibold text-fg-4 shadow-[inset_0_0_0_1px_var(--color-bd-2)]">
+            Not open yet
+          </span>
+
+          <p className="mt-3 max-w-[52ch] text-[11.5px] leading-[1.5] text-fg-4">
+            We cannot yet send you to this one in a way the network would credit back to you.
+            Starting it now would mean doing the work for nothing, so the button stays shut until
+            that link is proven.
+          </p>
+        </>
+      )}
     </Card>
   );
 }
