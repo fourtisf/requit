@@ -3,9 +3,9 @@
  *
  *   npm run worker
  *
- * Phase 0 registers only a heartbeat so the queue wiring is demonstrably alive.
- * Offer sync lands here in Phase 1; the payout executor and the reconciliation
- * job in Phase 2.
+ * Two queues, two failure domains (§2): maintenance keeps rewards maturing, and
+ * payouts sends money. A stuck chain must not stop postbacks being credited, so
+ * they do not share a worker.
  */
 // Standalone process — nothing loads .env for us the way Next does for the app.
 import "dotenv/config";
@@ -15,10 +15,16 @@ import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { alert } from "@/lib/alert";
 import { initSentry, Sentry } from "@/lib/observability";
+import { schedulePayoutJobs, startPayoutWorker } from "@/worker/payouts";
 
 initSentry();
 
 const connection = redis();
+
+// Built at start-up: the keystore is unlocked once, here, and nothing else in
+// the process ever sees the raw key. A chain with no keystore configured is
+// reported and skipped — the worker still runs.
+const { worker: payouts } = startPayoutWorker(connection);
 
 const maintenance = new Worker(
   QUEUE.maintenance,
@@ -78,6 +84,8 @@ async function main(): Promise<void> {
     { name: "mature-rewards" },
   );
 
+  await schedulePayoutJobs();
+
   console.log("[worker] ready");
 }
 
@@ -88,10 +96,10 @@ async function shutdown(signal: string): Promise<void> {
   shuttingDown = true;
 
   console.log(`[worker] ${signal} — draining`);
-  // `close()` waits for in-flight jobs. From Phase 2 an in-flight job may have
-  // broadcast a transaction, so killing it mid-flight is a reconciliation
-  // problem rather than a restart.
-  await maintenance.close();
+  // `close()` waits for in-flight jobs. A payout job may have broadcast a
+  // transaction and not yet written the hash, so killing it mid-flight turns a
+  // restart into a reconciliation problem. Wait for it.
+  await Promise.all([maintenance.close(), payouts.close()]);
   await connection.quit();
   process.exit(0);
 }

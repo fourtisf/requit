@@ -19,7 +19,7 @@ async function member(email = "ada@example.com", handle = "ada") {
 }
 
 /** Walks the whole flow the way the browser does. */
-async function bind(userId: string, signer = account, address = signer.address) {
+async function bind(userId: string, signer = account, address: string = signer.address) {
   const begin = await beginBinding({ userId, chain: "BASE", address });
   if (!begin.ok) return { begin, complete: null };
 
