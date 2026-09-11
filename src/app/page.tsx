@@ -12,6 +12,7 @@ import { Faq } from "@/components/marketing/faq";
 import { ContractAddress } from "@/components/contract-address";
 import { SocialCard } from "@/components/social-card";
 import { SocialNav } from "@/components/social-nav";
+import { ContractChip } from "@/components/contract-chip";
 
 /**
  * The public site.
@@ -51,11 +52,17 @@ export default function Home() {
             ))}
             </span>
 
-            {/* Top right is where people look for these, and looking for them
-                and finding nothing is what makes a project look abandoned. They
-                stay visible on a phone: two 30px icons, unlike the section
-                anchors, cost nothing next to the sign-in button. */}
-            <SocialNav className="ml-1" />
+            {/* Top right is where people look for the contract address and the
+                accounts, and looking and finding nothing is what makes a
+                project read as abandoned or as someone else's to impersonate.
+                All three stay visible on a phone: unlike the section anchors,
+                a chip and two 30px icons do not crowd the sign-in button.
+
+                Signposts, not content. Both land on #community — the token is
+                not what this product is, and a price-ticker-shaped block in the
+                header would say it is. */}
+            <ContractChip className="ml-1" />
+            <SocialNav />
 
             {/* Somebody who already has an account looks top right, which is
                 where every site puts this. Without it the only way in was the
