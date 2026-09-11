@@ -9,9 +9,10 @@ import { BRAND } from "@/lib/brand";
  *
  * Two rules this follows, both of which most projects break:
  *
- * 1. No date. "Coming soon" with a date is a promise, and a missed one is the
- *    first thing people point at. This says there is no contract yet, which is
- *    a fact, and says where it will appear when there is.
+ * 1. No date. "Coming soon" on its own is a state; with a date attached it is
+ *    a promise, and a missed one is the first thing people point at. The line
+ *    below carries the part that actually protects people — where the address
+ *    will appear, and that anything earlier is not ours.
  * 2. The full address, never truncated, with a copy button and an explorer
  *    link. A shortened address is the thing scammers exploit: 0xAB…CD matches
  *    thousands of contracts, and someone comparing only the ends buys the wrong
@@ -42,7 +43,7 @@ export function ContractAddress() {
           <span className="mn text-[12px] uppercase tracking-[0.08em] text-fg-4">
             {BRAND.ticker} contract
           </span>
-          <span className="mn text-[13.5px] text-amber">Not deployed yet</span>
+          <span className="mn text-[13.5px] text-amber">Coming soon</span>
         </div>
         <p className="mt-2 max-w-[58ch] text-[12.5px] leading-[1.6] text-fg-3">
           There is no {BRAND.ticker} contract. When there is one, the full address appears here

@@ -60,6 +60,21 @@ export function liveSocials(): LiveSocial[] {
   return SOCIALS.filter((social): social is LiveSocial => social.url !== null);
 }
 
+/** The accounts we have not opened yet. */
+export type PendingSocial = SocialLink & { url: null };
+
+/**
+ * Named and shown, but never linked.
+ *
+ * Silence about an account we have not opened is worse than saying so: it
+ * leaves nothing to check an impersonator against. "We have no X account yet"
+ * is a claim someone can hold up against the account messaging them. The type
+ * pins url to null, so a caller cannot accidentally build an href out of one.
+ */
+export function pendingSocials(): PendingSocial[] {
+  return SOCIALS.filter((social): social is PendingSocial => social.url === null);
+}
+
 export type TokenProblem = "malformed-address" | "wrong-chain-format";
 
 /**

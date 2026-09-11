@@ -4,6 +4,7 @@ import {
   TOKEN,
   explorerUrl,
   liveSocials,
+  pendingSocials,
   validateToken,
   type TokenInfo,
 } from "@/lib/social";
@@ -16,16 +17,32 @@ describe("the shipped values", () => {
     expect(TOKEN.address).toBeNull();
   });
 
-  it("has no social handle yet, so nothing renders", () => {
+  it("has no social handle yet, so nothing is linked", () => {
     // A link to an account that is not ours is how people get drained by an
-    // impersonator. Absent is safe; guessed is not.
+    // impersonator. Absent is safe; guessed is not. The chips still render —
+    // inert, and saying so — but nothing is clickable until a real handle lands
+    // in a diff.
     expect(SOCIALS.every((social) => social.url === null)).toBe(true);
     expect(liveSocials()).toEqual([]);
+    expect(pendingSocials()).toHaveLength(SOCIALS.length);
+  });
+
+  it("names both accounts, so an impersonator has something to be checked against", () => {
+    // The card is only useful if it says which accounts exist. Dropping one
+    // leaves the other unclaimed, which is the gap someone registers.
+    expect(SOCIALS.map((social) => social.key).sort()).toEqual(["telegram", "x"]);
   });
 
   it("whatever is shipped is valid for its chain", () => {
     // This is the check that survives the two above being flipped.
     expect(validateToken(TOKEN)).toBeNull();
+  });
+
+  it("splits every account into exactly one of linked or pending", () => {
+    // A social that fell out of both lists would vanish from the page without
+    // anyone noticing it had gone.
+    expect(liveSocials().length + pendingSocials().length).toBe(SOCIALS.length);
+    for (const social of pendingSocials()) expect(social.url).toBeNull();
   });
 
   it("ships only https links when it ships any", () => {
