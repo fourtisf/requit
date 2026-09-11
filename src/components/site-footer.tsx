@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { LEGAL, operatorName } from "@/lib/legal";
+import { SocialLinks } from "@/components/social-links";
 
 const COLUMNS = [
   {
@@ -39,6 +40,8 @@ export function SiteFooter() {
             >
               {BRAND.supportEmail}
             </a>
+
+            <SocialLinks className="mt-4" />
           </div>
 
           {COLUMNS.map((column) => (

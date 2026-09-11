@@ -7,6 +7,8 @@ import { HowItWorks } from "@/components/marketing/how-it-works";
 import { Comparison } from "@/components/marketing/comparison";
 import { PayoutTiming } from "@/components/marketing/payout-timing";
 import { Faq } from "@/components/marketing/faq";
+import { ContractAddress } from "@/components/contract-address";
+import { SocialCard } from "@/components/social-card";
 
 /**
  * The public site.
@@ -83,6 +85,17 @@ export default function Home() {
         <Comparison />
         <PayoutTiming />
         <Faq />
+
+        {/* Placed after the FAQ, not in the hero. The product is paid work; a
+            ticker at the top would tell visitors the token is the point, which
+            is both untrue and the read that attracts exactly the wrong
+            audience. */}
+        <section className="shell pb-[clamp(20px,4vw,40px)]">
+          <div className="grid gap-3 lg:grid-cols-[1.4fr_1fr]">
+            <ContractAddress />
+            <SocialCard />
+          </div>
+        </section>
 
         <section className="shell pb-[clamp(20px,4vw,40px)]">
           <div className="relative overflow-hidden rounded-[22px] px-[clamp(24px,4vw,48px)] py-[clamp(38px,6vw,74px)] text-center shadow-[inset_0_0_0_1px_var(--color-bd-2)] [background:linear-gradient(180deg,rgba(255,255,255,.058),rgba(255,255,255,.014))]">
