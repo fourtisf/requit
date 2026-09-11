@@ -2,6 +2,7 @@ import { createTransport } from "nodemailer";
 import { BRAND } from "@/lib/brand";
 import { serverEnv } from "@/lib/env";
 import { formatOtpForDisplay, OTP_TTL_SECONDS } from "@/lib/auth/otp";
+import { addressProblem, UnsendableAddressError } from "@/lib/auth/address";
 
 type SignInEmail = {
   to: string;
@@ -66,6 +67,12 @@ export function emailTransportConfigured(): boolean {
  */
 export async function sendSignInCode({ to, code }: SignInEmail): Promise<void> {
   const env = serverEnv();
+
+  // Before anything else, including the development log line. The transport we
+  // are pinned to has open parsing advisories, and this is the last point where
+  // an address can be refused rather than parsed. See lib/auth/address.ts.
+  const problem = addressProblem(to);
+  if (problem) throw new UnsendableAddressError(problem);
 
   if (env.EMAIL_SERVER === "") {
     // The code is a credential. Printing it to a production log would let
