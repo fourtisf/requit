@@ -6,6 +6,7 @@ import { createGame } from "@/lib/games/play";
 import { GAMES } from "@/lib/games/catalog";
 import { useRound } from "@/components/games/use-round";
 import { RoundFrame } from "@/components/games/round-frame";
+import { KeyCoach } from "@/components/games/key-coach";
 
 /**
  * The board.
@@ -124,6 +125,8 @@ export function MergeBoard({
         )
       }
       ended="No moves left."
+      // Until the first move lands, the board shows which keys it wants.
+      coach={state !== null && state.moves === 0 ? <KeyCoach /> : null}
     >
       <div
         onTouchStart={onTouchStart}

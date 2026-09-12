@@ -6,6 +6,7 @@ import { SIZE, createTrail } from "@/lib/games/trail";
 import { GAMES } from "@/lib/games/catalog";
 import { useRound } from "@/components/games/use-round";
 import { RoundFrame } from "@/components/games/round-frame";
+import { KeyCoach } from "@/components/games/key-coach";
 
 /**
  * Trail's board, which is the only one here that moves on its own.
@@ -143,6 +144,8 @@ export function TrailBoard({
         </>
       }
       ended="You ran out of room."
+      // The trail moves on its own, so this goes as soon as it is steered once.
+      coach={state !== null && state.heading === "right" && length === 3 ? <KeyCoach /> : null}
     >
       <div
         onTouchStart={onTouchStart}

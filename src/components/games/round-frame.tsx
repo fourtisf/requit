@@ -32,6 +32,7 @@ export function RoundFrame<TMove, TState>({
   secondary,
   hint,
   ended,
+  coach,
   children,
 }: {
   game: GameEntry;
@@ -44,6 +45,14 @@ export function RoundFrame<TMove, TState>({
   hint?: ReactNode;
   /** How this game says the round ended. Each has its own way of stopping. */
   ended?: ReactNode;
+  /**
+   * Shown over the board while a round is running — for a game that sits there
+   * silently until the player does the one thing nobody told them to do.
+   *
+   * It never takes a click: whatever is underneath still has to receive the
+   * input that makes the coach disappear.
+   */
+  coach?: ReactNode;
   children: ReactNode;
 }) {
   const { status, error, saved, best } = round;
@@ -89,6 +98,12 @@ export function RoundFrame<TMove, TState>({
 
       <div ref={board} className="relative mt-1.5">
         {children}
+
+        {status === "playing" && coach ? (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            {coach}
+          </div>
+        ) : null}
 
         {status === "playing" ? null : (
           <div className="absolute inset-0 flex items-center justify-center rounded-card bg-[rgba(8,9,10,.74)] px-4 text-center backdrop-blur-[2px]">
