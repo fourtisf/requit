@@ -147,6 +147,112 @@ description of one.
 
 ---
 
+## The arcade — posts about the games
+
+Pair with `public/og/play.jpg`. Six games are the only part of the site a
+stranger can *try* rather than read, which makes them the strongest thing the
+account has to post while tasks are not live.
+
+Every draft here says the games do not pay. That is the same rule as Post A's
+last line and it is load-bearing for the same reason: this category is full of
+"play to earn", most of it is not true, and an account that plays free games
+straight is the one people remember when it does start paying.
+
+### Post C — the games, plainly
+
+> We built six games.
+>
+> Free, no account, no download. Two minutes a round, and they work on a phone.
+>
+> They don't pay anything yet — we have no ad network connected, and we're not going to pretend otherwise.
+>
+> requit.xyz/play
+
+`229 / 280.`
+
+### Post D — the proof angle
+
+The strongest of the four, and the only one nobody else in this category can
+post. Use it if the account is going to post once.
+
+> Your browser never tells us your score.
+>
+> It sends the moves you made. Our server replays them with the same rules and takes its own result.
+>
+> Six free games, no account needed. They don't pay yet — no ad network, and we say so until there is one.
+>
+> requit.xyz/play
+
+`270 / 280.`
+
+**Why this one.** It is the same argument as the proof table, in a place people
+do not expect it. Everyone claims their scores are real; this says what the
+server actually does, and it is checkable — the rules are the same functions on
+both sides, and a move list that does not fit the board is refused.
+
+### Post E — short, for replies and quotes
+
+> Six games. Free, no account, no download.
+>
+> They don't pay yet — no ad network connected. The scores are still real: the server replays every round rather than believing your browser.
+>
+> requit.xyz/play
+
+`207 / 280.`
+
+### Post F — the leaderboard
+
+Post once the boards have names on them. Empty boards posted publicly are a
+photograph of an empty room.
+
+> Every game on Requit has a weekly board.
+>
+> Your score gets there by being replayed on our server — the moves go up, never the number your browser came up with.
+>
+> Free to play, no account. Signed in is what puts you on the board.
+>
+> requit.xyz/play
+
+`251 / 280.`
+
+### Versi Indonesia
+
+**Post C**
+
+> Kami membuat enam game.
+>
+> Gratis, tanpa akun, tanpa unduhan. Dua menit per ronde, jalan di HP.
+>
+> Belum menghasilkan apa pun — kami belum punya jaringan iklan, dan kami tidak akan pura-pura punya.
+>
+> requit.xyz/play
+
+`218 / 280.`
+
+**Post D**
+
+> Browser Anda tidak pernah memberi tahu kami skor Anda.
+>
+> Yang dikirim adalah gerakan Anda. Server kami memutarnya ulang dengan aturan yang sama dan memakai hasilnya sendiri.
+>
+> Enam game gratis, tanpa akun. Belum membayar apa pun — belum ada jaringan iklan.
+>
+> requit.xyz/play
+
+`279 / 280.`
+
+**Post E**
+
+> Enam game. Gratis, tanpa akun, tanpa unduhan.
+>
+> Belum menghasilkan — belum ada jaringan iklan. Skornya tetap nyata: server memutar ulang tiap ronde, bukan percaya kata browser Anda.
+>
+> requit.xyz/play
+
+`205 / 280.`
+
+---
+
 ## What not to write
 
 Three things that would cost more than they gain, listed because they are the
@@ -159,3 +265,7 @@ default in this category and will be suggested to you:
   answer and an audience you do not want yet.
 - **Screenshots of earnings.** There are none. A mocked-up dashboard is the
   exact thing every scam in this category posts, and people recognise it.
+- **"Play to earn", in any wording.** It is the default phrase for a post about
+  free games and it is not true here — no ad network is connected, so nothing a
+  player does turns into money yet. Posting it would make the games look like
+  every other thing in this category, which is the one thing they are not.
