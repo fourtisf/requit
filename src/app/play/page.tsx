@@ -3,13 +3,11 @@ import { currentUser } from "@/lib/session";
 import { AppNav } from "@/components/app-nav";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { Card, CardHeader } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { GameMark } from "@/components/games/game-mark";
 import { GAME_LIST } from "@/lib/games/catalog";
 import { personalBests } from "@/lib/games/session";
-import { earningsStatus } from "@/lib/ads/rewarded";
-import { BRAND } from "@/lib/brand";
+import { EarningNote } from "@/components/games/earning-note";
 import { arcadeCard } from "@/lib/og";
 import { spell } from "@/lib/format";
 
@@ -44,7 +42,6 @@ export default async function PlayPage() {
   const user = await currentUser();
   const signedIn = user !== null && !user.suspended;
   const bests = signedIn ? await personalBests(user.id) : null;
-  const earnings = earningsStatus();
 
   return (
     <>
@@ -94,23 +91,10 @@ export default async function PlayPage() {
           ))}
         </div>
 
-        {/*
-          The honest state of the earning half. A game showing a reward counter
-          while no advertiser was paying would be the company paying its members
-          out of its own float — the arrangement this product exists to not be.
-          It says so instead.
-        */}
-        {!earnings.earning ? (
-          <Card className="mt-7 max-w-[62ch]">
-            <CardHeader title="These games do not pay yet" />
-            <p className="text-[13.5px] leading-[1.65] text-fg-2">
-              Games like these earn through rewarded video, and {BRAND.name} has no ad network
-              connected. Until one is, there is no advertiser money behind a round — so scores are
-              recorded and nothing is credited. We would rather say that than show you a number
-              that never turns into a payout.
-            </p>
-          </Card>
-        ) : null}
+        <div className="mt-7">
+          <EarningNote signedIn={signedIn} />
+        </div>
+
       </main>
 
       {signedIn ? null : <SiteFooter />}

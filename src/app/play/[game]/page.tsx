@@ -5,13 +5,12 @@ import { currentUser } from "@/lib/session";
 import { AppNav } from "@/components/app-nav";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { Card, CardHeader } from "@/components/ui/card";
 import { GameBoard } from "@/components/games/game-board";
 import { GameMark } from "@/components/games/game-mark";
 import { ScoreBoard } from "@/components/games/score-board";
 import { GAMES, GAME_LIST, isGameSlug } from "@/lib/games/catalog";
 import { personalBest } from "@/lib/games/session";
-import { earningsStatus } from "@/lib/ads/rewarded";
+import { EarningNote } from "@/components/games/earning-note";
 import { BRAND } from "@/lib/brand";
 import { arcadeCard } from "@/lib/og";
 
@@ -48,7 +47,6 @@ export default async function GamePage({ params }: Props) {
   const user = await currentUser();
   const signedIn = user !== null && !user.suspended;
   const best = signedIn ? await personalBest(user.id, game) : 0;
-  const earnings = earningsStatus();
   const entry = GAMES[game];
   const others = GAME_LIST.filter((other) => other.slug !== game);
 
@@ -95,17 +93,9 @@ export default async function GamePage({ params }: Props) {
           </div>
         </div>
 
-        {!earnings.earning ? (
-          <Card className="mt-8 max-w-[62ch]">
-            <CardHeader title="This game does not pay yet" />
-            <p className="text-[13.5px] leading-[1.65] text-fg-2">
-              Games like this one earn through rewarded video, and {BRAND.name} has no ad network
-              connected. Until one is, there is no advertiser money behind a round — so scores are
-              recorded and nothing is credited. We would rather say that than show you a number
-              that never turns into a payout.
-            </p>
-          </Card>
-        ) : null}
+        <div className="mt-8">
+          <EarningNote signedIn={signedIn} />
+        </div>
 
         <div className="mt-8">
           <p className="mn text-[11.5px] uppercase tracking-[0.08em] text-fg-4">Also on the shelf</p>

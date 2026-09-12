@@ -59,3 +59,44 @@ export function earningsStatus(): EarningsStatus {
 export function canEarnFromGames(): boolean {
   return earningsStatus().earning;
 }
+
+/**
+ * Whether a particular player's round could be credited, and why not.
+ *
+ * Two refusals, and the order is deliberate. The network comes first because it
+ * is about whether there is money at all; the account comes second because it
+ * is about whether there is anyone to give it to.
+ *
+ * The account half is not a policy we chose — it is arithmetic. A credit is a
+ * row against a user id, and a round played by a visitor has no user id: no
+ * session is opened, nothing is written down, and there is no one for a payment
+ * to be owed to afterwards. `/api/play/start` already refuses a round to anyone
+ * without a session, so this function does not add a rule so much as say the
+ * existing one out loud, in the one place a screen can ask.
+ *
+ * Guests keep the whole game. What they do not keep is a claim, and they are
+ * told that before they play rather than after.
+ */
+export type EarnRefusal = "no-network" | "signed-out" | "suspended";
+
+export type EarnStatus =
+  | { earning: true; network: AdNetwork }
+  | { earning: false; reason: EarnRefusal };
+
+export function canEarn(
+  viewer: { signedIn: boolean; suspended?: boolean } | null,
+  /**
+   * Injectable so the account rule can be tested against a network that pays.
+   * The gate itself is a constant and stays one — a test that could flip it
+   * would be a test that could ship it flipped.
+   */
+  network: EarningsStatus = earningsStatus(),
+): EarnStatus {
+  if (!network.earning) return { earning: false, reason: "no-network" };
+
+  if (viewer === null || !viewer.signedIn) return { earning: false, reason: "signed-out" };
+  // A suspended account is told why on /suspended; nothing accrues meanwhile.
+  if (viewer.suspended) return { earning: false, reason: "suspended" };
+
+  return { earning: true, network: network.network };
+}

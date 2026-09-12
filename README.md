@@ -200,6 +200,15 @@ every game is deterministic from a seed the server issued — one seeded generat
 drives every tile, fruit, colour and shuffle — and because a move the board would
 not allow fails the whole submission rather than being skipped.
 
+**A credit will need an account, and visitors are told so before they play**
+(`canEarn()` in `src/lib/ads/rewarded.ts`). Two refusals in a deliberate order:
+the network first, because it decides whether there is money at all; the account
+second, because it decides whether there is anyone to give it to. The second is
+arithmetic rather than policy — a credit is a row against a user id, and a
+guest round is never written down, so `/api/play/start` refuses it a session and
+there is nobody to owe afterwards. The games stay free either way; what needs an
+account is the claim.
+
 **Every game has a weekly score board** (`src/lib/games/board.ts`), which is
 what a score is *for* while nothing pays: a position rather than a number on
 your own screen. One row per player, not per round; `publicPayouts = false`
