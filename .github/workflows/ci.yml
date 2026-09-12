@@ -66,9 +66,18 @@ jobs:
       - run: npm ci
 
       - name: Create the shadow and test databases
+        # `?schema=public` is Prisma's parameter, not libpq's, and psql refuses
+        # a URI carrying one it does not know. Stripping the query is the whole
+        # fix — the schema is created by the migrations anyway.
+        #
+        # This step failing took the rest of the job with it: the drift check,
+        # the migrations, the seed and every integration test. Worth saying out
+        # loud, because the other two jobs stayed green and a build that only
+        # typechecks looks a lot like a build that passed.
         run: |
-          psql "$DATABASE_URL" -c 'create database requit_shadow'
-          psql "$DATABASE_URL" -c 'create database requit_test'
+          BARE="${DATABASE_URL%%\?*}"
+          psql "$BARE" -c 'create database requit_shadow'
+          psql "$BARE" -c 'create database requit_test'
 
       # Catches the case where schema.prisma was edited but no migration was
       # generated — the drift that turns into a failed production deploy.
