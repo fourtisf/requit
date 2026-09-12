@@ -142,11 +142,7 @@ export function RoundFrame<TMove, TState>({
             ) : (
               // The whole panel is the button. Anywhere on the board starts the
               // next round, which is what a player tries first anyway.
-              <button
-                type="button"
-                onClick={round.begin}
-                className="group flex w-full flex-col items-center gap-3 py-6"
-              >
+              <div className="flex w-full flex-col items-center gap-3 py-6">
                 {status === "over" ? (
                   <span className="flex flex-col gap-1.5">
                     <span className="text-[15px] font-semibold tracking-[-0.02em]">
@@ -165,12 +161,27 @@ export function RoundFrame<TMove, TState>({
                   </span>
                 ) : null}
 
-                <span className="inline-flex items-center rounded-full bg-white px-[26px] py-[13px] text-[15px] font-semibold tracking-[-0.015em] text-bg shadow-[0_0_0_1px_rgba(255,255,255,.9),0_8px_26px_-12px_rgba(255,255,255,.32)] transition-transform duration-200 group-hover:-translate-y-px">
-                  {status === "over" ? "Play again" : signedIn ? "Start a round" : "Play now"}
-                </span>
+                {/* Today's board first, because the whole point of it is that
+                    everybody is on the same one. A random board stays one press
+                    away for anyone who wants to practise. */}
+                <button
+                  type="button"
+                  onClick={() => round.begin(true)}
+                  className="inline-flex items-center rounded-full bg-white px-[26px] py-[13px] text-[15px] font-semibold tracking-[-0.015em] text-bg shadow-[0_0_0_1px_rgba(255,255,255,.9),0_8px_26px_-12px_rgba(255,255,255,.32)] transition-transform duration-200 hover:-translate-y-px"
+                >
+                  Today&rsquo;s board
+                </button>
 
-                <span className="text-[12px] text-fg-3">{game.input}</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => round.begin(false)}
+                  className="text-[12.5px] text-fg-3 underline underline-offset-4 transition-colors hover:text-fg"
+                >
+                  or a random one
+                </button>
+
+                <span className="text-[12px] text-fg-4">{game.input}</span>
+              </div>
             )}
           </div>
         )}

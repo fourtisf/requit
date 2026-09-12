@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import type { GameSlug } from "@/lib/games/catalog";
 import type { Engine, RoundState } from "@/lib/games/engine";
 import { play } from "@/components/games/sound";
+import { dailySeed } from "@/lib/games/daily";
 
 /**
  * A round, from the button that opens it to the score the server writes down.
@@ -31,7 +32,8 @@ export type Round<TMove, TState> = {
   saved: number | null;
   /** The player's best, updated the moment the server beats it. */
   best: number;
-  begin: () => void;
+  /** `daily` opens today's board — the one everybody else is playing. */
+  begin: (daily?: boolean) => void;
   /** Plays a move. False when the rules refused it — the board can ignore it. */
   send: (move: TMove) => boolean;
   /**
@@ -90,38 +92,43 @@ export function useRound<TMove, TState extends RoundState>({
     [create],
   );
 
-  const begin = useCallback(() => {
-    setError(null);
-    setSaved(null);
+  const begin = useCallback(
+    (daily = false) => {
+      setError(null);
+      setSaved(null);
 
-    if (!signedIn) {
-      // A guest's seed can come from the browser: with no row to write and no
-      // score to keep, there is nothing a chosen seed could win.
-      open(Math.floor(Math.random() * 2 ** 31), null);
-      return;
-    }
-
-    setStatus("loading");
-    void (async () => {
-      try {
-        const response = await fetch("/api/play/start", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ game }),
-        });
-        const payload = await response.json();
-        if (!response.ok) {
-          setError(payload.error ?? "Could not start a round.");
-          setStatus("idle");
-          return;
-        }
-        open(payload.seed as number, payload.id as string);
-      } catch {
-        setError("Could not reach the server.");
-        setStatus("idle");
+      if (!signedIn) {
+        // A guest plays the same board as everybody else when they ask for it;
+        // it simply is not recorded, so it cannot be ranked. The random seed
+        // can come from the browser: with no row to write and no score to
+        // keep, there is nothing a chosen seed could win.
+        open(daily ? dailySeed(game) : Math.floor(Math.random() * 2 ** 31), null);
+        return;
       }
-    })();
-  }, [game, open, signedIn]);
+
+      setStatus("loading");
+      void (async () => {
+        try {
+          const response = await fetch("/api/play/start", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ game, daily }),
+          });
+          const payload = await response.json();
+          if (!response.ok) {
+            setError(payload.error ?? "Could not start a round.");
+            setStatus("idle");
+            return;
+          }
+          open(payload.seed as number, payload.id as string);
+        } catch {
+          setError("Could not reach the server.");
+          setStatus("idle");
+        }
+      })();
+    },
+    [game, open, signedIn],
+  );
 
   const finish = useCallback(async () => {
     const current = round.current;
@@ -144,7 +151,9 @@ export function useRound<TMove, TState extends RoundState>({
         setError(payload.error ?? "Could not save that round.");
       } else {
         setSaved(payload.score);
-        setBest((previous) => (payload.score > previous ? payload.score : previous));
+        setBest((previous) =>
+          payload.score > previous ? payload.score : previous,
+        );
       }
     } catch {
       setError("Could not save that round. Your score may not be recorded.");

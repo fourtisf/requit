@@ -228,13 +228,32 @@ guest round is never written down, so `/api/play/start` refuses it a session and
 there is nobody to owe afterwards. The games stay free either way; what needs an
 account is the claim.
 
-**Every game has a weekly score board** (`src/lib/games/board.ts`), which is
-what a score is *for* while nothing pays: a position rather than a number on
-your own screen. One row per player, not per round; `publicPayouts = false`
-hides the handle and never the row; and a player outside the visible ten is told
-their real rank, because that is nearly everyone. The window is `currentWeek()`
-— the same Sunday-to-Sunday UTC window §9 accrues against, not a second
-definition of a week.
+**Every game has a board for today and a board for the week**
+(`src/lib/games/board.ts`), which is what a score is *for* while nothing pays: a
+position rather than a number on your own screen. One row per player, not per
+round; `publicPayouts = false` hides the handle and never the row; and a player
+outside the visible ten is told their real rank, because that is nearly
+everyone. The weekly window is `currentWeek()` — the same Sunday-to-Sunday UTC
+window §9 accrues against, not a second definition of a week.
+
+**The daily board is the one that compares like with like**
+(`src/lib/games/daily.ts`). The weekly board ranks the best score anyone reached
+on any seed, which measures how many rounds somebody had time for as much as how
+well they played. The daily board hands every player the same seed — same grid,
+same pieces, same deal — and ranks their **first finished round**, because
+best-of on a fixed board is a restart button. The seed is
+`FNV-1a("<game>:<YYYY-MM-DD>")`, derived on the server: `/api/play/start` takes
+`{ daily: true }` and never a seed, so a browser cannot ask for a kinder day. It
+is derived in the open rather than from a secret, which lets tomorrow's board be
+worked out a day early — by the same person who could already solve any seed —
+and lets two players check they were given the same one, which is the property
+the board exists for. Guests play the day's board and do not appear on it: the
+same line as everywhere else, no account, no row.
+
+Being able to do this at all is a consequence of the two decisions above. A
+board everyone shares is only meaningful if the games are deterministic from a
+seed and the scores were recomputed rather than reported, and both were already
+true.
 
 **No board pays anything, and the gate that would have to open is written down**
 (`src/lib/games/prizes.ts`) in the same shape as the ad-network gate: named,

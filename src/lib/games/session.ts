@@ -21,10 +21,19 @@ const MAX_SEED = 2 ** 31 - 1;
 export async function startSession(
   userId: string,
   game: GameSlug,
+  /**
+   * A seed chosen by the server — today's board, and nothing else.
+   *
+   * It is an argument rather than a flag so that this function keeps knowing
+   * nothing about what a "daily" is: it opens a round on the seed it is handed,
+   * and the one caller allowed to hand it one is the route that derives it from
+   * the date.
+   */
+  fixed?: number,
 ): Promise<{ id: string; seed: number; game: GameSlug }> {
   // randomInt, not Math.random: a predictable seed is a solvable seed, and
   // someone who can predict tomorrow's seeds can pre-compute perfect games.
-  const seed = randomInt(1, MAX_SEED);
+  const seed = fixed ?? randomInt(1, MAX_SEED);
 
   const session = await prisma.gameSession.create({
     data: { userId, game, seed },

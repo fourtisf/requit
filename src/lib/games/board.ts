@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { type GameSlug } from "@/lib/games/catalog";
 import { type LeaderboardWindow } from "@/lib/leaderboard";
+import { dailySeed, dailyWindow } from "@/lib/games/daily";
 
 /**
  * High scores, per game.
@@ -109,4 +110,86 @@ export async function standing(
   });
 
   return { best, rank: ahead.length + 1 };
+}
+
+/**
+ * Today's board: everyone who played the one seed the day was given.
+ *
+ * The rule is the first finished round, not the best of them. Best-of lets a
+ * player restart the identical board until it goes well, which turns the one
+ * comparison worth having — same grid, same pieces — back into a measure of how
+ * many attempts somebody had time for.
+ *
+ * Read as rows rather than grouped in SQL because "the score of the earliest
+ * round per player" is not a thing a groupBy returns: a max score and a min
+ * time come from different rows. At a day's volume this is a short list; if a
+ * day ever returns more rows than a page can hold, it becomes a window function
+ * and the rule stays the same.
+ */
+export async function todaysBoard(
+  game: GameSlug,
+  limit = 10,
+  now: Date = new Date(),
+): Promise<{ seed: number; rows: ScoreRow[] }> {
+  const seed = dailySeed(game, now.toISOString().slice(0, 10));
+  const window = dailyWindow(now);
+
+  const sessions = await prisma.gameSession.findMany({
+    where: {
+      game,
+      seed,
+      endedAt: { not: null, gte: window.start, lt: window.end },
+    },
+    orderBy: { endedAt: "asc" },
+    select: { userId: true, score: true, endedAt: true },
+  });
+
+  const first = new Map<string, { score: number; at: Date }>();
+  for (const session of sessions) {
+    if (first.has(session.userId)) continue;
+    first.set(session.userId, { score: session.score, at: session.endedAt ?? window.start });
+  }
+
+  const ranked = [...first.entries()]
+    .sort((a, b) => b[1].score - a[1].score || a[1].at.getTime() - b[1].at.getTime())
+    .slice(0, limit);
+  if (ranked.length === 0) return { seed, rows: [] };
+
+  const users = await prisma.user.findMany({
+    where: { id: { in: ranked.map(([userId]) => userId) } },
+    select: { id: true, handle: true, countryCode: true, publicPayouts: true },
+  });
+  const byId = new Map(users.map((user) => [user.id, user]));
+
+  return {
+    seed,
+    rows: ranked.map(([userId, entry], index) => {
+      const user = byId.get(userId);
+      return {
+        rank: index + 1,
+        handle: user?.publicPayouts ? user.handle : null,
+        countryCode: user?.countryCode ?? "XX",
+        score: entry.score,
+        at: entry.at,
+      };
+    }),
+  };
+}
+
+/** Whether this player has already finished today's board, and with what. */
+export async function todaysResult(
+  userId: string,
+  game: GameSlug,
+  now: Date = new Date(),
+): Promise<{ score: number; at: Date } | null> {
+  const seed = dailySeed(game, now.toISOString().slice(0, 10));
+  const window = dailyWindow(now);
+
+  const session = await prisma.gameSession.findFirst({
+    where: { userId, game, seed, endedAt: { not: null, gte: window.start, lt: window.end } },
+    orderBy: { endedAt: "asc" },
+    select: { score: true, endedAt: true },
+  });
+
+  return session?.endedAt ? { score: session.score, at: session.endedAt } : null;
 }

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { standing, topScores } from "@/lib/games/board";
+import { standing, todaysBoard, todaysResult, topScores } from "@/lib/games/board";
 import { prizeWeek } from "@/lib/games/prizes";
+import { dailySeed } from "@/lib/games/daily";
 import { makeUser, prisma, resetDatabase } from "@/test/db";
 
 /**
@@ -146,5 +147,105 @@ describe("where a player stands", () => {
 
     expect(await standing(me.id, "spot", THIS_WEEK)).toEqual({ best: 200, rank: 1 });
     expect(await standing(me.id, "spot", null)).toEqual({ best: 900, rank: 1 });
+  });
+});
+
+describe("today's board", () => {
+  const TODAY = dailySeed("spot");
+
+  async function daily(userId: string, score: number, minutesAgo: number) {
+    return prisma.gameSession.create({
+      data: {
+        userId,
+        game: "spot",
+        seed: TODAY,
+        score,
+        endedAt: new Date(Date.now() - minutesAgo * 60_000),
+      },
+    });
+  }
+
+  it("hands out one seed for the day, per game", async () => {
+    // The comparison is the whole feature: two players today must have been
+    // given the identical board.
+    expect(dailySeed("spot")).toBe(dailySeed("spot"));
+    expect(dailySeed("spot")).not.toBe(dailySeed("blocks"));
+  });
+
+  it("is empty before anyone finishes it", async () => {
+    const board = await todaysBoard("spot");
+    expect(board.seed).toBe(TODAY);
+    expect(board.rows).toEqual([]);
+  });
+
+  it("ranks the players who played it, best first", async () => {
+    const ada = await member();
+    const bob = await member();
+    await daily(ada.id, 400, 30);
+    await daily(bob.id, 900, 20);
+
+    const { rows } = await todaysBoard("spot");
+    expect(rows.map((row) => [row.rank, row.handle, row.score])).toEqual([
+      [1, bob.handle, 900],
+      [2, ada.handle, 400],
+    ]);
+  });
+
+  it("counts the first finished round, not the best one", async () => {
+    // Best-of lets a player restart the identical board until it goes well,
+    // which turns the one comparison worth having back into a measure of how
+    // many attempts somebody had time for.
+    const ada = await member();
+    await daily(ada.id, 200, 40);
+    await daily(ada.id, 5_000, 5);
+
+    const { rows } = await todaysBoard("spot");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.score).toBe(200);
+    expect(await todaysResult(ada.id, "spot")).toMatchObject({ score: 200 });
+  });
+
+  it("ignores a round on another board, however good", async () => {
+    const ada = await member();
+    await prisma.gameSession.create({
+      data: { userId: ada.id, game: "spot", seed: TODAY + 1, score: 9_000, endedAt: new Date() },
+    });
+
+    expect((await todaysBoard("spot")).rows).toEqual([]);
+    expect(await todaysResult(ada.id, "spot")).toBeNull();
+  });
+
+  it("ignores yesterday's round on the same seed", async () => {
+    // The seed changes daily, but a seed can repeat across games and months;
+    // the window is what makes "today" mean today.
+    const ada = await member();
+    await prisma.gameSession.create({
+      data: {
+        userId: ada.id,
+        game: "spot",
+        seed: TODAY,
+        score: 900,
+        endedAt: new Date(Date.now() - 30 * 60 * 60 * 1000),
+      },
+    });
+    expect((await todaysBoard("spot")).rows).toEqual([]);
+  });
+
+  it("hides the handle of a member who turned it off", async () => {
+    const quiet = await member({ publicPayouts: false });
+    await daily(quiet.id, 700, 10);
+
+    const { rows } = await todaysBoard("spot");
+    expect(rows[0]).toMatchObject({ rank: 1, handle: null, score: 700 });
+  });
+
+  it("breaks a tie by who finished it first", async () => {
+    const early = await member();
+    const late = await member();
+    await daily(early.id, 500, 60);
+    await daily(late.id, 500, 5);
+
+    const { rows } = await todaysBoard("spot");
+    expect(rows.map((row) => row.handle)).toEqual([early.handle, late.handle]);
   });
 });

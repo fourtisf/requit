@@ -1,14 +1,19 @@
 import Link from "next/link";
 import { type GameEntry } from "@/lib/games/catalog";
-import { topScores, standing } from "@/lib/games/board";
+import { standing, todaysBoard, todaysResult } from "@/lib/games/board";
 import { prizeWeek } from "@/lib/games/prizes";
 
 /**
- * This week's top ten for one game, and where the reader stands in it.
+ * Today's board for one game, and where the reader stands.
  *
  * It answers the only fair question a scoring game can be asked while nothing
  * is paying: what is the score for. Before this, it was a number on your own
  * screen and nothing else — which is not an answer.
+ *
+ * Today rather than this week, because today is the one everybody played the
+ * same board on. A weekly best-of ranks luck and volume as much as skill: the
+ * kind opening beats the careful hour. The week is still here, as one line
+ * about where the reader stands in it.
  *
  * It promises nothing. There is no prize here and no hint of one; the gate that
  * would have to open first, and what would have to be true to open it, is
@@ -23,30 +28,37 @@ export async function ScoreBoard({
   viewer: string | null;
 }) {
   const week = prizeWeek();
-  const [rows, mine] = await Promise.all([
-    topScores(game.slug, week, 10),
+  const [today, mine, weekly] = await Promise.all([
+    todaysBoard(game.slug, 10),
+    viewer ? todaysResult(viewer, game.slug) : Promise.resolve(null),
     viewer ? standing(viewer, game.slug, week) : Promise.resolve(null),
   ]);
 
-  const listed = mine?.rank !== null && (mine?.rank ?? 0) <= rows.length;
+  const rows = today.rows;
+  const yours = rows.findIndex((row) => mine !== null && row.score === mine.score);
 
   return (
     <section className="mt-8 max-w-[46ch] lg:mt-7">
       <div className="flex flex-wrap items-baseline gap-x-3">
-        <h2 className="text-[15px] font-semibold tracking-[-0.02em]">Top this week</h2>
+        <h2 className="text-[15px] font-semibold tracking-[-0.02em]">Today&rsquo;s board</h2>
         <span className="mn text-[11.5px] text-fg-4">
-          {week.start.toISOString().slice(5, 10)} — {week.end.toISOString().slice(5, 10)} UTC
+          {new Date().toISOString().slice(0, 10)} UTC
         </span>
       </div>
 
+      <p className="mt-1.5 max-w-[46ch] text-[12.5px] leading-[1.55] text-fg-3">
+        Everybody gets the same board today, so these are comparable. Your first finished round is
+        the one that counts — replaying it until it goes well would make the number meaningless.
+      </p>
+
       {rows.length === 0 ? (
         <p className="mt-3 text-[13px] leading-[1.6] text-fg-3">
-          Nobody has finished a round of {game.title} this week. The board starts with whoever does.
+          Nobody has finished today&rsquo;s {game.title} board yet. It starts with whoever does.
         </p>
       ) : (
         <ol className="mt-3">
-          {rows.map((row) => {
-            const you = mine !== null && mine.rank === row.rank && mine.best === row.score;
+          {rows.map((row, index) => {
+            const you = mine !== null && index === yours;
             return (
               <li
                 key={row.rank}
@@ -66,18 +78,32 @@ export async function ScoreBoard({
         </ol>
       )}
 
-      {/* Where you stand, said plainly, including when that is outside the ten
-          rows above — which is where nearly everyone is. */}
-      {mine && mine.rank !== null && !listed ? (
+      {/* Your own result, said plainly — including when it is nowhere near the
+          ten rows above, which is where nearly everyone is. */}
+      {mine !== null ? (
         <p className="mt-3 text-[13px] text-fg-2">
-          You are <span className="mn text-fg">#{mine.rank}</span> this week with{" "}
-          <span className="mn text-ac-2">{mine.best}</span>.
+          {yours >= 0 ? (
+            <>
+              You are <span className="mn text-fg">#{yours + 1}</span> today with{" "}
+              <span className="mn text-ac-2">{mine.score}</span>.
+            </>
+          ) : (
+            <>
+              You finished today&rsquo;s board with <span className="mn text-ac-2">{mine.score}</span>
+              , outside the ten above.
+            </>
+          )}
         </p>
       ) : null}
 
-      {mine && mine.rank === null ? (
-        <p className="mt-3 text-[13px] text-fg-3">
-          You have not finished a round this week yet.
+      {viewer !== null && mine === null ? (
+        <p className="mt-3 text-[13px] text-fg-3">You have not played today&rsquo;s board yet.</p>
+      ) : null}
+
+      {weekly && weekly.rank !== null ? (
+        <p className="mt-1.5 text-[12.5px] text-fg-3">
+          Across every board this week you are <span className="mn text-fg-2">#{weekly.rank}</span>{" "}
+          with <span className="mn text-fg-2">{weekly.best}</span>.
         </p>
       ) : null}
 

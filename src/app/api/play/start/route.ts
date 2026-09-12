@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { rateLimit } from "@/lib/rate-limit";
 import { startSession } from "@/lib/games/session";
 import { isGameSlug } from "@/lib/games/catalog";
+import { dailySeed } from "@/lib/games/daily";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,14 +44,21 @@ export async function POST(request: Request) {
   const body = await request
     .json()
     .then((value: unknown) =>
-      value !== null && typeof value === "object" ? (value as { game?: unknown }) : {},
+      value !== null && typeof value === "object"
+        ? (value as { game?: unknown; daily?: unknown })
+        : {},
     )
-    .catch(() => ({}) as { game?: unknown });
+    .catch(() => ({}) as { game?: unknown; daily?: unknown });
   const game = body.game ?? "merge";
   if (!isGameSlug(game)) {
     return NextResponse.json({ error: "No such game." }, { status: 404 });
   }
 
-  const round = await startSession(session.user.id, game);
-  return NextResponse.json(round);
+  // Today's board is the same board for everybody, so its seed comes from the
+  // date here rather than from the request. A client that could name its own
+  // seed could shop for a kind one, and the comparison the daily board exists
+  // for would be worth nothing.
+  const daily = body.daily === true;
+  const round = await startSession(session.user.id, game, daily ? dailySeed(game) : undefined);
+  return NextResponse.json({ ...round, daily });
 }
