@@ -376,7 +376,7 @@ and are cheaper to get right before there are more pages.
 | Authoritative gate | `requireUser()` in `src/lib/session.ts` | Middleware runs on the edge and cannot reach the database. Suspension is decided here. |
 | CSP with per-request nonce | `src/middleware.ts` | Next inlines bootstrap scripts, so a nonce-less policy means `'unsafe-inline'`, which is not a policy. `frame-ancestors 'none'` — a withdrawal screen inside someone else's iframe is a clickjacked payout. |
 | HSTS, nosniff, Referrer-Policy, Permissions-Policy | `next.config.ts` | Static headers, set once. |
-| Indexing opt-in | `NEXT_PUBLIC_ALLOW_INDEXING` | Staging cannot be indexed by omission. |
+| Indexing opt-in | `NEXT_PUBLIC_ALLOW_INDEXING` | Staging cannot be indexed by omission. `robots.txt` and `/sitemap.xml` are both derived from `src/lib/sitemap.ts` and both go silent when it is unset — the two disagreeing is how a staging box ends up in a search result, and a test asserts the sitemap offers nothing robots blocks. |
 | Sign-in rate limits | `src/auth.ts` | 5 codes per address / 15 min, and 20 per source IP / hour. The per-address limit alone is bypassed by rotating the address, which costs the attacker nothing and costs us an email each time. |
 | Session payload allowlist | `src/lib/auth/session-payload.ts` | `/api/auth/session` is browser-readable. Spreading the adapter row would publish `sessionToken`. Tested. |
 | Suspension with appeal | `/suspended` | §7: never ban silently. |

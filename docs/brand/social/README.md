@@ -65,29 +65,43 @@ Two constraints shaped all of them:
 
 ## Open Graph card
 
-**`public/og/play.jpg`** — 1200×630 at 2×, the card a link preview shows when
-`requit.xyz/play` or any game page is pasted into X, Telegram or WhatsApp. It is
-wired up in `src/lib/og.ts`; before it, the site had no link preview at all, on
-any page.
+Two cards, both 1200×630 at 2×, both wired up in `src/lib/og.ts`:
+
+| File | Shown when someone pastes |
+|---|---|
+| **`public/og/site.jpg`** | `requit.xyz` and every page without a card of its own — the landing page, `/proof`, the policies. Attached in the root layout. |
+| **`public/og/play.jpg`** | `requit.xyz/play` or any game page. |
+
+Before these the site had no link preview at all, on any page: a forwarded link
+was a bare row of text, which is what a link to an abandoned project looks like.
 
 Source is `render-og.html`. Regenerate with `npx tsx scripts/og.ts` (needs a
 local `playwright` — it is deliberately not a dependency, see `tsconfig.json`).
 
 Three things it does on purpose:
 
-- **Six marks for six games.** They are the same miniatures the shelf draws, so
-  the card is about *our* games rather than about games. Add a game and the
-  shelf grows by itself; this file does not, so redraw it.
+- **One mark per game.** They are the same miniatures the shelf draws, so the
+  card is about *our* games rather than about games. Add a game and the shelf
+  grows by itself; this file does not, so redraw it — it is at seven.
 - **JPEG, not PNG.** The grain that keeps a flat panel on flat black from
   looking cheap is noise, and noise is what PNG cannot compress. The first
   render was 2.6MB, which WhatsApp declines to fetch. The same card as JPEG is
   160KB.
-- **The headline is spelled, not numbered.** "Six games", matching `spell()` in
-  `src/lib/format.ts`, which the page's own `og:title` uses — a preview whose
-  title says 6 and whose picture says six looks assembled by two people.
+- **The headline is spelled, not numbered.** "Seven games", matching `spell()`
+  in `src/lib/format.ts`, which the page's own `og:title` uses — a preview whose
+  title says 7 and whose picture says seven looks assembled by two people.
+
+Two things on the site card in particular:
+
+- **It says tasks are not live yet**, in amber, as the site itself does. A
+  preview that implies live paid work while the page says otherwise is the
+  impression this product exists to avoid — and the badge is the first thing to
+  change on the day Phase 1 opens.
+- **The three steps are the product**, not decoration: finish, confirmed, paid.
+  A stranger who never scrolls past the preview has still been told what this
+  is and what it pays in.
 
 ## Not made yet
 
-A card for the site itself (`/`), about the paid work rather than the arcade.
-Pages without one still get a title and description; an empty `og:image` beats
-the wrong one.
+App icons beyond `src/app/icon.svg`: no `apple-touch-icon`, no web manifest. A
+phone that bookmarks the site draws its own initial today.

@@ -19,7 +19,10 @@ const SOURCE = resolve(process.cwd(), "docs/brand/social/render-og.html");
 const OUT = resolve(process.cwd(), "public/og");
 
 /** Each card is one element in the source, screenshotted at 2× a 1200×630. */
-const CARDS: { id: string; file: string }[] = [{ id: "og-play", file: "play.jpg" }];
+const CARDS: { id: string; file: string }[] = [
+  { id: "og-play", file: "play.jpg" },
+  { id: "og-site", file: "site.jpg" },
+];
 
 async function main(): Promise<void> {
   mkdirSync(OUT, { recursive: true });

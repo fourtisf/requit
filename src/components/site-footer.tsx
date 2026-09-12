@@ -11,6 +11,7 @@ const COLUMNS = [
       { href: "/#compare", label: "Why us" },
       { href: "/#timing", label: "Payout timing" },
       { href: "/#faq", label: "Questions" },
+      { href: "/play", label: "Play" },
       { href: "/proof", label: "Proof" },
     ],
   },

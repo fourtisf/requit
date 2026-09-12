@@ -54,6 +54,29 @@
   .amber{background:#E8C68B}
   .head-cell{background:#95E0C1}
   .label{position:absolute;left:0;right:0;bottom:-22px;text-align:center;font-family:GeistMono;font-size:12px;color:#434645}
+
+  /* ── the site card ──────────────────────────────────────────────────────
+     Same ground and same lockup as the arcade card; a different right-hand
+     side, because this one is about the paid work rather than the games.
+     Spaced wider (right:520px) than the arcade card: the headline here is the
+     product sentence and has to survive WhatsApp's square crop. */
+  .inner-wide{position:absolute;left:68px;right:520px;top:64px;bottom:64px;display:flex;flex-direction:column}
+  .badge{display:inline-flex;align-items:center;gap:10px;align-self:flex-start;margin-top:26px;
+    padding:9px 16px;border-radius:999px;background:rgba(232,198,139,.09);
+    box-shadow:inset 0 0 0 1px rgba(232,198,139,.22);font-size:16px;color:#E8C68B}
+  .badge b{font-weight:400;color:#E8C68B}
+  .steps{position:absolute;right:68px;top:50%;transform:translateY(-50%);width:396px;display:flex;flex-direction:column;gap:12px}
+  .step{display:flex;align-items:center;gap:16px;padding:19px 20px;border-radius:18px;
+    background:rgba(255,255,255,.026);box-shadow:inset 0 0 0 1px rgba(255,255,255,.075),0 18px 40px -24px rgba(0,0,0,.9)}
+  .step .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;
+    font-family:GeistMono;font-size:14px;color:#9C9E9C;background:rgba(255,255,255,.05)}
+  .step .t{font-size:19px;color:#DEDFDE;line-height:1.3}
+  .step .t small{display:block;font-size:14.5px;color:#6A6D6B;margin-top:3px}
+  /* The last step is the promise the whole product is judged on, so it is the
+     one that carries the accent. */
+  .step.paid{background:rgba(107,203,165,.1);box-shadow:inset 0 0 0 1px rgba(107,203,165,.26)}
+  .step.paid .n{background:rgba(107,203,165,.3);color:#08090A}
+  .step.paid .t{color:#FBFBFA}
 </style></head><body>
 
 <div class="card" id="og-play">
@@ -141,6 +164,46 @@
       <div class="c"></div><div class="c" style="background:rgba(107,203,165,.5)"></div><div class="c" style="background:rgba(232,198,139,.55)"></div><div class="c"></div>
       <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
     </div>
+  </div>
+  <div class="grain"></div>
+</div>
+
+<!-- The card for the site itself. Everything except /play links here, so this
+     is the one a stranger sees first when the domain is pasted anywhere.
+
+     The amber badge is deliberate and dated: it says tasks are not live. When
+     they are, this line and the sub-head both change — see the note in
+     docs/brand/social/README.md. A preview that implies live work while the
+     page says otherwise is the exact impression this site is built to avoid. -->
+<div class="card" id="og-site">
+  <div class="inner-wide">
+    <div class="lockup">
+      <svg viewBox="0 0 32 32" width="30" height="30" style="display:block;overflow:visible">
+        <g style="filter:drop-shadow(0 6px 18px rgba(107,203,165,.28))">
+          <path d="M6.8 8.4 14.4 16 6.8 23.6Z" fill="url(#a)" stroke="url(#a)" stroke-width="2.6" stroke-linejoin="round"/>
+          <path d="M17.6 8.4 25.2 16 17.6 23.6Z" fill="url(#b)" stroke="url(#b)" stroke-width="2.6" stroke-linejoin="round"/>
+        </g>
+      </svg>
+      Requit
+    </div>
+
+    <h1 class="head" style="font-size:66px;max-width:13ch">Advertiser-funded work.<br><span>Paid the same day.</span></h1>
+    <p class="sub" style="max-width:40ch">Reward, the odds of reaching it, and any cost — on screen
+      before you start, never after.</p>
+
+    <span class="badge"><b>Accounts open · tasks not live yet</b></span>
+
+    <div class="foot">
+      <span class="url">requit.xyz</span>
+      <span class="dot"></span>
+      <span class="free">USDC or ETH, from $10</span>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step"><span class="n">1</span><span class="t">You finish a task<small>Every requirement shown up front</small></span></div>
+    <div class="step"><span class="n">2</span><span class="t">The network confirms it<small>Or you open a dispute that has a status</small></span></div>
+    <div class="step paid"><span class="n">3</span><span class="t">We pay you the same day<small>USDC on Solana, or ETH</small></span></div>
   </div>
   <div class="grain"></div>
 </div>
