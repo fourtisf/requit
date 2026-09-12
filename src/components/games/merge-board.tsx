@@ -114,7 +114,15 @@ export function MergeBoard({
       signedIn={signedIn}
       score={state?.score ?? 0}
       secondary={state?.best ?? 0}
-      hint={reached ? `${TARGET} reached. Keep going.` : "Swipe, or use the arrow keys."}
+      hint={
+        reached ? (
+          `${TARGET} reached. Keep going.`
+        ) : (
+          <>
+            <span className="mn text-fg">← ↑ → ↓</span> to slide the tiles — or swipe.
+          </>
+        )
+      }
       ended="No moves left."
     >
       <div

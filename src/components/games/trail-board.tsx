@@ -137,7 +137,11 @@ export function TrailBoard({
       signedIn={signedIn}
       score={state?.score ?? 0}
       secondary={length}
-      hint="Swipe, or use the arrow keys."
+      hint={
+        <>
+          <span className="mn text-fg">← ↑ → ↓</span> to steer — or swipe.
+        </>
+      }
       ended="You ran out of room."
     >
       <div
