@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
 import { GAME_LIST } from "@/lib/games/catalog";
+import { spell } from "@/lib/format";
 import { BRAND } from "@/lib/brand";
 
 /**
@@ -15,11 +16,9 @@ import { BRAND } from "@/lib/brand";
  * It promises nothing about earning. That half is not connected, and a CTA
  * hinting otherwise would be the first broken promise a visitor met.
  */
-/** A headline reads "six games", not "6 games". The shelf's own label can count. */
-const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight"];
-
 export function PlayCta() {
-  const count = WORDS[GAME_LIST.length] ?? String(GAME_LIST.length);
+  // A headline reads "six games", not "6 games". The shelf's own label counts.
+  const count = spell(GAME_LIST.length);
 
   return (
     <section id="play" className="shell scroll-mt-20 py-[clamp(40px,6vw,72px)]">

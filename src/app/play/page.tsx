@@ -10,10 +10,20 @@ import { GAME_LIST } from "@/lib/games/catalog";
 import { personalBests } from "@/lib/games/session";
 import { earningsStatus } from "@/lib/ads/rewarded";
 import { BRAND } from "@/lib/brand";
+import { arcadeCard } from "@/lib/og";
+import { spell } from "@/lib/format";
+
+const BLURB = `${GAME_LIST.length} short games, made by us. Free, and no account needed to try them.`;
 
 export const metadata = {
   title: "Play",
-  description: `${GAME_LIST.length} short games, made by us. Free, and no account needed to try them.`,
+  description: BLURB,
+  // The words on the card itself, so the preview's title and its picture do
+  // not disagree about how many games there are.
+  ...arcadeCard(
+    `${spell(GAME_LIST.length).replace(/^./, (letter) => letter.toUpperCase())} games. No account needed.`,
+    BLURB,
+  ),
 };
 export const dynamic = "force-dynamic";
 

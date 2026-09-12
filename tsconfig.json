@@ -23,9 +23,10 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  // scripts/shots.ts imports playwright, which is deliberately NOT a dependency:
-  // it is a local authoring tool, and declaring it would make `npm ci` download
-  // a ~150MB browser on every deploy. Without this line `next build` typechecks
-  // it against a package the server does not have, and the deploy fails.
-  "exclude": ["node_modules", "scripts/shots.ts"]
+  // These two import playwright, which is deliberately NOT a dependency: they
+  // are local authoring tools, and declaring it would make `npm ci` download a
+  // ~150MB browser on every deploy. Without this line `next build` typechecks
+  // them against a package the server does not have, and the deploy fails.
+  // Anything else under scripts/ is a real tool and is checked normally.
+  "exclude": ["node_modules", "scripts/shots.ts", "scripts/og.ts"]
 }

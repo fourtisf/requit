@@ -12,6 +12,19 @@ export function money(amount: Prisma.Decimal): string {
   return `$${amount.toFixed(2)}`;
 }
 
+const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+
+/**
+ * A small number, written out.
+ *
+ * For prose, where "6 games" reads like a spreadsheet and "six games" reads
+ * like a sentence. Money and dates never use this — a figure is a figure, and
+ * every one of those on this site has to be checkable against a query.
+ */
+export function spell(count: number): string {
+  return WORDS[count] ?? String(count);
+}
+
 const DATE = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
   month: "short",

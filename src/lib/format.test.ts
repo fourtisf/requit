@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Prisma } from "@prisma/client";
-import { money, relative, stamp } from "@/lib/format";
+import { money, relative, spell, stamp } from "@/lib/format";
 
 const d = (value: string) => new Prisma.Decimal(value);
 
@@ -58,5 +58,20 @@ describe("relative", () => {
   it("handles a future time, which a hold window is", () => {
     expect(relative(new Date(now.getTime() + 3600_000), now)).toBe("in 1 hour");
     expect(relative(new Date(now.getTime() + 72 * 3600_000), now)).toBe("in 3 days");
+  });
+});
+
+describe("spelling a small number", () => {
+  it("writes the ones out", () => {
+    // "6 games" reads like a spreadsheet; "six games" reads like a sentence.
+    expect(spell(0)).toBe("no");
+    expect(spell(1)).toBe("one");
+    expect(spell(6)).toBe("six");
+    expect(spell(10)).toBe("ten");
+  });
+
+  it("gives up past ten rather than inventing grammar", () => {
+    expect(spell(11)).toBe("11");
+    expect(spell(48)).toBe("48");
   });
 });

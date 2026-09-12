@@ -63,6 +63,31 @@ Two constraints shaped all of them:
   every edge, and the bloom sits right of centre so the light is not in the
   part the avatar hides.
 
+## Open Graph card
+
+**`public/og/play.jpg`** — 1200×630 at 2×, the card a link preview shows when
+`requit.xyz/play` or any game page is pasted into X, Telegram or WhatsApp. It is
+wired up in `src/lib/og.ts`; before it, the site had no link preview at all, on
+any page.
+
+Source is `render-og.html`. Regenerate with `npx tsx scripts/og.ts` (needs a
+local `playwright` — it is deliberately not a dependency, see `tsconfig.json`).
+
+Three things it does on purpose:
+
+- **Six marks for six games.** They are the same miniatures the shelf draws, so
+  the card is about *our* games rather than about games. Add a game and the
+  shelf grows by itself; this file does not, so redraw it.
+- **JPEG, not PNG.** The grain that keeps a flat panel on flat black from
+  looking cheap is noise, and noise is what PNG cannot compress. The first
+  render was 2.6MB, which WhatsApp declines to fetch. The same card as JPEG is
+  160KB.
+- **The headline is spelled, not numbered.** "Six games", matching `spell()` in
+  `src/lib/format.ts`, which the page's own `og:title` uses — a preview whose
+  title says 6 and whose picture says six looks assembled by two people.
+
 ## Not made yet
 
-The Open Graph card (1200×630) that link previews use. Ask if you want it.
+A card for the site itself (`/`), about the paid work rather than the arcade.
+Pages without one still get a title and description; an empty `og:image` beats
+the wrong one.

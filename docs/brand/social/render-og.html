@@ -1,0 +1,138 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+  @font-face{font-family:GeistSemi;src:url("../../../node_modules/geist/dist/fonts/geist-sans/Geist-SemiBold.woff2") format("woff2");font-weight:600;font-display:block}
+  @font-face{font-family:GeistReg;src:url("../../../node_modules/geist/dist/fonts/geist-sans/Geist-Regular.woff2") format("woff2");font-weight:400;font-display:block}
+  @font-face{font-family:GeistMono;src:url("../../../node_modules/geist/dist/fonts/geist-mono/GeistMono-Regular.woff2") format("woff2");font-weight:400;font-display:block}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111}
+
+  /* 1200x630 is what every scraper crops to. Everything important is inset far
+     enough that WhatsApp's tighter square crop still holds the sentence. */
+  .card{
+    width:1200px;height:630px;position:relative;overflow:hidden;
+    background:#08090A;
+    background-image:
+      radial-gradient(46% 70% at 74% 42%,rgba(107,203,165,.26) 0%,rgba(107,203,165,.06) 48%,transparent 76%),
+      radial-gradient(70% 120% at 30% -20%,rgba(255,255,255,.06),transparent 62%),
+      radial-gradient(46% 90% at 4% 112%,rgba(107,203,165,.08),transparent 70%);
+    font-family:GeistReg,system-ui,sans-serif;color:#FBFBFA;
+  }
+  /* The same grain the site itself lays over everything. Without it a flat
+     panel on flat black reads cheap — the lesson from the first avatar set. */
+  .grain{position:absolute;inset:0;opacity:.28;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  .inner{position:absolute;left:68px;right:420px;top:64px;bottom:64px;display:flex;flex-direction:column}
+  .lockup{display:flex;align-items:center;gap:13px;font-family:GeistSemi;font-size:27px;letter-spacing:-.03em}
+
+  .head{margin-top:auto;font-family:GeistSemi;font-size:74px;line-height:1.03;letter-spacing:-.045em;max-width:15ch}
+  .head span{color:#6A6D6B}
+  .sub{margin-top:22px;font-size:22px;line-height:1.5;color:#9C9E9C;max-width:44ch}
+
+  .foot{margin-top:38px;display:flex;align-items:center;gap:14px}
+  .url{font-family:GeistMono;font-size:20px;letter-spacing:-.02em;color:#FBFBFA}
+  .free{font-size:17px;color:#6A6D6B}
+  .dot{width:5px;height:5px;border-radius:50%;background:#434645}
+
+  /* The six games, drawn as the shelf draws them. A generic illustration would
+     be about games; these are about ours, and are recognisable after one round. */
+  /* Six marks for six games. Four was the layout before the shelf grew, and a
+     card that says six while showing four is the kind of small lie this site
+     does not get to tell. */
+  .rail{position:absolute;right:68px;top:50%;transform:translateY(-50%);
+    display:grid;grid-template-columns:repeat(3,100px);gap:14px}
+  .mark{width:100px;height:100px;border-radius:18px;background:rgba(255,255,255,.026);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.075), 0 18px 40px -24px rgba(0,0,0,.9);
+    padding:10px;display:grid;gap:4px}
+  .m4{grid-template-columns:repeat(4,1fr)}
+  .m2{grid-template-columns:repeat(2,1fr)}
+  .c{border-radius:4px;background:rgba(255,255,255,.05)}
+  .on{background:rgba(107,203,165,.55)}
+  .dim{background:rgba(107,203,165,.3)}
+  .amber{background:#E8C68B}
+  .head-cell{background:#95E0C1}
+  .label{position:absolute;left:0;right:0;bottom:-22px;text-align:center;font-family:GeistMono;font-size:12px;color:#434645}
+</style></head><body>
+
+<div class="card" id="og-play">
+  <div class="inner">
+    <div class="lockup">
+      <svg viewBox="0 0 32 32" width="30" height="30" style="display:block;overflow:visible">
+        <defs>
+          <linearGradient id="a" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F1F3F1"/><stop offset="1" stop-color="#C3C8C5"/></linearGradient>
+          <linearGradient id="b" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#C9F3E1"/><stop offset=".5" stop-color="#8CDCBB"/><stop offset="1" stop-color="#3E9878"/></linearGradient>
+        </defs>
+        <g style="filter:drop-shadow(0 6px 18px rgba(107,203,165,.28))">
+          <path d="M6.8 8.4 14.4 16 6.8 23.6Z" fill="url(#a)" stroke="url(#a)" stroke-width="2.6" stroke-linejoin="round"/>
+          <path d="M17.6 8.4 25.2 16 17.6 23.6Z" fill="url(#b)" stroke="url(#b)" stroke-width="2.6" stroke-linejoin="round"/>
+        </g>
+      </svg>
+      Requit
+    </div>
+
+    <h1 class="head">Six games.<br><span>No account needed.</span></h1>
+    <p class="sub">Made by us. Two-minute rounds, and every score is checked on our
+      server by replaying the moves you made.</p>
+
+    <div class="foot">
+      <span class="url">requit.xyz/play</span>
+      <span class="dot"></span>
+      <span class="free">Free — no download</span>
+    </div>
+  </div>
+
+  <div class="rail">
+    <!-- Blocks -->
+    <div class="mark m4">
+      <div class="c"></div><div class="c on"></div><div class="c on"></div><div class="c"></div>
+      <div class="c"></div><div class="c on"></div><div class="c on"></div><div class="c"></div>
+      <div class="c"></div><div class="c on"></div><div class="c on"></div><div class="c on"></div>
+      <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+    </div>
+    <!-- Spot -->
+    <div class="mark m4" style="gap:5px">
+      <div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div>
+      <div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 66%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div>
+      <div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div>
+      <div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div><div class="c" style="background:hsl(150 44% 46%)"></div>
+    </div>
+    <!-- Trail -->
+    <div class="mark m4">
+      <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+      <div class="c head-cell"></div><div class="c dim"></div><div class="c dim"></div><div class="c dim"></div>
+      <div class="c"></div><div class="c"></div><div class="c"></div><div class="c dim"></div>
+      <div class="c"></div><div class="c"></div><div class="c amber"></div><div class="c"></div>
+    </div>
+    <!-- Flood -->
+    <div class="mark m4">
+      <div class="c" style="background:#6bcba5"></div><div class="c" style="background:#6bcba5"></div><div class="c" style="background:#e8c68b"></div><div class="c" style="background:#7fa6d9"></div>
+      <div class="c" style="background:#6bcba5"></div><div class="c" style="background:#6bcba5"></div><div class="c" style="background:#b98cd4"></div><div class="c" style="background:#e8c68b"></div>
+      <div class="c" style="background:#d98f77"></div><div class="c" style="background:#8fa0ad"></div><div class="c" style="background:#7fa6d9"></div><div class="c" style="background:#b98cd4"></div>
+      <div class="c" style="background:#e8c68b"></div><div class="c" style="background:#d98f77"></div><div class="c" style="background:#6bcba5"></div><div class="c" style="background:#8fa0ad"></div>
+    </div>
+    <!-- Recall -->
+    <div class="mark m2" style="gap:7px">
+      <div class="c" style="display:grid;place-items:center;background:rgba(107,203,165,.16)">
+        <div style="width:16px;height:16px;border-radius:50%;background:#95E0C1"></div>
+      </div>
+      <div class="c" style="display:grid;place-items:center">
+        <div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.22)"></div>
+      </div>
+      <div class="c" style="display:grid;place-items:center">
+        <div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.22)"></div>
+      </div>
+      <div class="c" style="display:grid;place-items:center;background:rgba(107,203,165,.16)">
+        <div style="width:15px;height:15px;transform:rotate(45deg);background:#95E0C1"></div>
+      </div>
+    </div>
+    <!-- Merge -->
+    <div class="mark m4">
+      <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+      <div class="c"></div><div class="c" style="background:rgba(255,255,255,.08)"></div><div class="c" style="background:rgba(107,203,165,.3)"></div><div class="c"></div>
+      <div class="c"></div><div class="c" style="background:rgba(107,203,165,.5)"></div><div class="c" style="background:rgba(232,198,139,.55)"></div><div class="c"></div>
+      <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+    </div>
+  </div>
+  <div class="grain"></div>
+</div>
+
+</body></html>

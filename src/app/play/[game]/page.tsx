@@ -13,6 +13,7 @@ import { GAMES, GAME_LIST, isGameSlug } from "@/lib/games/catalog";
 import { personalBest } from "@/lib/games/session";
 import { earningsStatus } from "@/lib/ads/rewarded";
 import { BRAND } from "@/lib/brand";
+import { arcadeCard } from "@/lib/og";
 
 type Props = { params: Promise<{ game: string }> };
 
@@ -25,9 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isGameSlug(game)) return { title: "Play" };
 
   const entry = GAMES[game];
+  const description = `${entry.tagline} Free, and no account needed to try it.`;
   return {
     title: entry.title,
-    description: `${entry.tagline} Free, and no account needed to try it.`,
+    description,
+    ...arcadeCard(`${entry.title} — ${BRAND.name}`, description),
   };
 }
 
