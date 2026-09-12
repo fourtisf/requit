@@ -25,6 +25,15 @@ const prisma = new PrismaClient();
 /** The accounts prisma/seed.ts creates. Kept in one shape: the email domain. */
 const SEED_EMAIL = "%@example.com";
 
+/**
+ * What scripts/seed-demo.ts leaves behind: a fixed session token that is a
+ * standing way into an account, and three rewards nobody earned. Those rewards
+ * are the dangerous ones — /proof sums reward rows, so a demo row is a figure
+ * on a public page that never happened.
+ */
+const DEMO_SESSION = "demo-shot-session";
+const DEMO_TXNS = ["d1", "d2", "d3"];
+
 async function main(): Promise<void> {
   const confirmed = process.argv.includes("--yes");
 
@@ -34,11 +43,16 @@ async function main(): Promise<void> {
   });
   const ids = seedAccounts.map((account) => account.id);
 
-  const [offers, tiers, realUsers, rewards, withdrawals, disputes, referred] = await Promise.all([
+  const [offers, tiers, realUsers, rewards, demoRewards, demoSessions, withdrawals, disputes, referred] =
+    await Promise.all([
     prisma.offer.count(),
     prisma.offerTier.count(),
     prisma.user.count({ where: { NOT: { email: { endsWith: "@example.com" } } } }),
     prisma.reward.count(),
+    prisma.reward.count({
+      where: { networkTxnId: { in: DEMO_TXNS }, user: { email: { endsWith: "@example.com" } } },
+    }),
+    prisma.session.count({ where: { sessionToken: DEMO_SESSION } }),
     prisma.withdrawal.count({ where: { userId: { in: ids } } }),
     prisma.dispute.count({ where: { userId: { in: ids } } }),
     prisma.user.count({ where: { referredById: { in: ids } } }),
@@ -47,12 +61,16 @@ async function main(): Promise<void> {
   console.log(`\n  offers          ${offers}`);
   console.log(`  offer tiers     ${tiers}`);
   console.log(`  seed accounts   ${ids.length}  (${SEED_EMAIL})`);
-  console.log(`  real accounts   ${realUsers}  (untouched)\n`);
+  console.log(`  real accounts   ${realUsers}  (untouched)`);
+  console.log(`  demo rewards    ${demoRewards}  (scripts/seed-demo.ts)`);
+  console.log(`  demo sessions   ${demoSessions}  (${DEMO_SESSION})\n`);
 
   // Any of these means the rows are not seed data any more, and deciding which
   // of them is precious is not a script's call to make.
   const refusals: string[] = [];
-  if (rewards > 0) refusals.push(`${rewards} reward rows exist`);
+  // Demo rewards are removable; any other reward row is money somebody was told
+  // about, and no script gets to decide it did not happen.
+  if (rewards - demoRewards > 0) refusals.push(`${rewards - demoRewards} real reward rows exist`);
   if (withdrawals > 0) refusals.push(`a seed account has ${withdrawals} withdrawals`);
   if (disputes > 0) refusals.push(`a seed account has ${disputes} disputes`);
   if (referred > 0) refusals.push(`${referred} accounts were referred by a seed account`);
@@ -63,7 +81,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  if (offers === 0 && tiers === 0 && ids.length === 0) {
+  if (offers === 0 && tiers === 0 && ids.length === 0 && demoRewards === 0 && demoSessions === 0) {
     console.log("  Nothing to remove. This database is already clean.\n");
     return;
   }
@@ -80,16 +98,22 @@ async function main(): Promise<void> {
   // Wallets and devices are deleted explicitly: their relations deliberately do
   // NOT cascade from a user, so that removing a member can never quietly take
   // a payout address with it.
-  const [removedTiers, removedOffers, , , removedUsers] = await prisma.$transaction([
-    prisma.offerTier.deleteMany({}),
-    prisma.offer.deleteMany({}),
-    prisma.wallet.deleteMany({ where: { userId: { in: ids } } }),
-    prisma.device.deleteMany({ where: { userId: { in: ids } } }),
-    prisma.user.deleteMany({ where: { id: { in: ids } } }),
-  ]);
+  const [removedTiers, removedOffers, removedRewards, removedSessions, , , removedUsers] =
+    await prisma.$transaction([
+      prisma.offerTier.deleteMany({}),
+      prisma.offer.deleteMany({}),
+      prisma.reward.deleteMany({
+        where: { networkTxnId: { in: DEMO_TXNS }, user: { email: { endsWith: "@example.com" } } },
+      }),
+      prisma.session.deleteMany({ where: { sessionToken: DEMO_SESSION } }),
+      prisma.wallet.deleteMany({ where: { userId: { in: ids } } }),
+      prisma.device.deleteMany({ where: { userId: { in: ids } } }),
+      prisma.user.deleteMany({ where: { id: { in: ids } } }),
+    ]);
 
   console.log(
     `  Removed ${removedOffers.count} offers, ${removedTiers.count} tiers, ` +
+      `${removedRewards.count} demo rewards, ${removedSessions.count} demo sessions, ` +
       `${removedUsers.count} seed accounts.\n`,
   );
 }

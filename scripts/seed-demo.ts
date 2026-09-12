@@ -26,6 +26,23 @@ async function main() {
     throw new Error("Refusing to run: this deletes every offer and opens a fixed session.");
   }
 
+  // NODE_ENV is set by whoever typed the command, and typing the command in the
+  // wrong terminal is the entire failure this guards against. So the real test
+  // is whether anyone has ever signed up here: this script deletes every offer,
+  // writes three rewards that nobody earned, and opens a session token that is
+  // a standing way into somebody's account.
+  const members = await prisma.user.count({
+    where: { NOT: { email: { endsWith: "@example.com" } } },
+  });
+  if (members > 0 && process.env.SEED_ANYWAY !== "1") {
+    throw new Error(
+      `Refusing to run: ${members} real account${members === 1 ? " exists" : "s exist"} here, ` +
+        "so this is not a screenshot machine. It would delete every offer, invent three " +
+        "rewards, and open a fixed session token.\n\n" +
+        "If you are certain: SEED_ANYWAY=1 npx tsx scripts/seed-demo.ts",
+    );
+  }
+
   await prisma.offerTier.deleteMany();
   await prisma.offer.deleteMany();
 
@@ -89,15 +106,19 @@ async function main() {
     },
   });
 
-  // A member whose session the screenshot uses.
-  const existing = await prisma.user.findFirst({ where: { handle: "ada" } });
-  const user = existing ?? await prisma.user.create({
-    data: {
+  // A member whose session the screenshot uses. Matched on the email, because
+  // that is the account's identity — looking it up by handle meant that on a
+  // database where prisma/seed.ts had already made ada_w with this address, the
+  // script tried to create a second account with the same email and died on the
+  // unique index, halfway through, having already deleted every offer.
+  const user = await prisma.user.upsert({
+    where: { email: "ada@example.com" },
+    update: { handle: "ada", countryCode: "GB", riskTier: "STANDARD", suspendedAt: null },
+    create: {
       email: "ada@example.com", handle: "ada", countryCode: "GB",
       referralCode: "ADADEMO1", unsubscribeToken: randomUUID(), riskTier: "STANDARD",
     },
   });
-  await prisma.user.update({ where: { id: user.id }, data: { countryCode: "GB", riskTier: "STANDARD", suspendedAt: null } });
 
   await prisma.session.deleteMany({ where: { sessionToken: "demo-shot-session" } });
   await prisma.session.create({
