@@ -84,7 +84,37 @@ const offers: OfferSeed[] = [
   { network: Network.TOROX, networkOfferId: "trx-4008", name: "Photo editor — 3-day trial", description: "Cancel before it renews.", category: OfferCategory.APP, countries: ["US"], devices: ["ios"], advertiserPays: "9.5000", userPays: "6.1700", requiresPurchase: true, purchaseAmount: "0.99", deadlineDays: 3 },
 ];
 
+/**
+ * Refuses to run against a database with real members in it.
+ *
+ * Every offer below is invented — made-up names, made-up rewards, no tracking
+ * URL behind any of them. On a developer's machine that is the point. On the
+ * live site it is fake inventory on a page that tells people it has none, which
+ * is the one impression this product cannot afford, and it is one careless
+ * `npm run db:seed` away at any time.
+ *
+ * The test is "are there accounts here that are not seed accounts", not an
+ * environment variable: NODE_ENV is set by whoever typed the command, and the
+ * command being typed in the wrong terminal is exactly the mistake this is for.
+ */
+async function refuseIfLive(): Promise<void> {
+  if (process.env.SEED_ANYWAY === "1") return;
+
+  const strangers = await prisma.user.count({
+    where: { email: { notIn: users.map((user) => user.email) } },
+  });
+  if (strangers === 0) return;
+
+  throw new Error(
+    `This database has ${strangers} account${strangers === 1 ? "" : "s"} that the seed did not ` +
+      "create, so it is not a development database. The seed would add invented offers with " +
+      "invented rewards to a site that says it has no tasks yet.\n\n" +
+      "If you are certain: SEED_ANYWAY=1 npm run db:seed",
+  );
+}
+
 async function main(): Promise<void> {
+  await refuseIfLive();
   console.log("Seeding…");
 
   for (const user of users) {

@@ -44,6 +44,13 @@ export default async function TasksPage({
   const { light, heavy } = splitLight(all);
   const offers = showEverything ? all : light;
 
+  // Listed and startable are different numbers, and the page had only the
+  // first. An offer whose network has not confirmed how it credits us cannot be
+  // opened by anybody — see lib/networks/handoff.ts — so a header that counts it
+  // as "available" is telling a member something the buttons then contradict.
+  const startable = all.filter((offer) => offer.canStart).length;
+  const stuck = all.length > 0 && startable === 0;
+
   // Keyed on the whole catalogue, not the filtered view. "Nothing live in your
   // country" and "everything live in your country is heavy" are different
   // facts, and offering to notify someone about the first when the second is
@@ -59,9 +66,13 @@ export default async function TasksPage({
 
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
         <h1 className="text-[27px] font-semibold tracking-[-0.042em]">Tasks</h1>
-        {offers.length > 0 ? (
+        {startable > 0 ? (
           <span className="mn text-[12.5px] text-fg-4">
-            {offers.length} available in {user.countryCode}
+            {startable} available in {user.countryCode}
+          </span>
+        ) : all.length > 0 ? (
+          <span className="mn text-[12.5px] text-fg-4">
+            {all.length} listed · none can be started yet
           </span>
         ) : null}
       </div>
@@ -76,6 +87,17 @@ export default async function TasksPage({
       {unavailableDetail ? (
         <p className="mt-4 rounded-card px-[18px] py-3 text-[12.5px] leading-[1.6] text-amber surface-inset">
           {unavailableDetail} Nothing was started, and nothing was counted against you.
+        </p>
+      ) : null}
+
+      {/* One statement at the top beats discovering it button by button. The
+          per-card explanation stays: somebody who lands mid-page needs it too. */}
+      {stuck ? (
+        <p className="mt-4 max-w-[72ch] rounded-card px-[18px] py-3 text-[12.5px] leading-[1.6] text-amber surface-inset">
+          None of these can be started yet. They are in the feed for {user.countryCode}, but no
+          network has confirmed how a click carries your account — so a task opened now would be
+          work done that nobody could credit to you. The buttons stay shut until that link is
+          proven, and we would rather shut them than let you find out afterwards.
         </p>
       ) : null}
 
@@ -166,7 +188,7 @@ export default async function TasksPage({
           task rather than a preparation for one, and it is different tomorrow.
           It disappears when real inventory arrives — paid work outranks our own
           survey — and it stays on the dashboard, where it also lives. */}
-      {all.length === 0 ? (
+      {startable === 0 ? (
         <div className="mt-8 flex max-w-[68ch] flex-col gap-3">
           <QuestionCard userId={user.id} />
           <ReadinessCard userId={user.id} />
