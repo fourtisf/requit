@@ -1,7 +1,10 @@
-import { type Board, type Direction, best, emptyBoard, isOver, move, rng, spawn } from "@/lib/games/merge";
+import { type Direction, isDirection } from "@/lib/games/direction";
+import { rng } from "@/lib/games/rng";
+import { type Board, best, emptyBoard, isOver, move, spawn } from "@/lib/games/merge";
+import { type Engine, type GameRules, type Verification, verifyRound } from "@/lib/games/engine";
 
 /**
- * A game in progress, and the replay that checks one after the fact.
+ * Merge as a playable round: the engine, and the rules the server scores with.
  *
  * The client runs `createGame` to play. The server runs the *same* function
  * over the move list the client submits, and takes its own result as the score.
@@ -25,11 +28,8 @@ export type GameState = {
   best: number;
 };
 
-export type Game = {
-  state: () => GameState;
-  /** False when the board did not shift: not a move, and nothing spawns. */
-  play: (direction: Direction) => boolean;
-};
+/** `play` is false when the board did not shift: not a move, and nothing spawns. */
+export type Game = Engine<Direction, GameState>;
 
 export function createGame(seed: number): Game {
   const next = rng(seed);
@@ -53,11 +53,11 @@ export function createGame(seed: number): Game {
   };
 }
 
-export type ReplayFailure = "too-many-moves" | "illegal-move";
-
-export type Replay =
-  | { ok: true; score: number; moves: number; best: number }
-  | { ok: false; reason: ReplayFailure; atMove: number };
+export const MERGE_RULES: GameRules<Direction> = {
+  maxMoves: MAX_MOVES,
+  create: createGame,
+  parse: (value) => (isDirection(value) ? value : null),
+};
 
 /**
  * Recomputes a game from its seed and its moves.
@@ -67,18 +67,6 @@ export type Replay =
  * means the move list was assembled by something else, and the honest response
  * is to refuse the whole submission rather than score a game nobody played.
  */
-export function replay(seed: number, moves: readonly Direction[]): Replay {
-  if (moves.length > MAX_MOVES) {
-    return { ok: false, reason: "too-many-moves", atMove: MAX_MOVES };
-  }
-
-  const game = createGame(seed);
-  for (let index = 0; index < moves.length; index += 1) {
-    if (!game.play(moves[index]!)) {
-      return { ok: false, reason: "illegal-move", atMove: index };
-    }
-  }
-
-  const final = game.state();
-  return { ok: true, score: final.score, moves: final.moves, best: final.best };
+export function replay(seed: number, moves: unknown): Verification {
+  return verifyRound(MERGE_RULES, seed, moves);
 }

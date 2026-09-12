@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { SIZE, type Board, best, isOver, move, rng, slide, spawn, start } from "@/lib/games/merge";
+import { SIZE, type Board, best, isOver, move, slide, spawn, start } from "@/lib/games/merge";
+import { rng } from "@/lib/games/rng";
 import { MAX_MOVES, createGame, replay } from "@/lib/games/play";
 import type { Direction } from "@/lib/games/merge";
 
@@ -89,29 +90,6 @@ describe("game over", () => {
 
   it("sees a vertical pair, not just a horizontal one", () => {
     expect(isOver(board([2, 4, 8, 16], [2, 8, 16, 2], [8, 16, 2, 4], [16, 2, 4, 8]))).toBe(false);
-  });
-});
-
-describe("the seeded generator", () => {
-  it("gives the same stream for the same seed", () => {
-    // Everything downstream rests on this: it is what lets the server replay a
-    // browser's game and get the same board.
-    const a = rng(12345);
-    const b = rng(12345);
-    expect([a(), a(), a()]).toEqual([b(), b(), b()]);
-  });
-
-  it("gives a different stream for a different seed", () => {
-    expect(rng(1)()).not.toBe(rng(2)());
-  });
-
-  it("stays inside [0, 1)", () => {
-    const next = rng(99);
-    for (let index = 0; index < 500; index += 1) {
-      const value = next();
-      expect(value).toBeGreaterThanOrEqual(0);
-      expect(value).toBeLessThan(1);
-    }
   });
 });
 

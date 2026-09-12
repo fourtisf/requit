@@ -180,6 +180,45 @@ placeholder.
 
 ---
 
+## The arcade (`/play`)
+
+Four games of our own — Merge, Trail, Flood and Recall — playable without an
+account. It is the only part of the site a stranger can *try* rather than read,
+which is why it is not behind sign-in.
+
+**Every score in the database is the score of a round that was actually played.**
+A browser never sends a score; it sends the moves, and the server replays them
+with the same rules the browser ran and takes its own result. That works because
+every game is deterministic from a seed the server issued — one seeded generator
+drives every tile, fruit, colour and shuffle — and because a move the board would
+not allow fails the whole submission rather than being skipped.
+
+What a replay proves is that the round is a legal game, not that a human played
+it: a program can play a legal game, and Recall's deal can be recomputed by
+anyone who wants it badly enough. That gap is not closable in a browser, which
+is why the gate on turning a score into money is an ad network's server-side
+callback (`src/lib/ads/rewarded.ts`) and not a high score. **No game pays
+anything today**, and every game page says so rather than showing a counter that
+never becomes a payout.
+
+**Adding a game** is a rules object and a catalog entry:
+
+| Step | Where |
+|---|---|
+| Pure rules, no React, no `Math.random`, no `Date.now()` | `src/lib/games/<slug>.ts` |
+| `GameRules`: `create`, `parse`, `maxMoves` | same file, exported |
+| Title, tagline, how-to, what its second number means | `GAMES` in `src/lib/games/catalog.ts` |
+| The board | `src/components/games/<slug>-board.tsx`, via `useRound` |
+
+No migration: `GameSession.game` is a slug, and `bestTile` holds whatever second
+number the game names (`bestLabel`). The catalog is also the security boundary —
+a slug that is not a key in it is not a game, and a round is always scored with
+the rules of the slug *stored on its row*, never one that arrives with the moves.
+`src/lib/games/catalog.test.ts` holds every game to that contract in one loop, so
+a fifth game cannot quietly ship without meeting it.
+
+---
+
 ## Member surfaces (Phase 0.2)
 
 Added after the handoff was written. Four of the five sit on top of Phase 1 data,
@@ -290,6 +329,8 @@ src/
     notify.ts         Notification email. Never the sign-in code.
     risk.ts           The §6.1 hold ladder — one table, UI and payouts share it
     leaderboard.ts    Top workers by confirmed rewards (also feeds §9)
+    games/            The arcade: one file of pure rules per game, one
+                      catalog, one replay. See "The arcade" above.
     statement.ts      A member's own auditable record, and its CSV
     auth/
       session-payload.ts  What /api/auth/session is allowed to publish

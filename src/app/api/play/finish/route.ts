@@ -8,12 +8,14 @@ export const dynamic = "force-dynamic";
 /**
  * Scores a round.
  *
- * The body carries the session id and the moves — never a score. Whatever the
- * browser thinks it scored is not in the request at all, so there is nothing
- * for a tampered client to inflate.
+ * The body carries the session id and the moves — never a score, and never the
+ * game. Whatever the browser thinks it scored is not in the request at all, so
+ * there is nothing for a tampered client to inflate, and the rules the moves
+ * are checked against are the ones the stored round was opened under.
  */
 const STATUS: Record<FinishFailure, number> = {
   "not-found": 404,
+  "unknown-game": 410,
   "already-finished": 409,
   "bad-moves": 400,
   "too-many-moves": 400,
@@ -22,6 +24,7 @@ const STATUS: Record<FinishFailure, number> = {
 
 const MESSAGE: Record<FinishFailure, string> = {
   "not-found": "That round does not exist.",
+  "unknown-game": "That game is no longer available, so the round cannot be scored.",
   "already-finished": "That round was already scored.",
   "bad-moves": "That is not a list of moves.",
   "too-many-moves": "That round is too long to check.",

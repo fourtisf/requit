@@ -10,8 +10,17 @@
  *
  * So: no React, no randomness of its own, no Date.now(). The board and the seed
  * go in, the next board comes out, and the same inputs always give the same
- * result. lib/games/verify.ts depends on that.
+ * result. lib/games/engine.ts depends on that, and so does every game added
+ * since.
  */
+
+import { type Direction, DIRECTIONS, isDirection } from "@/lib/games/direction";
+import { below, rng } from "@/lib/games/rng";
+
+// Re-exported because a direction is part of this game's public vocabulary —
+// the board and the replay both speak it — even though the four names are now
+// shared with Trail.
+export { DIRECTIONS, isDirection, type Direction };
 
 export const SIZE = 4;
 /** Reaching this is the win. The board keeps going afterwards. */
@@ -20,34 +29,8 @@ export const TARGET = 2048;
 /** Row-major, length SIZE * SIZE. 0 is an empty cell. */
 export type Board = readonly number[];
 
-export type Direction = "up" | "down" | "left" | "right";
-
-export const DIRECTIONS: readonly Direction[] = ["up", "down", "left", "right"];
-
-export function isDirection(value: unknown): value is Direction {
-  return typeof value === "string" && (DIRECTIONS as readonly string[]).includes(value);
-}
-
 export function emptyBoard(): Board {
   return new Array<number>(SIZE * SIZE).fill(0);
-}
-
-/**
- * A seeded generator, so a game can be replayed move for move.
- *
- * mulberry32: small, fast, and — the part that matters here — identical in
- * every JavaScript runtime, which is what lets the server recompute a browser's
- * game exactly.
- */
-export function rng(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let t = state;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 /**
@@ -152,7 +135,7 @@ export function spawn(board: Board, next: () => number): Board {
   });
   if (empty.length === 0) return board;
 
-  const cell = empty[Math.floor(next() * empty.length)]!;
+  const cell = empty[below(empty.length, next)]!;
   const out = [...board];
   out[cell] = next() < 0.9 ? 2 : 4;
   return out;

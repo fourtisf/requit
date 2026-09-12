@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { SIZE, TARGET, type Board, type Direction, isDirection } from "@/lib/games/merge";
-import { createGame, type Game, type GameState } from "@/lib/games/play";
-import { Button } from "@/components/ui/button";
+import { useCallback, useEffect, useRef } from "react";
+import { SIZE, TARGET, type Board, type Direction } from "@/lib/games/merge";
+import { createGame } from "@/lib/games/play";
+import { GAMES } from "@/lib/games/catalog";
+import { useRound } from "@/components/games/use-round";
+import { RoundFrame } from "@/components/games/round-frame";
 
 /**
  * The board.
@@ -40,15 +42,6 @@ function tileSize(value: number): string {
   return "text-[clamp(21px,6.2vw,34px)]";
 }
 
-type Round = { id: string; seed: number };
-
-/**
- * `signedIn` false is a real mode, not a degraded one. A visitor can play the
- * whole game; the only difference is that nothing is recorded, so there is no
- * round to open on the server and no moves to submit. Putting a sign-in wall in
- * front of the one thing on this site a stranger can actually try would waste
- * it.
- */
 export function MergeBoard({
   personalBest,
   signedIn,
@@ -56,97 +49,13 @@ export function MergeBoard({
   personalBest: number;
   signedIn: boolean;
 }) {
-  const game = useRef<Game | null>(null);
-  const moves = useRef<Direction[]>([]);
-  const round = useRef<Round | null>(null);
-
-  const [state, setState] = useState<GameState | null>(null);
-  const [best, setBest] = useState(personalBest);
-  const [status, setStatus] = useState<"idle" | "loading" | "playing" | "saving" | "over">("idle");
-  const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState<number | null>(null);
-
-  const begin = useCallback(async () => {
-    setStatus("loading");
-    setError(null);
-    setSaved(null);
-
-    if (!signedIn) {
-      // A guest's seed can come from the browser: with no row to write and no
-      // score to keep, there is nothing a chosen seed could win.
-      const seed = Math.floor(Math.random() * 2 ** 31);
-      round.current = null;
-      game.current = createGame(seed);
-      moves.current = [];
-      setState(game.current.state());
-      setStatus("playing");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/play/start", { method: "POST" });
-      const payload = await response.json();
-      if (!response.ok) {
-        setError(payload.error ?? "Could not start a round.");
-        setStatus("idle");
-        return;
-      }
-
-      round.current = payload as Round;
-      game.current = createGame(payload.seed);
-      moves.current = [];
-      setState(game.current.state());
-      setStatus("playing");
-    } catch {
-      setError("Could not reach the server.");
-      setStatus("idle");
-    }
-  }, [signedIn]);
-
-  const finish = useCallback(async () => {
-    const current = round.current;
-    if (!current) {
-      // Guest round. Nothing to submit, and the score stays on screen only.
-      setStatus("over");
-      return;
-    }
-
-    setStatus("saving");
-    try {
-      const response = await fetch("/api/play/finish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // No score in the body. There is deliberately nothing here to inflate.
-        body: JSON.stringify({ sessionId: current.id, moves: moves.current }),
-      });
-      const payload = await response.json();
-      if (!response.ok) {
-        setError(payload.error ?? "Could not save that round.");
-      } else {
-        setSaved(payload.score);
-        setBest((previous) => (payload.score > previous ? payload.score : previous));
-      }
-    } catch {
-      setError("Could not save that round. Your score may not be recorded.");
-    } finally {
-      setStatus("over");
-    }
-  }, []);
-
-  const push = useCallback(
-    (direction: Direction) => {
-      const current = game.current;
-      if (!current || status !== "playing") return;
-
-      if (!current.play(direction)) return;
-      moves.current.push(direction);
-
-      const next = current.state();
-      setState(next);
-      if (next.over) void finish();
-    },
-    [finish, status],
-  );
+  const round = useRound({
+    game: "merge",
+    signedIn,
+    personalBest,
+    create: useCallback((seed: number) => createGame(seed), []),
+  });
+  const { state, send } = round;
 
   // Keyboard. Arrow keys and WASD, and preventDefault so arrows do not scroll
   // the page out from under the board mid-game.
@@ -163,14 +72,14 @@ export function MergeBoard({
         d: "right",
       };
       const direction = map[event.key];
-      if (!direction || !isDirection(direction)) return;
+      if (!direction) return;
       event.preventDefault();
-      push(direction);
+      send(direction);
     }
 
     window.addEventListener("keydown", onKey, { passive: false });
     return () => window.removeEventListener("keydown", onKey);
-  }, [push]);
+  }, [send]);
 
   // Touch. Most people will play this on a phone, so a swipe has to work as
   // well as a key — and has to not be confused with a scroll.
@@ -192,29 +101,26 @@ export function MergeBoard({
     const dy = point.clientY - startPoint.y;
     if (Math.abs(dx) < MIN_SWIPE && Math.abs(dy) < MIN_SWIPE) return;
 
-    push(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up");
+    send(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up");
   }
 
   const board: Board = state?.board ?? new Array<number>(SIZE * SIZE).fill(0);
   const reached = state !== null && state.best >= TARGET;
 
   return (
-    <div className="max-w-[440px]">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="mn text-[11.5px] uppercase tracking-[0.08em] text-fg-4">Score</p>
-          <p className="mn text-[30px] font-semibold tracking-[-0.03em]">{state?.score ?? 0}</p>
-        </div>
-        <div className="text-right">
-          <p className="mn text-[11.5px] uppercase tracking-[0.08em] text-fg-4">Your best</p>
-          <p className="mn text-[17px] text-fg-2">{best}</p>
-        </div>
-      </div>
-
+    <RoundFrame
+      game={GAMES.merge}
+      round={round}
+      signedIn={signedIn}
+      score={state?.score ?? 0}
+      secondary={state?.best ?? 0}
+      hint={reached ? `${TARGET} reached. Keep going.` : "Swipe, or use the arrow keys."}
+      ended="No moves left."
+    >
       <div
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
-        className="mt-4 grid touch-none select-none grid-cols-4 gap-2 rounded-card bg-surf p-2 shadow-[inset_0_0_0_1px_var(--color-bd)]"
+        className="grid touch-none select-none grid-cols-4 gap-2 rounded-card bg-surf p-2 shadow-[inset_0_0_0_1px_var(--color-bd)]"
       >
         {board.map((value, index) => (
           <div
@@ -227,52 +133,6 @@ export function MergeBoard({
           </div>
         ))}
       </div>
-
-      {status === "idle" ? (
-        <div className="mt-5">
-          <Button onClick={begin}>{signedIn ? "Start a round" : "Play now"}</Button>
-          <p className="mt-3 max-w-[44ch] text-[12.5px] leading-[1.6] text-fg-3">
-            Swipe or use the arrow keys. Two tiles with the same number merge into one. Reach{" "}
-            {TARGET} to win — the board carries on afterwards.
-          </p>
-        </div>
-      ) : null}
-
-      {status === "loading" ? <p className="mt-5 text-[13px] text-fg-3">Starting…</p> : null}
-
-      {status === "playing" ? (
-        <p className="mt-4 text-[12.5px] text-fg-3">
-          {reached ? `${TARGET} reached. Keep going.` : "Swipe, or use the arrow keys."}
-        </p>
-      ) : null}
-
-      {status === "saving" ? <p className="mt-5 text-[13px] text-fg-3">Saving the round…</p> : null}
-
-      {status === "over" ? (
-        <div className="mt-5">
-          <p className="text-[15px] font-semibold tracking-[-0.02em]">No moves left.</p>
-          {saved !== null ? (
-            <p className="mt-1.5 text-[13px] text-fg-2">
-              Scored <span className="mn text-ac-2">{saved}</span> — checked on the server against
-              the moves you made.
-            </p>
-          ) : null}
-          {!signedIn ? (
-            <p className="mt-1.5 max-w-[44ch] text-[13px] leading-[1.6] text-fg-2">
-              Scored <span className="mn text-ac-2">{state?.score ?? 0}</span>, kept nowhere.{" "}
-              <a href="/signin" className="text-ac-2 underline underline-offset-4">
-                Sign in
-              </a>{" "}
-              and rounds are recorded against your account.
-            </p>
-          ) : null}
-          <div className="mt-4">
-            <Button onClick={begin}>Play again</Button>
-          </div>
-        </div>
-      ) : null}
-
-      {error ? <p className="mt-3 text-[12.5px] text-amber">{error}</p> : null}
-    </div>
+    </RoundFrame>
   );
 }
