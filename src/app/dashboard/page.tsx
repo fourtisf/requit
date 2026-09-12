@@ -2,6 +2,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { requireUser } from "@/lib/session";
 import { AppNav } from "@/components/app-nav";
 import { Card, CardHeader } from "@/components/ui/card";
+import { ReadinessCard } from "@/components/readiness-card";
 import { StatGrid, Stat } from "@/components/ui/stat";
 import { UNKNOWN_COUNTRY } from "@/lib/country";
 import { TIER_LADDER, TIER_RULES, holdDescription, isLadderTier } from "@/lib/risk";
@@ -44,6 +45,8 @@ export default async function DashboardPage() {
       </StatGrid>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
+        <ReadinessCard userId={id} />
+
         <Card>
           <CardHeader
             title="Tasks"

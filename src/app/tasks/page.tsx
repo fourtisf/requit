@@ -18,6 +18,7 @@ import { BRAND } from "@/lib/brand";
 import { NotifyMe } from "@/components/notify-me";
 import { isWaiting, waitingIn } from "@/lib/interest";
 import { TaskKindsGrid } from "@/components/task-kinds-grid";
+import { ReadinessCard } from "@/components/readiness-card";
 import { HANDOFF_DETAIL, type HandoffFailure } from "@/lib/networks/handoff";
 
 export const metadata = { title: "Tasks" };
@@ -157,6 +158,15 @@ export default async function TasksPage({
           where someone is one settings change away from a full page and has even
           less idea what they are waiting for. An empty list that also explains
           nothing is the version of this page people leave and do not return to. */}
+      {/* The page called Tasks, with no tasks on it, is where somebody is asking
+          "so what can I do". Answering with a description of future work and
+          nothing to act on is how a member decides there is nothing here. */}
+      {all.length === 0 ? (
+        <div className="mt-8 max-w-[68ch]">
+          <ReadinessCard userId={user.id} />
+        </div>
+      ) : null}
+
       {all.length === 0 ? (
         <section className="mt-10">
           <h2 className="text-[17px] font-semibold tracking-[-0.03em]">

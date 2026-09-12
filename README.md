@@ -290,6 +290,30 @@ a fifth game cannot quietly ship without meeting it.
 
 ---
 
+## What a member can do while there are no tasks
+
+`src/lib/readiness.ts`, shown on `/dashboard` and on `/tasks` when the list is
+empty — which today is always.
+
+The honest problem: the task machinery is finished and the inventory is zero,
+because no offer network has approved us. A member who signs up finds a page
+with nothing on it, and games are something to do rather than something to
+finish. So this is a short, finite list of the things that are real work today —
+country on file, a verified payout wallet, the waiting list for their country,
+reward emails on, a referral, a finished round — every one checked against the
+database rather than ticked by clicking.
+
+**None of them pay, and the card says so in its first sentence.** What they buy
+is the day tasks arrive: a member with a verified wallet and a known country is
+paid that day, and one without either is a support ticket at the worst possible
+moment.
+
+Deliberately absent: streaks, daily check-ins, badges. Rewarding somebody for
+opening a page is a way of having activity without having a product, and a test
+fails if any step's copy starts quoting money.
+
+---
+
 ## Member surfaces (Phase 0.2)
 
 Added after the handoff was written. Four of the five sit on top of Phase 1 data,
