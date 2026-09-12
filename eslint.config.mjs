@@ -19,6 +19,13 @@ const config = [
       ],
     },
   },
+  {
+    // CommonJS by extension, and PM2 loads it as such. require() is the only
+    // way to import in one, so the rule against it is not applicable rather
+    // than being ignored.
+    files: ["**/*.cjs"],
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
 ];
 
 export default config;
