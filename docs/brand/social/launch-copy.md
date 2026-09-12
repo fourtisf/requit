@@ -149,9 +149,14 @@ description of one.
 
 ## The arcade — posts about the games
 
-Pair with `public/og/play.jpg`. Six games are the only part of the site a
+Pair with `public/og/play.jpg`. The games are the only part of the site a
 stranger can *try* rather than read, which makes them the strongest thing the
 account has to post while tasks are not live.
+
+**The count is written out by hand in every draft below, and in the card.** The
+shelf counts itself; this file does not. When a game ships, the number here and
+the one drawn into `public/og/play.jpg` both have to be changed, or the account
+posts a figure the page it links to contradicts.
 
 Every draft here says the games do not pay. That is the same rule as Post A's
 last line and it is load-bearing for the same reason: this category is full of
@@ -160,7 +165,7 @@ straight is the one people remember when it does start paying.
 
 ### Post C — the games, plainly
 
-> We built six games.
+> We built seven games.
 >
 > Free, no account, no download. Two minutes a round, and they work on a phone.
 >
@@ -168,7 +173,7 @@ straight is the one people remember when it does start paying.
 >
 > requit.xyz/play
 
-`229 / 280.`
+`231 / 280.`
 
 ### Post D — the proof angle
 
@@ -179,11 +184,11 @@ post. Use it if the account is going to post once.
 >
 > It sends the moves you made. Our server replays them with the same rules and takes its own result.
 >
-> Six free games, no account needed. They don't pay yet — no ad network, and we say so until there is one.
+> Seven free games, no account needed. They don't pay yet — no ad network, and we say so until there is one.
 >
 > requit.xyz/play
 
-`270 / 280.`
+`272 / 280.`
 
 **Why this one.** It is the same argument as the proof table, in a place people
 do not expect it. Everyone claims their scores are real; this says what the
@@ -192,13 +197,13 @@ both sides, and a move list that does not fit the board is refused.
 
 ### Post E — short, for replies and quotes
 
-> Six games. Free, no account, no download.
+> Seven games. Free, no account, no download.
 >
 > They don't pay yet — no ad network connected. The scores are still real: the server replays every round rather than believing your browser.
 >
 > requit.xyz/play
 
-`207 / 280.`
+`209 / 280.`
 
 ### Post F — the leaderboard
 
@@ -219,7 +224,7 @@ photograph of an empty room.
 
 **Post C**
 
-> Kami membuat enam game.
+> Kami membuat tujuh game.
 >
 > Gratis, tanpa akun, tanpa unduhan. Dua menit per ronde, jalan di HP.
 >
@@ -227,29 +232,29 @@ photograph of an empty room.
 >
 > requit.xyz/play
 
-`218 / 280.`
+`219 / 280.`
 
 **Post D**
 
 > Browser Anda tidak pernah memberi tahu kami skor Anda.
 >
-> Yang dikirim adalah gerakan Anda. Server kami memutarnya ulang dengan aturan yang sama dan memakai hasilnya sendiri.
+> Yang dikirim adalah gerakan Anda. Server kami memutarnya ulang dengan aturan yang sama dan memakai hasil itu.
 >
-> Enam game gratis, tanpa akun. Belum membayar apa pun — belum ada jaringan iklan.
+> Tujuh game gratis, tanpa akun. Belum membayar apa pun — belum ada jaringan iklan.
 >
 > requit.xyz/play
 
-`279 / 280.`
+`273 / 280.`
 
 **Post E**
 
-> Enam game. Gratis, tanpa akun, tanpa unduhan.
+> Tujuh game. Gratis, tanpa akun, tanpa unduhan.
 >
 > Belum menghasilkan — belum ada jaringan iklan. Skornya tetap nyata: server memutar ulang tiap ronde, bukan percaya kata browser Anda.
 >
 > requit.xyz/play
 
-`205 / 280.`
+`206 / 280.`
 
 ---
 
