@@ -22,6 +22,8 @@ const TABLES = [
   "NetworkInvoice",
   "AdminAction",
   "CountryInterest",
+  "GameSession",
+  "PollAnswer",
   "User",
 ] as const;
 

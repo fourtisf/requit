@@ -19,6 +19,7 @@ import { NotifyMe } from "@/components/notify-me";
 import { isWaiting, waitingIn } from "@/lib/interest";
 import { TaskKindsGrid } from "@/components/task-kinds-grid";
 import { ReadinessCard } from "@/components/readiness-card";
+import { QuestionCard } from "@/components/poll/question-card";
 import { HANDOFF_DETAIL, type HandoffFailure } from "@/lib/networks/handoff";
 
 export const metadata = { title: "Tasks" };
@@ -161,8 +162,13 @@ export default async function TasksPage({
       {/* The page called Tasks, with no tasks on it, is where somebody is asking
           "so what can I do". Answering with a description of future work and
           nothing to act on is how a member decides there is nothing here. */}
+      {/* The question goes first: it is the only thing on this page that is a
+          task rather than a preparation for one, and it is different tomorrow.
+          It disappears when real inventory arrives — paid work outranks our own
+          survey — and it stays on the dashboard, where it also lives. */}
       {all.length === 0 ? (
-        <div className="mt-8 max-w-[68ch]">
+        <div className="mt-8 flex max-w-[68ch] flex-col gap-3">
+          <QuestionCard userId={user.id} />
           <ReadinessCard userId={user.id} />
         </div>
       ) : null}

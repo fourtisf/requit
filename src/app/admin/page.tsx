@@ -4,6 +4,7 @@ import { emailTransportConfigured } from "@/lib/auth/email";
 import { AdminForm } from "@/components/admin-form";
 import { testMailAction } from "@/app/admin/actions";
 import { demandByCountry } from "@/lib/interest";
+import { recentResults } from "@/lib/poll/board";
 import { TableScroll, Th, Td } from "@/components/ui/table";
 import { liability, treasury } from "@/lib/admin/treasury";
 import { AdminNav } from "@/components/admin-nav";
@@ -16,7 +17,11 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminOverviewPage() {
   await requireAdmin();
-  const [figures, demand] = await Promise.all([treasury(), demandByCountry()]);
+  const [figures, demand, answers] = await Promise.all([
+    treasury(),
+    demandByCountry(),
+    recentResults(),
+  ]);
   const owed = liability(figures);
   const covered = figures.receivable.sub(owed);
 
@@ -142,6 +147,50 @@ export default async function AdminOverviewPage() {
           </ul>
         </Card>
       </div>
+
+      {/*
+        The other half of the question of the day. Members are told their
+        answers decide things; this is where they can be read, and a feature
+        that tells people that without anyone able to see the answers is a form
+        with a nicer sentence on it.
+
+        Days nobody answered are absent rather than empty — most days before
+        launch had no members on them, and rows of zeroes hide the days that
+        say something.
+      */}
+      {answers.length > 0 ? (
+        <section className="mt-10">
+          <h2 className="mn text-[17px] font-semibold tracking-[-0.03em]">What members said</h2>
+          <p className="mt-2 max-w-[64ch] text-[13.5px] leading-[1.65] text-fg-2">
+            The last two weeks of the daily question. One answer per member per day, final once
+            given — so these are first reactions, not a vote somebody could organise.
+          </p>
+
+          <div className="mt-5 grid gap-3 lg:grid-cols-2">
+            {answers.map((result) => (
+              <Card key={result.day}>
+                <CardHeader
+                  title={result.question.ask}
+                  aside={
+                    <span className="mn">
+                      {result.day} · {result.tally.total}
+                    </span>
+                  }
+                />
+                <dl>
+                  {result.tally.rows.map((row) => (
+                    <Row
+                      key={row.option.id}
+                      label={row.option.label}
+                      value={`${Math.round(row.share * 100)}% · ${row.count}`}
+                    />
+                  ))}
+                </dl>
+              </Card>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

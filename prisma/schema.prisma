@@ -60,13 +60,14 @@ model User {
   suspendedAt   DateTime?
   suspendReason String?
 
-  wallets     Wallet[]
-  rewards     Reward[]
-  withdrawals Withdrawal[]
-  disputes    Dispute[]
-  devices     Device[]
-  interests   CountryInterest[]
+  wallets      Wallet[]
+  rewards      Reward[]
+  withdrawals  Withdrawal[]
+  disputes     Dispute[]
+  devices      Device[]
+  interests    CountryInterest[]
   gameSessions GameSession[]
+  pollAnswers  PollAnswer[]
 
   // ── Referral (section 4) ──
   referralCode String    @unique
@@ -173,11 +174,9 @@ model Offer {
 
 /**
  * One round of one of our own games.
- *
  * The seed is generated here, on the server, and never accepted from the
  * client. A player who chooses their own seed can pre-solve the board offline
  * and submit a perfect game — and once a score is worth money, someone will.
- *
  * `score` is likewise never read from the browser. It is recomputed by
  * replaying the submitted moves against this row's seed (lib/games/play.ts).
  */
@@ -199,6 +198,35 @@ model GameSession {
 
   @@index([userId, startedAt])
   @@index([game, score])
+}
+
+/// One member's answer to one day's question.
+///
+/// The first task on this site that is not a game and not a form about the
+/// member themselves. It is also a rehearsal of the thing Phase 1 sells: a
+/// survey, asked and answered and counted, with the difference that we are the
+/// one asking and nobody is paid.
+model PollAnswer {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// The UTC day the question belongs to, as YYYY-MM-DD — the same string the
+  /// daily board uses, so "today" means the same thing in both features.
+  day String
+
+  /// Stored rather than derived. The rotation that picks a question from the
+  /// bank can change; an answer that no longer says what it answered is data
+  /// that has quietly become a lie.
+  questionId String
+  optionId   String
+
+  createdAt DateTime @default(now())
+
+  /// One answer per member per day, enforced here rather than in a handler.
+  /// The reveal is only worth anything if the answer was final.
+  @@unique([userId, day])
+  @@index([day, questionId])
 }
 
 enum Network {

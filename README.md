@@ -180,6 +180,58 @@ placeholder.
 
 ---
 
+## The question of the day (`/tasks`, `/dashboard`)
+
+The first thing on this site that is a task, is not a game, and is not
+paperwork about yourself. One question a day, the same one for everybody, an
+answer takes under a minute — and the answers are the only audience data we
+have.
+
+**It is the shape of the thing Phase 1 sells.** A survey is the archetypal
+offer-wall task, so this rehearses the whole flow — asked, answered, counted —
+with us as the one asking, nobody paid, and the two halves an offer wall leaves
+out: what the answer is used for, printed under the result, and what everyone
+else said.
+
+**The results are hidden until you answer, and an answer is final**
+(`src/lib/poll/board.ts`). Seeing the counts first changes the answer, and we
+would be left with data about what people think other people think. Finality is
+not strictness: an editable answer is a look at the results followed by a
+correction, which is the same thing. The rule is a unique index on
+`(userId, day)` rather than a check in a handler, because two tabs both pass a
+check and one of them wins.
+
+**The browser never names the question it is answering** — `/api/poll/answer`
+carries the chosen option and nothing else, and derives the day and the question
+server-side. Same rule as the daily board's seed: a request that could name its
+own question could answer one whose results it had already seen.
+
+**Questions are walked in a shuffled lap, not picked at random**
+(`src/lib/poll/rotation.ts`). A random pick repeats inside a week often enough
+to be noticed, and being asked on Thursday what you answered on Tuesday is the
+moment a daily thing stops being worth opening. Every question is asked once
+before any is asked twice, and each lap is reshuffled from its lap number — the
+same seeded determinism the games use, reused rather than reinvented.
+
+**Ids are permanent, and an answer stores the question's.** The rotation can be
+reordered and the bank can grow; a row that named only a position would quietly
+become an answer to a different question. The operator's view on `/admin` labels
+each day with the question its own rows name, never with what today's rotation
+would pick.
+
+**It is not a check-in, and there is no streak.** `src/lib/readiness.ts` refuses
+streaks and daily rewards on the grounds that paying someone for opening a page
+is activity standing in for a product, and that still holds. The difference is
+that an answer produces something that did not exist before: a row of real
+audience data, and a number on a result everybody can see. What a member is
+shown is a count of days answered — a fact, not a score to protect.
+
+**Every question is one whose answer changes something we do**
+(`src/lib/poll/questions.ts`), and what it changes is written on the card. A
+question nobody acts on is a form, and people can tell the difference faster
+than you can write one. No free text: it cannot be counted, cannot be shown
+back, and is a place to paste a wallet address that should not be pasted.
+
 ## The arcade (`/play`)
 
 Seven games of our own — Blocks, Spot, SOS, Recall, Trail, Flood and Merge —
