@@ -63,7 +63,7 @@ export function RoundFrame<TMove, TState>({
   }, [status]);
 
   return (
-    <div className="max-w-[min(460px,58vh)]">
+    <div className="w-full max-w-[min(460px,58vh)]">
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div>
           <p className="mn text-[11.5px] uppercase tracking-[0.08em] text-fg-4">Score</p>
@@ -79,7 +79,15 @@ export function RoundFrame<TMove, TState>({
         </div>
       </div>
 
-      <div ref={board} className="relative mt-4">
+      {/* The control line lives above the board, not under it.
+          Under the board is under the fold on a short window, and the one
+          moment it has to be readable is the moment a round starts. The height
+          is reserved so that starting a round does not shift the grid. */}
+      <p className="mt-4 min-h-[19px] text-[12.5px] text-fg-2">
+        {status === "playing" ? hint : null}
+      </p>
+
+      <div ref={board} className="relative mt-1.5">
         {children}
 
         {status === "playing" ? null : (
@@ -124,10 +132,6 @@ export function RoundFrame<TMove, TState>({
           </div>
         )}
       </div>
-
-      {status === "playing" && hint ? (
-        <p className="mt-4 text-[12.5px] text-fg-3">{hint}</p>
-      ) : null}
 
       {status === "over" && !signedIn ? (
         <p className="mt-4 max-w-[46ch] text-[13px] leading-[1.6] text-fg-2">

@@ -73,16 +73,19 @@ export default async function GamePage({ params }: Props) {
             anyway — the board's own button says what to press. */}
         <p className="mt-2 max-w-[64ch] text-[13.5px] leading-[1.6] text-fg-2">{entry.tagline}</p>
 
-        <div className="mt-5">
+        {/* Beside the board once there is room for it. A 460px column on a
+            1280px screen leaves two thirds of the window empty while the rules
+            sit below the fold, which is a strange way to use a desktop. */}
+        <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-12">
           <GameBoard slug={game} personalBest={best} signedIn={signedIn} />
-        </div>
 
-        <p className="mt-6 max-w-[58ch] text-[13px] leading-[1.65] text-fg-3">
-          {entry.how}{" "}
-          {signedIn
-            ? "Your score is checked on the server by replaying the moves you made."
-            : "You do not need an account to play — sign in and your rounds start being recorded."}
-        </p>
+          <p className="max-w-[58ch] text-[13px] leading-[1.65] text-fg-3 lg:max-w-[32ch] lg:pt-1">
+            {entry.how}{" "}
+            {signedIn
+              ? "Your score is checked on the server by replaying the moves you made."
+              : "You do not need an account to play — sign in and your rounds start being recorded."}
+          </p>
+        </div>
 
         {!earnings.earning ? (
           <Card className="mt-8 max-w-[62ch]">
