@@ -193,6 +193,30 @@ with us as the one asking, nobody paid, and the two halves an offer wall leaves
 out: what the answer is used for, printed under the result, and what everyone
 else said.
 
+**The call is the part that can be won.** An opinion cannot be scored — there
+is no right answer to "what device are you on", and inventing one would be the
+first fake number on a site whose argument is that it has none. A guess about
+*other people* can be scored exactly, because tomorrow the rows say what
+everybody actually chose. So the round is two moves in a fixed order: your own
+answer, which is the task and is never scored, and then a call on which answer
+the crowd will pick. Asking for the answer first is what keeps the survey
+honest — by the time anyone is thinking about winning, their answer is already
+in.
+
+**It settles at midnight UTC, and that wait is the round ending**
+(`src/lib/poll/calls.ts`). Today's shares are not the result; the crowd is still
+arriving. Nobody can call a day after seeing how it went, and there is a reason
+to come back tomorrow that is not a prize. A tie pays everyone who called either
+side of it: "most people said X" is not true of a two-way split, and scoring it
+as though it were would turn the game on a coin flip nobody could have read.
+
+**The board ranks days read right, not days answered.** Answering more often
+does not move it. Ranked on the count rather than the percentage, because one
+lucky call is not a better week than four out of five — accuracy breaks ties.
+The window is `currentWeek()`, the same Sunday-to-Sunday UTC week the game
+boards use. A member outside the visible ten is told their real position, which
+is the same rule as the arcade.
+
 **The results are hidden until you answer, and an answer is final**
 (`src/lib/poll/board.ts`). Seeing the counts first changes the answer, and we
 would be left with data about what people think other people think. Finality is
@@ -218,6 +242,12 @@ reordered and the bank can grow; a row that named only a position would quietly
 become an answer to a different question. The operator's view on `/admin` labels
 each day with the question its own rows name, never with what today's rotation
 would pick.
+
+**It has the arcade's rules, not a check-in's.** One round a day, the same one
+for everybody, a move the server scores from rows rather than from anything the
+browser says, and a board. What differs is where the truth comes from: a game is
+checked by replaying it, and this is checked against the crowd — which nobody
+can fake either.
 
 **It is not a check-in, and there is no streak.** `src/lib/readiness.ts` refuses
 streaks and daily rewards on the grounds that paying someone for opening a page

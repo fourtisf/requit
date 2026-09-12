@@ -31,15 +31,20 @@ export async function POST(request: Request) {
   const body = await request
     .json()
     .then((value: unknown) =>
-      value !== null && typeof value === "object" ? (value as { optionId?: unknown }) : {},
+      value !== null && typeof value === "object"
+        ? (value as { optionId?: unknown; predictedOptionId?: unknown })
+        : {},
     )
-    .catch(() => ({}) as { optionId?: unknown });
+    .catch(() => ({}) as { optionId?: unknown; predictedOptionId?: unknown });
 
   if (typeof body.optionId !== "string") {
     return json({ error: "Pick one of the answers." }, 400);
   }
+  if (typeof body.predictedOptionId !== "string") {
+    return json({ error: "Call which answer most people picked." }, 400);
+  }
 
-  const result = await recordAnswer(session.user.id, body.optionId);
+  const result = await recordAnswer(session.user.id, body.optionId, body.predictedOptionId);
   if (result.status === "unknown-option") {
     // Also what a tab left open past midnight sends: yesterday's options
     // against today's question. Reloading is the fix, and says so.
@@ -50,6 +55,7 @@ export async function POST(request: Request) {
   return json(
     {
       answered: result.answer.optionId,
+      called: result.answer.predicted,
       already: result.status === "already",
       tally: await tallyFor(day, question),
     },

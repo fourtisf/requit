@@ -39,7 +39,7 @@ function firstOption(at: Date): string {
 describe("answering", () => {
   it("records the answer, and the question it was an answer to", async () => {
     const ada = await member();
-    const result = await recordAnswer(ada.id, firstOption(TODAY), TODAY);
+    const result = await recordAnswer(ada.id, firstOption(TODAY), firstOption(TODAY), TODAY);
 
     expect(result.status).toBe("recorded");
 
@@ -51,7 +51,7 @@ describe("answering", () => {
 
   it("refuses an option the day's question does not offer", async () => {
     const ada = await member();
-    expect(await recordAnswer(ada.id, "not-an-option", TODAY)).toEqual({
+    expect(await recordAnswer(ada.id, "not-an-option", "not-an-option", TODAY)).toEqual({
       status: "unknown-option",
     });
     expect(await prisma.pollAnswer.count()).toBe(0);
@@ -65,7 +65,7 @@ describe("answering", () => {
     const todays = todaysQuestion(TODAY).question.options.map((option) => option.id);
 
     if (todays.includes(tomorrows)) return; // two questions sharing an option id
-    expect((await recordAnswer(ada.id, tomorrows, TODAY)).status).toBe("unknown-option");
+    expect((await recordAnswer(ada.id, tomorrows, tomorrows, TODAY)).status).toBe("unknown-option");
   });
 
   it("is final — a second answer does not change the first", async () => {
@@ -73,8 +73,8 @@ describe("answering", () => {
     const question = todaysQuestion(TODAY).question;
     const [first, second] = [question.options[0]!.id, question.options[1]!.id];
 
-    await recordAnswer(ada.id, first, TODAY);
-    const again = await recordAnswer(ada.id, second, TODAY);
+    await recordAnswer(ada.id, first, first, TODAY);
+    const again = await recordAnswer(ada.id, second, second, TODAY);
 
     expect(again.status).toBe("already");
     expect(again.status === "already" && again.answer.optionId).toBe(first);
@@ -84,16 +84,16 @@ describe("answering", () => {
   it("hands back the answer that stands, rather than an error", async () => {
     const ada = await member();
     const option = firstOption(TODAY);
-    await recordAnswer(ada.id, option, TODAY);
+    await recordAnswer(ada.id, option, option, TODAY);
 
-    const again = await recordAnswer(ada.id, option, TODAY);
+    const again = await recordAnswer(ada.id, option, option, TODAY);
     expect(again.status === "already" && again.answer.optionId).toBe(option);
   });
 
   it("lets the same member answer again on the next day", async () => {
     const ada = await member();
-    await recordAnswer(ada.id, firstOption(TODAY), TODAY);
-    expect((await recordAnswer(ada.id, firstOption(TOMORROW), TOMORROW)).status).toBe("recorded");
+    await recordAnswer(ada.id, firstOption(TODAY), firstOption(TODAY), TODAY);
+    expect((await recordAnswer(ada.id, firstOption(TOMORROW), firstOption(TOMORROW), TOMORROW)).status).toBe("recorded");
     expect(await answeredDays(ada.id)).toBe(2);
   });
 
@@ -101,7 +101,7 @@ describe("answering", () => {
     const ada = await member();
     expect(await answerOf(ada.id, "2026-09-12")).toBeNull();
 
-    await recordAnswer(ada.id, firstOption(TODAY), TODAY);
+    await recordAnswer(ada.id, firstOption(TODAY), firstOption(TODAY), TODAY);
     expect((await answerOf(ada.id, "2026-09-12"))?.optionId).toBe(firstOption(TODAY));
     // Yesterday stays empty: a day is a day, not "recently".
     expect(await answerOf(ada.id, "2026-09-11")).toBeNull();
@@ -124,7 +124,7 @@ describe("the result", () => {
 
     for (const option of [first, first, first, second]) {
       const voter = await member();
-      await recordAnswer(voter.id, option, TODAY);
+      await recordAnswer(voter.id, option, option, TODAY);
     }
 
     const tally = await tallyFor(day, question);
@@ -137,7 +137,7 @@ describe("the result", () => {
   it("keeps the options nobody picked, because that is half the answer", async () => {
     const { day, question } = todaysQuestion(TODAY);
     const ada = await member();
-    await recordAnswer(ada.id, question.options[0]!.id, TODAY);
+    await recordAnswer(ada.id, question.options[0]!.id, question.options[0]!.id, TODAY);
 
     const tally = await tallyFor(day, question);
     expect(tally.rows.map((row) => row.option.id)).toEqual(
@@ -147,7 +147,7 @@ describe("the result", () => {
 
   it("counts one day only — yesterday's answers are not in today's result", async () => {
     const ada = await member();
-    await recordAnswer(ada.id, firstOption(TODAY), TODAY);
+    await recordAnswer(ada.id, firstOption(TODAY), firstOption(TODAY), TODAY);
 
     const tomorrow = todaysQuestion(TOMORROW);
     expect((await tallyFor(tomorrow.day, tomorrow.question)).total).toBe(0);
@@ -162,9 +162,9 @@ describe("the operator's view", () => {
   it("returns a day per day answered, newest first", async () => {
     const ada = await member();
     const bob = await member();
-    await recordAnswer(ada.id, firstOption(TODAY), TODAY);
-    await recordAnswer(bob.id, firstOption(TODAY), TODAY);
-    await recordAnswer(ada.id, firstOption(TOMORROW), TOMORROW);
+    await recordAnswer(ada.id, firstOption(TODAY), firstOption(TODAY), TODAY);
+    await recordAnswer(bob.id, firstOption(TODAY), firstOption(TODAY), TODAY);
+    await recordAnswer(ada.id, firstOption(TOMORROW), firstOption(TOMORROW), TOMORROW);
 
     const results = await recentResults(14, TOMORROW);
     expect(results.map((result) => result.day)).toEqual(["2026-09-13", "2026-09-12"]);
@@ -174,7 +174,7 @@ describe("the operator's view", () => {
 
   it("labels a day with the question its answers name", async () => {
     const ada = await member();
-    await recordAnswer(ada.id, firstOption(TODAY), TODAY);
+    await recordAnswer(ada.id, firstOption(TODAY), firstOption(TODAY), TODAY);
 
     const [result] = await recentResults(14, TODAY);
     expect(result?.question.id).toBe(questionFor("2026-09-12").id);
@@ -182,13 +182,13 @@ describe("the operator's view", () => {
 
   it("leaves out days nobody answered", async () => {
     const ada = await member();
-    await recordAnswer(ada.id, firstOption(TODAY), TODAY);
+    await recordAnswer(ada.id, firstOption(TODAY), firstOption(TODAY), TODAY);
     expect((await recentResults(14, TOMORROW)).map((result) => result.day)).toEqual(["2026-09-12"]);
   });
 
   it("does not reach back further than it was asked to", async () => {
     const ada = await member();
-    await recordAnswer(ada.id, firstOption(TODAY), TODAY);
+    await recordAnswer(ada.id, firstOption(TODAY), firstOption(TODAY), TODAY);
     const muchLater = new Date("2026-10-30T10:00:00.000Z");
     expect(await recentResults(14, muchLater)).toEqual([]);
   });

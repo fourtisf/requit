@@ -5,115 +5,155 @@ import type { PollQuestion } from "@/lib/poll/questions";
 import type { Tally } from "@/lib/poll/board";
 
 /**
- * Ask, answer, reveal.
+ * Answer, call, reveal.
  *
- * The reveal is the point. There is nothing to pay a member with today, so what
- * an answer buys is the one thing we can actually give: what everybody else
- * said, which they could not see a moment ago and cannot see without answering.
+ * Two moves, in this order and never the other. The answer is the task and is
+ * not scored — there is no right device to be reading this on. The call is the
+ * game: which answer will most people have picked. Asking for the answer first
+ * is what keeps the survey honest, because by the time anybody is thinking
+ * about winning, their own answer is already in.
  *
- * The result is rendered from the response to the same request that recorded
- * the answer. Fetching it separately would put a spinner in the middle of the
- * only interesting second in the interaction.
+ * The reveal shows today's shares, which are not the result — the day is still
+ * open and the crowd is still arriving. The call settles at midnight UTC and
+ * the card says so tomorrow. That wait is the round ending, and it is the
+ * reason to come back that is not a prize.
  */
 export function QuestionForm({
   question,
   answered,
+  called,
   tally,
 }: {
   question: PollQuestion;
-  /** The option this member already chose, if they have. */
   answered: string | null;
-  /** Only ever passed once they have answered — see the note above. */
+  called: string | null;
   tally: Tally | null;
 }) {
-  const [chosen, setChosen] = useState<string | null>(answered);
+  const [mine, setMine] = useState<string | null>(answered);
+  const [call, setCall] = useState<string | null>(called);
   const [result, setResult] = useState<Tally | null>(tally);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  function answer(optionId: string) {
-    if (chosen !== null || pending) return;
+  function send(prediction: string) {
+    if (mine === null || pending) return;
     setError(null);
 
     startTransition(async () => {
       const response = await fetch("/api/poll/answer", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ optionId }),
+        body: JSON.stringify({ optionId: mine, predictedOptionId: prediction }),
       });
 
       const payload: unknown = await response.json().catch(() => null);
-      const data = (payload ?? {}) as { answered?: string; tally?: Tally; error?: string };
+      const data = (payload ?? {}) as {
+        answered?: string;
+        called?: string | null;
+        tally?: Tally;
+        error?: string;
+      };
 
       if (!response.ok || !data.answered || !data.tally) {
         setError(data.error ?? "That did not go through. Try again.");
         return;
       }
 
-      // The server's answer wins, not the button that was clicked: on a second
-      // tab the answer that stands is the first one, and this is where that
-      // shows up.
-      setChosen(data.answered);
+      // The server's row wins over the buttons that were clicked: on a second
+      // tab the answer that stands is the first one, and this is where it shows.
+      setMine(data.answered);
+      setCall(data.called ?? prediction);
       setResult(data.tally);
     });
   }
 
-  if (chosen === null || result === null) {
+  // ── Move one: the answer ────────────────────────────────────────────────
+  if (mine === null) {
     return (
       <div className="mt-4 flex flex-col gap-2">
         {question.options.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            disabled={pending}
-            onClick={() => answer(option.id)}
-            className="rounded-soft bg-surf px-[15px] py-[13px] text-left text-[14px] text-fg shadow-[inset_0_0_0_1px_var(--color-bd)] transition-colors hover:bg-surf-2 disabled:opacity-50"
-          >
-            {option.label}
-          </button>
+          <Choice key={option.id} label={option.label} onClick={() => setMine(option.id)} />
         ))}
-        {error ? <p className="mt-1 text-[12.5px] text-amber">{error}</p> : null}
         <p className="mt-1 text-[12px] leading-[1.55] text-fg-4">
-          You see everyone&rsquo;s answers as soon as you have given yours. Answers are final —
-          that is the only thing that keeps the results worth looking at.
+          Your own answer first. It is never scored — there is no right one — and it is what the
+          result is made of.
         </p>
       </div>
     );
   }
 
-  const mine = result.rows.find((row) => row.option.id === chosen);
-  const top = result.rows.reduce((best, row) => (row.count > best.count ? row : best), result.rows[0]!);
-  const withMajority = mine !== undefined && mine.option.id === top.option.id && result.total > 1;
+  // ── Move two: the call ──────────────────────────────────────────────────
+  if (call === null || result === null) {
+    return (
+      <div className="mt-4">
+        <p className="text-[13px] leading-[1.6] text-fg-2">
+          You answered{" "}
+          <span className="text-fg">
+            {question.options.find((option) => option.id === mine)?.label}
+          </span>
+          . Now call it:{" "}
+          <span className="text-fg">which answer will most people have picked today?</span>
+        </p>
+
+        <div className="mt-3 flex flex-col gap-2">
+          {question.options.map((option) => (
+            <Choice
+              key={option.id}
+              label={option.label}
+              yours={option.id === mine}
+              disabled={pending}
+              onClick={() => send(option.id)}
+            />
+          ))}
+        </div>
+
+        {error ? <p className="mt-2 text-[12.5px] text-amber">{error}</p> : null}
+        <p className="mt-2 text-[12px] leading-[1.55] text-fg-4">
+          It settles at midnight UTC, when the day closes and the count stops moving. You find out
+          tomorrow — nobody can call it after seeing the result.
+        </p>
+        <button
+          type="button"
+          onClick={() => setMine(null)}
+          className="mt-3 text-[12.5px] text-fg-3 transition-colors hover:text-fg"
+        >
+          Change my answer
+        </button>
+      </div>
+    );
+  }
+
+  // ── The reveal ──────────────────────────────────────────────────────────
+  const label = (id: string) => question.options.find((option) => option.id === id)?.label ?? id;
+  const leader = result.rows.reduce((best, row) => (row.count > best.count ? row : best), result.rows[0]!);
+  const leading = call === leader.option.id && result.total > 1;
 
   return (
     <div className="mt-4">
       <ul className="flex flex-col gap-2">
         {result.rows.map((row) => {
-          const yours = row.option.id === chosen;
+          const yours = row.option.id === mine;
+          const theCall = row.option.id === call;
           return (
             <li
               key={row.option.id}
-              // Both rings written out in full: Tailwind reads the source for
-              // class names, so a ring assembled from an interpolation is one
-              // that exists in the markup and never in the stylesheet.
               className={
                 yours
                   ? "relative overflow-hidden rounded-soft px-[15px] py-[13px] shadow-[inset_0_0_0_1px_rgba(107,203,165,.3)]"
                   : "relative overflow-hidden rounded-soft px-[15px] py-[13px] shadow-[inset_0_0_0_1px_var(--color-bd)]"
               }
             >
-              {/* The bar is the row's own background, so a long label never
-                  collides with a chart drawn beside it. */}
               <span
                 aria-hidden
                 style={{ width: `${Math.round(row.share * 100)}%` }}
                 className={`absolute inset-y-0 left-0 ${yours ? "bg-[rgba(107,203,165,.18)]" : "bg-surf-2"}`}
               />
-              <span className="relative flex items-baseline gap-3">
+              <span className="relative flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 <span className={`text-[14px] ${yours ? "text-fg" : "text-fg-2"}`}>
                   {row.option.label}
-                  {yours ? <span className="mn ml-2 text-[11px] text-ac-2">yours</span> : null}
                 </span>
+                {yours ? <span className="mn text-[11px] text-ac-2">yours</span> : null}
+                {theCall ? <span className="mn text-[11px] text-amber">your call</span> : null}
                 <span className="mn ml-auto shrink-0 text-[12.5px] tabular-nums text-fg-3">
                   {Math.round(row.share * 100)}%
                 </span>
@@ -125,17 +165,39 @@ export function QuestionForm({
 
       <p className="mt-3 text-[12.5px] leading-[1.6] text-fg-3">
         {result.total === 1
-          ? "You are the first to answer today. Check back later and the shares will have moved."
-          : withMajority
-            ? `${result.total} answers so far, and most of them agree with you.`
-            : `${result.total} answers so far. Yours is not the most common one.`}
+          ? `You are the first today. You called ${label(call)} — come back tomorrow and see.`
+          : leading
+            ? `${result.total} answers so far, and ${label(call)} is ahead. Your call is winning, but the day is not over.`
+            : `${result.total} answers so far, and “${leader.option.label}” is ahead of your call.`}
       </p>
 
-      {/* What the answer is for. It is the difference between a task and a
-          form, and it is only a difference if it is on the screen. */}
       <p className="mt-2 max-w-[62ch] text-[12px] leading-[1.6] text-fg-4">
         <span className="text-fg-3">What we do with it:</span> {question.use}
       </p>
     </div>
+  );
+}
+
+function Choice({
+  label,
+  yours,
+  disabled,
+  onClick,
+}: {
+  label: string;
+  yours?: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className="flex items-center gap-3 rounded-soft bg-surf px-[15px] py-[13px] text-left text-[14px] text-fg shadow-[inset_0_0_0_1px_var(--color-bd)] transition-colors hover:bg-surf-2 disabled:opacity-50"
+    >
+      <span>{label}</span>
+      {yours ? <span className="mn ml-auto text-[11px] text-ac-2">your answer</span> : null}
+    </button>
   );
 }

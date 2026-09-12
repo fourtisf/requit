@@ -35,14 +35,16 @@ export function todaysQuestion(now: Date = new Date()): Today {
   return { day, question: questionFor(day) };
 }
 
-export type Answer = { optionId: string; at: Date };
+export type Answer = { optionId: string; predicted: string | null; at: Date };
 
 export async function answerOf(userId: string, day: string): Promise<Answer | null> {
   const row = await prisma.pollAnswer.findUnique({
     where: { userId_day: { userId, day } },
-    select: { optionId: true, createdAt: true },
+    select: { optionId: true, predictedOptionId: true, createdAt: true },
   });
-  return row ? { optionId: row.optionId, at: row.createdAt } : null;
+  return row
+    ? { optionId: row.optionId, predicted: row.predictedOptionId, at: row.createdAt }
+    : null;
 }
 
 export type Recorded =
@@ -54,17 +56,26 @@ export type Recorded =
 export async function recordAnswer(
   userId: string,
   optionId: string,
+  /** The call: which option they think most people picked. Both land together. */
+  predictedOptionId: string,
   now: Date = new Date(),
 ): Promise<Recorded> {
   const { day, question } = todaysQuestion(now);
   if (!optionById(question, optionId)) return { status: "unknown-option" };
+  // The call is checked against the same question. A call for an option that is
+  // not on today's board could never be scored, so it is refused rather than
+  // stored as a row that will always read as wrong.
+  if (!optionById(question, predictedOptionId)) return { status: "unknown-option" };
 
   try {
     const row = await prisma.pollAnswer.create({
-      data: { userId, day, questionId: question.id, optionId },
-      select: { optionId: true, createdAt: true },
+      data: { userId, day, questionId: question.id, optionId, predictedOptionId },
+      select: { optionId: true, predictedOptionId: true, createdAt: true },
     });
-    return { status: "recorded", answer: { optionId: row.optionId, at: row.createdAt } };
+    return {
+      status: "recorded",
+      answer: { optionId: row.optionId, predicted: row.predictedOptionId, at: row.createdAt },
+    };
   } catch (error) {
     // The unique index is the arbiter, not a read-then-write in this function:
     // two tabs submitting at once would both pass a check and one would win.

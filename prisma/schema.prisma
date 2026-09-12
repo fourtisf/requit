@@ -221,6 +221,16 @@ model PollAnswer {
   questionId String
   optionId   String
 
+  /// The call: which option this member thinks MOST people will pick.
+  ///
+  /// Separate from their own answer on purpose. The answer is the task and is
+  /// asked first, so the game cannot bend it — nobody is tempted to answer what
+  /// they think will win, because they have already answered.
+  ///
+  /// Nullable for the rows written before the call existed. A row without one is
+  /// an answer with no bet on it, and is scored as neither right nor wrong.
+  predictedOptionId String?
+
   createdAt DateTime @default(now())
 
   /// One answer per member per day, enforced here rather than in a handler.
