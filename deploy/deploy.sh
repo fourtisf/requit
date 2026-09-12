@@ -38,9 +38,12 @@ for required in DATABASE_URL REDIS_URL AUTH_SECRET AUTH_URL; do
   fi
 done
 
-echo "==> Refusing to deploy with uncommitted changes"
+# Phrased as a question, not a verdict. The previous wording announced the
+# refusal before knowing whether it would refuse, so every successful deploy
+# opened with a line that read like a failure.
+echo "==> Checking for uncommitted changes"
 if ! git diff --quiet || ! git diff --cached --quiet; then
-  echo "    Working tree is dirty. Commit or stash on the server first." >&2
+  echo "    Refusing: the working tree is dirty. Commit or stash on the server first." >&2
   exit 1
 fi
 
@@ -49,7 +52,7 @@ git fetch origin "$BRANCH"
 git checkout "$BRANCH"
 git reset --hard "origin/$BRANCH"
 
-echo "==> Installing exactly what the lockfile says"
+echo "==> Installing exactly what the lockfile says (a minute or two, quietly)"
 # `npm ci`, not `npm install`: a deploy must never resolve a different tree than
 # the one that was tested. postinstall runs prisma generate.
 #
