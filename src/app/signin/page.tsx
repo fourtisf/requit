@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { BrandLockup } from "@/components/ui/brand-mark";
 import { SignInForm } from "@/components/signin-form";
+import { LegalConsent } from "@/components/legal-consent";
 import { emailTransportConfigured, emailTransportDetail } from "@/lib/auth/email";
 import { OTP_LENGTH } from "@/lib/auth/otp";
 import { serverEnv } from "@/lib/env";
@@ -37,7 +38,10 @@ export default async function SignInPage() {
         </p>
 
         {emailTransportConfigured() ? (
-          <SignInForm callbackUrl="/dashboard" />
+          <>
+            <SignInForm callbackUrl="/dashboard" />
+            <LegalConsent className="mt-5 text-[12px] leading-[1.6] text-fg-4" />
+          </>
         ) : (
           <div className="mt-7 rounded-soft bg-[rgba(232,198,139,.08)] px-[14px] py-3.5 shadow-[inset_0_0_0_1px_rgba(232,198,139,.2)]">
             <p className="text-[12.5px] leading-[1.55] text-amber">

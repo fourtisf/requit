@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { BrandLockup } from "@/components/ui/brand-mark";
 import { Button } from "@/components/ui/button";
+import { LegalConsent } from "@/components/legal-consent";
 import { OTP_LENGTH, OTP_TTL_SECONDS } from "@/lib/auth/otp";
 
 export const metadata = { title: "Enter your code" };
@@ -69,6 +70,8 @@ export default async function VerifyCodePage() {
             Sign in
           </Button>
         </form>
+
+        <LegalConsent className="mt-5 text-[12px] leading-[1.6] text-fg-4" />
 
         <a href="/signin" className="mt-5 block text-[12.5px] text-fg-3 transition-colors hover:text-fg">
           Start again
