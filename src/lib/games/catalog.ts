@@ -92,7 +92,7 @@ export const GAMES: Record<GameSlug, GameEntry> = {
     slug: "spot",
     title: "Spot",
     tagline: "One tile is not like the others.",
-    how: `Tap the odd one out. Each level the grid grows and the difference gets smaller, and the points grow with it. One wrong tile ends the round — there is no clock, so take as long as you like.`,
+    how: `Tap the odd one out before the bar runs out. Each level the grid grows, the difference gets smaller and the clock gets shorter. A wrong tile ends the round, and so does the clock — the points are the levels you cleared.`,
     input: "Tap the odd tile",
     bestLabel: "Level reached",
     ...playable(SPOT_RULES),

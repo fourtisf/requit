@@ -10,9 +10,12 @@ import { type Engine, type GameRules } from "@/lib/games/engine";
  * every other game we built needed a rule explained first, and the ones that
  * needed it most were the ones nobody played.
  *
- * The difficulty is not speed — there is no clock, because a clock is the one
- * thing a replay cannot check. It is the difference itself, which shrinks each
- * level until the tile is genuinely hard to see.
+ * The difficulty is the difference, which shrinks each level until the tile is
+ * genuinely hard to see. There is a clock as well, and it is deliberately NOT
+ * here: a replay can prove a tap was legal and can never prove it was quick, so
+ * the timer lives in the board (spot-board.tsx), ends the round, and adds
+ * nothing to the score. What the server recomputes is levels cleared, which is
+ * exactly what it can check.
  */
 
 /** The round ends here even if the player is still finding them. */

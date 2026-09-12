@@ -33,6 +33,15 @@ export type Round<TMove, TState> = {
   begin: () => void;
   /** Plays a move. False when the rules refused it — the board can ignore it. */
   send: (move: TMove) => boolean;
+  /**
+   * Ends the round now and sends what was played.
+   *
+   * For a game that can stop for a reason the rules do not model — a clock.
+   * The rules stay time-free on purpose: a replay can prove the moves were
+   * legal and can never prove they were fast, so the clock belongs to the
+   * board, and the score is still only what the moves earned.
+   */
+  stop: () => void;
 };
 
 export function useRound<TMove, TState extends RoundState>({
@@ -135,6 +144,12 @@ export function useRound<TMove, TState extends RoundState>({
     }
   }, []);
 
+  const stop = useCallback(() => {
+    if (!live.current) return;
+    live.current = false;
+    void finish();
+  }, [finish]);
+
   const send = useCallback(
     (move: TMove) => {
       const current = engine.current;
@@ -153,5 +168,5 @@ export function useRound<TMove, TState extends RoundState>({
     [finish],
   );
 
-  return { state, status, error, saved, best, begin, send };
+  return { state, status, error, saved, best, begin, send, stop };
 }

@@ -200,6 +200,13 @@ every game is deterministic from a seed the server issued — one seeded generat
 drives every tile, fruit, colour and shuffle — and because a move the board would
 not allow fails the whole submission rather than being skipped.
 
+**Spot's clock is in the board, not in the rules** (`spot-board.tsx`). A replay
+can prove a tap was legal and can never prove it was quick, so the timer ends
+the round and adds nothing to the score — what the server recomputes is levels
+cleared, which is exactly what it can check. Any game that wants a clock keeps
+it on the same terms; `useRound().stop()` is how a board ends a round for a
+reason the rules do not model.
+
 What a replay proves is that the round is a legal game, not that a human played
 it: a program can play a legal game, and Recall's deal can be recomputed by
 anyone who wants it badly enough. That gap is not closable in a browser, which
