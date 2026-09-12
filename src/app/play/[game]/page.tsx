@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Card, CardHeader } from "@/components/ui/card";
 import { GameBoard } from "@/components/games/game-board";
 import { GameMark } from "@/components/games/game-mark";
+import { ScoreBoard } from "@/components/games/score-board";
 import { GAMES, GAME_LIST, isGameSlug } from "@/lib/games/catalog";
 import { personalBest } from "@/lib/games/session";
 import { earningsStatus } from "@/lib/ads/rewarded";
@@ -79,12 +80,16 @@ export default async function GamePage({ params }: Props) {
         <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-12">
           <GameBoard slug={game} personalBest={best} signedIn={signedIn} />
 
-          <p className="max-w-[58ch] text-[13px] leading-[1.65] text-fg-3 lg:max-w-[32ch] lg:pt-1">
-            {entry.how}{" "}
-            {signedIn
-              ? "Your score is checked on the server by replaying the moves you made."
-              : "You do not need an account to play — sign in and your rounds start being recorded."}
-          </p>
+          <div className="lg:pt-1">
+            <p className="max-w-[58ch] text-[13px] leading-[1.65] text-fg-3 lg:max-w-[34ch]">
+              {entry.how}{" "}
+              {signedIn
+                ? "Your score is checked on the server by replaying the moves you made."
+                : "You do not need an account to play — sign in and your rounds start being recorded."}
+            </p>
+
+            <ScoreBoard game={entry} viewer={signedIn ? user.id : null} />
+          </div>
         </div>
 
         {!earnings.earning ? (

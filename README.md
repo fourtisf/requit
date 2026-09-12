@@ -200,6 +200,23 @@ every game is deterministic from a seed the server issued — one seeded generat
 drives every tile, fruit, colour and shuffle — and because a move the board would
 not allow fails the whole submission rather than being skipped.
 
+**Every game has a weekly score board** (`src/lib/games/board.ts`), which is
+what a score is *for* while nothing pays: a position rather than a number on
+your own screen. One row per player, not per round; `publicPayouts = false`
+hides the handle and never the row; and a player outside the visible ten is told
+their real rank, because that is nearly everyone. The window is `currentWeek()`
+— the same Sunday-to-Sunday UTC window §9 accrues against, not a second
+definition of a week.
+
+**No board pays anything, and the gate that would have to open is written down**
+(`src/lib/games/prizes.ts`) in the same shape as the ad-network gate: named,
+listed, and refusing. Two locks, both shut. *Money*: a ranking prize has to be
+funded by somebody, and with no ad network the only source is the company's own
+float — paying members out of capital, which is the arrangement this product
+exists to not be. *Law*: paying a leaderboard from a pot, on a schedule, by
+rank, is a lottery in several jurisdictions, and §9 already puts the token half
+behind a written legal go-ahead. Until both open, no screen mentions a prize.
+
 **Spot's clock is in the board, not in the rules** (`spot-board.tsx`). A replay
 can prove a tap was legal and can never prove it was quick, so the timer ends
 the round and adds nothing to the score — what the server recomputes is levels

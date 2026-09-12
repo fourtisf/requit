@@ -99,12 +99,13 @@ export default async function SettingsPage() {
           <ToggleRow
             name="publicPayouts"
             defaultChecked={user.publicPayouts}
-            label="Show my handle on the public payout table"
+            label="Show my handle on public tables"
             description={
               <>
-                Amounts and transaction hashes are always public — a payout nobody can verify is
-                not proof of anything. This controls your handle only. With it off you still
-                appear, as <span className="mn">anonymous</span>.
+                The payout table and the game score boards. Amounts and transaction hashes are
+                always public — a payout nobody can verify is not proof of anything. This controls
+                your handle only. With it off you still appear on both, as{" "}
+                <span className="mn">anonymous</span>.
               </>
             }
           />
