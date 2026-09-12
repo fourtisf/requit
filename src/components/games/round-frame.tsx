@@ -1,18 +1,28 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { GameEntry } from "@/lib/games/catalog";
 import type { Round } from "@/components/games/use-round";
-import { Button } from "@/components/ui/button";
 
 /**
- * Everything around a board: the score, the start button, and what a finished
- * round is told.
+ * Everything around a board: the score, the way in, and what a finished round
+ * is told.
  *
  * The boards themselves are four different shapes, but a player meets the same
  * screen each time — the numbers in the same corners, the same sentence about
  * what was recorded and what was not. Keeping that here is what stops the
  * fourth game from quietly having a slightly different story about scoring.
+ *
+ * Two rules this layout exists to obey, both learned the hard way from a
+ * laptop at 150% zoom:
+ *
+ * 1. The way to start is ON the board. A start button under the board is a
+ *    start button below the fold, and what is left on screen is a full-size
+ *    empty grid that does not answer a click. The board reads as broken, and
+ *    the player is right — there was nothing to press.
+ * 2. The board fits the window. Capping the column against viewport height as
+ *    well as width means the grid, its score and its button are all on screen
+ *    at once, on a short window as much as on a phone.
  */
 export function RoundFrame<TMove, TState>({
   game,
@@ -37,9 +47,23 @@ export function RoundFrame<TMove, TState>({
   children: ReactNode;
 }) {
   const { status, error, saved, best } = round;
+  const waiting = status === "loading" || status === "saving";
+
+  /**
+   * Bring the whole board into view when a round starts.
+   *
+   * On a short window the grid's last row can sit under the fold, and the one
+   * moment that is unforgivable is the one just after the player pressed play.
+   * `nearest` scrolls the minimum needed, so a window where it already fits
+   * does not move at all.
+   */
+  const board = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (status === "playing") board.current?.scrollIntoView({ block: "nearest" });
+  }, [status]);
 
   return (
-    <div className="max-w-[460px]">
+    <div className="max-w-[min(460px,58vh)]">
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div>
           <p className="mn text-[11.5px] uppercase tracking-[0.08em] text-fg-4">Score</p>
@@ -55,45 +79,64 @@ export function RoundFrame<TMove, TState>({
         </div>
       </div>
 
-      <div className="mt-4">{children}</div>
+      <div ref={board} className="relative mt-4">
+        {children}
 
-      {status === "idle" ? (
-        <div className="mt-5">
-          <Button onClick={round.begin}>{signedIn ? "Start a round" : "Play now"}</Button>
-          <p className="mt-3 max-w-[46ch] text-[12.5px] leading-[1.6] text-fg-3">{game.how}</p>
-        </div>
-      ) : null}
+        {status === "playing" ? null : (
+          <div className="absolute inset-0 flex items-center justify-center rounded-card bg-[rgba(8,9,10,.74)] px-4 text-center backdrop-blur-[2px]">
+            {waiting ? (
+              <p className="text-[13px] text-fg-3">
+                {status === "loading" ? "Starting…" : "Saving the round…"}
+              </p>
+            ) : (
+              // The whole panel is the button. Anywhere on the board starts the
+              // next round, which is what a player tries first anyway.
+              <button
+                type="button"
+                onClick={round.begin}
+                className="group flex w-full flex-col items-center gap-3 py-6"
+              >
+                {status === "over" ? (
+                  <span className="flex flex-col gap-1.5">
+                    <span className="text-[15px] font-semibold tracking-[-0.02em]">
+                      {ended ?? "Round over."}
+                    </span>
+                    {saved !== null ? (
+                      <span className="text-[12.5px] text-fg-2">
+                        Scored <span className="mn text-ac-2">{saved}</span>, checked on the server
+                      </span>
+                    ) : (
+                      <span className="text-[12.5px] text-fg-2">
+                        Scored <span className="mn text-ac-2">{score}</span>
+                        {signedIn ? "" : ", kept nowhere"}
+                      </span>
+                    )}
+                  </span>
+                ) : null}
 
-      {status === "loading" ? <p className="mt-5 text-[13px] text-fg-3">Starting…</p> : null}
+                <span className="inline-flex items-center rounded-full bg-white px-[26px] py-[13px] text-[15px] font-semibold tracking-[-0.015em] text-bg shadow-[0_0_0_1px_rgba(255,255,255,.9),0_8px_26px_-12px_rgba(255,255,255,.32)] transition-transform duration-200 group-hover:-translate-y-px">
+                  {status === "over" ? "Play again" : signedIn ? "Start a round" : "Play now"}
+                </span>
+
+                <span className="text-[12px] text-fg-3">{game.input}</span>
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
       {status === "playing" && hint ? (
         <p className="mt-4 text-[12.5px] text-fg-3">{hint}</p>
       ) : null}
 
-      {status === "saving" ? <p className="mt-5 text-[13px] text-fg-3">Saving the round…</p> : null}
-
-      {status === "over" ? (
-        <div className="mt-5">
-          <p className="text-[15px] font-semibold tracking-[-0.02em]">{ended ?? "Round over."}</p>
-          {saved !== null ? (
-            <p className="mt-1.5 text-[13px] text-fg-2">
-              Scored <span className="mn text-ac-2">{saved}</span> — checked on the server against
-              the moves you made.
-            </p>
-          ) : null}
-          {!signedIn ? (
-            <p className="mt-1.5 max-w-[46ch] text-[13px] leading-[1.6] text-fg-2">
-              Scored <span className="mn text-ac-2">{score}</span>, kept nowhere.{" "}
-              <a href="/signin" className="text-ac-2 underline underline-offset-4">
-                Sign in
-              </a>{" "}
-              and rounds are recorded against your account.
-            </p>
-          ) : null}
-          <div className="mt-4">
-            <Button onClick={round.begin}>Play again</Button>
-          </div>
-        </div>
+      {status === "over" && !signedIn ? (
+        <p className="mt-4 max-w-[46ch] text-[13px] leading-[1.6] text-fg-2">
+          Nothing was recorded.{" "}
+          <a href="/signin" className="text-ac-2 underline underline-offset-4">
+            Sign in
+          </a>{" "}
+          and your rounds start being kept against your account.
+        </p>
       ) : null}
 
       {error ? <p className="mt-3 text-[12.5px] text-amber">{error}</p> : null}

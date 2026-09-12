@@ -67,16 +67,22 @@ export default async function GamePage({ params }: Props) {
           <span className="mn text-[12.5px] text-fg-4">{entry.input.toLowerCase()}</span>
         </div>
 
-        <p className="mt-2.5 max-w-[64ch] text-[13.5px] leading-[1.6] text-fg-2">
+        {/* One line above the board, the rules below it. A paragraph of
+            instructions before the grid pushes the board itself off a short
+            window, and nobody reads the rules until after the first round
+            anyway — the board's own button says what to press. */}
+        <p className="mt-2 max-w-[64ch] text-[13.5px] leading-[1.6] text-fg-2">{entry.tagline}</p>
+
+        <div className="mt-5">
+          <GameBoard slug={game} personalBest={best} signedIn={signedIn} />
+        </div>
+
+        <p className="mt-6 max-w-[58ch] text-[13px] leading-[1.65] text-fg-3">
           {entry.how}{" "}
           {signedIn
             ? "Your score is checked on the server by replaying the moves you made."
             : "You do not need an account to play — sign in and your rounds start being recorded."}
         </p>
-
-        <div className="mt-7">
-          <GameBoard slug={game} personalBest={best} signedIn={signedIn} />
-        </div>
 
         {!earnings.earning ? (
           <Card className="mt-8 max-w-[62ch]">
