@@ -10,15 +10,56 @@
  * explicit that the hot wallet passphrase is supplied out of band and never
  * lands in the repo or the deploy script.
  */
-// Set PORT in .env if 3000 is taken. deploy.sh sources .env before reloading,
-// so PM2 inherits it — but remember to change the upstream in nginx.conf too.
-const PORT = process.env.PORT || "3000";
+const { existsSync, readFileSync } = require("node:fs");
+const { join } = require("node:path");
+
+const APP_DIR = "/var/www/requit";
+
+/**
+ * The port, read from .env by this file rather than inherited from whoever ran
+ * pm2.
+ *
+ * It used to be `process.env.PORT || "3000"`, which worked through deploy.sh —
+ * that sources .env first — and failed through everything else. `pm2 restart
+ * --update-env` from a login shell re-evaluates this file with no PORT set, so
+ * the app silently moved from 3001 to 3000 while Caddy went on proxying to
+ * 3001. Every process reported healthy and the site was down.
+ *
+ * A port that depends on the ambient environment is a port that changes when
+ * nobody meant to change it. This reads the same file the app reads.
+ */
+function portFromEnvFile() {
+  const path = join(APP_DIR, ".env");
+  if (!existsSync(path)) return null;
+
+  // Last wins, the way dotenv resolves a duplicated key.
+  let value = null;
+  for (const line of readFileSync(path, "utf8").split("\n")) {
+    const match = /^\s*PORT\s*=\s*(.*)$/.exec(line);
+    if (!match) continue;
+    let raw = (match[1] || "").trim();
+    // A quoted value ends at its closing quote; an unquoted one ends at a #.
+    if (raw.startsWith('"') || raw.startsWith("'")) {
+      const quote = raw[0];
+      const end = raw.indexOf(quote, 1);
+      raw = end === -1 ? raw.slice(1) : raw.slice(1, end);
+    } else {
+      raw = raw.split("#")[0].trim();
+    }
+    if (/^\d{1,5}$/.test(raw)) value = raw;
+  }
+  return value;
+}
+
+// .env first, then the environment, then Next's own default. Change the
+// upstream in the Caddyfile to match if you move it.
+const PORT = portFromEnvFile() || process.env.PORT || "3000";
 
 module.exports = {
   apps: [
     {
       name: "requit-web",
-      cwd: "/var/www/requit",
+      cwd: APP_DIR,
       script: "node_modules/next/dist/bin/next",
       args: `start -p ${PORT}`,
       instances: 1,
@@ -36,7 +77,7 @@ module.exports = {
     },
     {
       name: "requit-worker",
-      cwd: "/var/www/requit",
+      cwd: APP_DIR,
       script: "node_modules/.bin/tsx",
       args: "src/worker/index.ts",
       instances: 1,
