@@ -160,6 +160,23 @@ export function carefulness(board: number): number {
 }
 
 /**
+ * How often the opponent notices a line that is sitting there for it.
+ *
+ * The first version always took one, and that was the other half of why the
+ * early boards were unwinnable: a beginner leaves lines constantly, and an
+ * opponent that converts every single one of them wins 5×5 against anybody
+ * still learning to see the patterns.
+ *
+ * So on the first board it misses a third of them, and by the last it misses
+ * none. It never walks past one on purpose — there is no "letting you win"
+ * here, which is insulting when spotted. It is the same thing a person does
+ * when the board is busy: it just does not see it.
+ */
+export function alertness(board: number): number {
+  return Math.min(1, 0.65 + 0.12 * (board - 1));
+}
+
+/**
  * The opponent's move.
  *
  * Three rules, in order: take a line if one is there; otherwise, if it is
@@ -171,12 +188,16 @@ function botMove(
   size: number,
   next: () => number,
   care: number,
+  eyes: number,
 ): SosMove | null {
   const open = empties(board);
   if (open.length === 0) return null;
 
+  // Drawn before the branch so the stream advances identically whether or not
+  // there was anything to see. A replay has to roll the same dice.
+  const notices = next() < eyes;
   const wins = scoringMoves(board, size);
-  if (wins.length > 0) return wins[0]!.move;
+  if (wins.length > 0 && notices) return wins[0]!.move;
 
   // Drawn before the search, not after, so the stream advances the same way
   // whether or not a safe move exists — a replay has to see the same rolls.
@@ -191,8 +212,22 @@ function botMove(
     }
   }
 
-  const careless = open.map((cell) => ({ cell, letter: "O" as Letter }));
-  const pool = looking && safe.length > 0 ? safe : careless;
+  /**
+   * Careless means careless: any square, either letter.
+   *
+   * The first version wrote O everywhere when it was not looking ahead, which
+   * was not an easy opponent at all — it was a cautious one with a different
+   * accent. A board filling with O's is a minefield for the player, because
+   * almost any S then completes an S-O-_ the opponent takes on its next turn,
+   * while an opponent that never writes S leaves almost nothing to take back.
+   * "Easy" was making the game harder.
+   */
+  const anything: SosMove[] = [];
+  for (const cell of open) {
+    anything.push({ cell, letter: "S" }, { cell, letter: "O" });
+  }
+
+  const pool = looking && safe.length > 0 ? safe : anything;
   return pool[below(pool.length, next)]!;
 }
 
@@ -287,7 +322,7 @@ export function createSos(seed: number): Engine<SosMove, SosState> {
 
       // The opponent answers, and keeps answering while it is scoring.
       for (let guard = 0; guard <= size * size; guard += 1) {
-        const reply = botMove(board, size, next, carefulness(board_no));
+        const reply = botMove(board, size, next, carefulness(board_no), alertness(board_no));
         if (reply === null) break;
 
         const botScored = place(reply, "bot");

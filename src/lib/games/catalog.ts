@@ -102,7 +102,7 @@ export const GAMES: Record<GameSlug, GameEntry> = {
     slug: "sos",
     title: "SOS",
     tagline: "The squared-paper game, against something that plays back.",
-    how: `Write S or O in any empty square. Complete S-O-S in a line — across, down or diagonally — and it is yours, and you go again. When the grid fills, the higher count takes the board: beat it and the next board is bigger. ${SOS_POINTS} a line, ${BOARD_POINTS} a board, starting at ${FIRST_SIZE}×${FIRST_SIZE}.`,
+    how: `Write S or O in any empty square. Complete S-O-S in a line — across, down or diagonally — and it is yours, and you go again. Green squares are where your letter scores. On the first board, amber ones show what would hand it a line back — after that you are watching for those yourself. When the grid fills, the higher count takes the board: beat it and the next board is bigger. ${SOS_POINTS} a line, ${BOARD_POINTS} a board, starting at ${FIRST_SIZE}×${FIRST_SIZE}.`,
     input: "Pick a letter, tap a square",
     bestLabel: "Boards won",
     ...playable(SOS_RULES),

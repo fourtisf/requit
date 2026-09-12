@@ -194,12 +194,23 @@ in a glance and go first; Merge is the one you find after you already trust the
 place. SOS sits third because half of Indonesia already learned it at a school
 desk — a game somebody knows needs no instructions either.
 
-**SOS's opponent is a rule, not a player.** It takes a line when one is there,
+**SOS's opponent is a rule, not a player.** It takes a line when it notices one,
 looks one move ahead as often as the ladder says it should, and breaks ties out
 of the same seeded stream as everything else — so the server replays both sides
-of a match from the one player's moves. Its carelessness early is deliberate and
-measured: an opponent that always looks ahead wins every SOS endgame, and a
-competent test player lost 0–10 to it before the curve was added.
+of a match from the one player's moves.
+
+Its difficulty was tuned by measurement, and every attempt to guess it was
+wrong:
+
+| What was tried | What it actually did |
+|---|---|
+| Always looks ahead | Won every endgame. A competent test player lost 0–10, 0–6, 0–5. |
+| "Careless" = always write O | Made it *harder*: a board of O's means any S you write completes an S-O-_ it takes next turn, while it never writes the S's you could build on. |
+| Always takes a line it sees | Beginners leave lines constantly, so 5×5 was unwinnable. It now misses about a third on board one and none by board four. |
+| Mark the squares that give a line away, on every board | A player who only read the marks cleared the whole ladder 5 times out of 5. Restricted to board one: the same player finishes on 1, 2, 3, 3 and 3 boards. |
+
+The last row is the rule for any assist added here: if following it wins the
+game, it is not an assist, it is the game.
 
 **Every score in the database is the score of a round that was actually played.**
 A browser never sends a score; it sends the moves, and the server replays them

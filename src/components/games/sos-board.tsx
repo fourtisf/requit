@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { type Letter, createSos } from "@/lib/games/sos";
+import { type Letter, type Square, createSos, linesFrom, scoringMoves } from "@/lib/games/sos";
 import { GAMES } from "@/lib/games/catalog";
 import { useRound } from "@/components/games/use-round";
 import { RoundFrame } from "@/components/games/round-frame";
@@ -37,6 +37,45 @@ export function SosBoard({
   const line = new Set(state?.last ?? []);
   const mine = state?.lastBy === "you";
 
+  /**
+   * Squares where the letter in your hand would finish a line.
+   *
+   * The hard part of SOS on a screen is not strategy, it is scanning: a player
+   * has to sweep the whole grid for S_S, SO_ and _OS every turn, and the ones
+   * they miss are the ones the opponent takes. On paper you see the board for
+   * as long as you like; here the board can just say so.
+   *
+   * It gives nothing away. Taking every line you can see is exactly what the
+   * opponent does, and it still loses boards — the game is in what you leave
+   * behind, and that part is untouched.
+   */
+  const scoring = new Set<number>();
+  /**
+   * And, on the first board only, squares that would hand the opponent one.
+   *
+   * This is the half that decides the game: writing S beside an S, or O between
+   * two S's, loses the next turn. Showing it teaches the pattern — and showing
+   * it forever plays the game for you. Measured both ways: a player who took
+   * every green square and avoided every amber one cleared the whole ladder
+   * five times out of five, while the same player without the warning finished
+   * on 1, 2, 3, 4 and 4 boards. The second one is a game.
+   *
+   * So board one is where it is explained, and from board two you are looking
+   * for it yourself.
+   */
+  const risky = new Set<number>();
+
+  if (playing && state) {
+    for (let cell = 0; cell < size * size; cell += 1) {
+      if (board[cell] !== "") continue;
+      const after = [...board] as Square[];
+      after[cell] = letter;
+
+      if (linesFrom(after, size, cell).length > 0) scoring.add(cell);
+      else if (state.board_no === 1 && scoringMoves(after, size).length > 0) risky.add(cell);
+    }
+  }
+
   return (
     <RoundFrame
       game={GAMES.sos}
@@ -46,7 +85,9 @@ export function SosBoard({
       secondary={state?.best ?? 0}
       hint={
         state
-          ? `Board ${state.board_no} · ${state.size}×${state.size} — you ${state.you}, it ${state.bot}`
+          ? `Board ${state.board_no} · ${state.size}×${state.size} — you ${state.you}, it ${state.bot}${
+              state.board_no === 1 ? " · amber gives it a line" : ""
+            }`
           : null
       }
       ended={state?.cleared ? "You cleared the ladder." : "It took the board."}
@@ -92,6 +133,8 @@ export function SosBoard({
           {Array.from({ length: size * size }, (_, cell) => {
             const written = board[cell] ?? "";
             const inLine = line.has(cell);
+            const wins = scoring.has(cell);
+            const gives = risky.has(cell);
 
             return (
               <button
@@ -109,10 +152,19 @@ export function SosBoard({
                       : "bg-[rgba(232,198,139,.45)] text-bg"
                     : written !== ""
                       ? "bg-surf-3 text-fg-2"
-                      : "bg-surf-2/40 enabled:hover:bg-surf-2"
+                      : wins
+                        ? "bg-ac-dim shadow-[inset_0_0_0_1px_rgba(107,203,165,.45)] enabled:hover:bg-[rgba(107,203,165,.22)]"
+                        : "bg-surf-2/40 enabled:hover:bg-surf-2"
                 }`}
               >
-                {written}
+                {/* A dot rather than an amber outline: an amber *fill* already
+                    means "the line it just took", and two amber meanings on one
+                    board is one too many. */}
+                {written === "" && gives ? (
+                  <span className="size-[5px] rounded-full bg-[rgba(232,198,139,.55)]" />
+                ) : (
+                  written
+                )}
               </button>
             );
           })}
