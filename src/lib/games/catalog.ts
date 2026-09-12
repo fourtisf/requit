@@ -6,6 +6,7 @@ import { FLOOD_RULES, MOVE_LIMIT, TILE_POINTS, SPARE_MOVE_POINTS } from "@/lib/g
 import { RECALL_RULES, MATCH_POINTS, MISS_PENALTY, PAIRS } from "@/lib/games/recall";
 import { BLOCKS_RULES } from "@/lib/games/blocks";
 import { SPOT_RULES } from "@/lib/games/spot";
+import { SOS_RULES, FIRST_SIZE, SOS_POINTS, BOARD_POINTS } from "@/lib/games/sos";
 
 /**
  * Every game on the site, in one list.
@@ -36,7 +37,7 @@ import { SPOT_RULES } from "@/lib/games/spot";
  * a glance, so they lead; Merge is the one you find after you already trust the
  * place.
  */
-export const GAME_SLUGS = ["blocks", "spot", "recall", "trail", "flood", "merge"] as const;
+export const GAME_SLUGS = ["blocks", "spot", "sos", "recall", "trail", "flood", "merge"] as const;
 
 export type GameSlug = (typeof GAME_SLUGS)[number];
 
@@ -96,6 +97,15 @@ export const GAMES: Record<GameSlug, GameEntry> = {
     input: "Tap the odd tile",
     bestLabel: "Level reached",
     ...playable(SPOT_RULES),
+  },
+  sos: {
+    slug: "sos",
+    title: "SOS",
+    tagline: "The squared-paper game, against something that plays back.",
+    how: `Write S or O in any empty square. Complete S-O-S in a line — across, down or diagonally — and it is yours, and you go again. When the grid fills, the higher count takes the board: beat it and the next board is bigger. ${SOS_POINTS} a line, ${BOARD_POINTS} a board, starting at ${FIRST_SIZE}×${FIRST_SIZE}.`,
+    input: "Pick a letter, tap a square",
+    bestLabel: "Boards won",
+    ...playable(SOS_RULES),
   },
   merge: {
     slug: "merge",

@@ -182,8 +182,8 @@ placeholder.
 
 ## The arcade (`/play`)
 
-Six games of our own — Blocks, Spot, Recall, Trail, Flood and Merge — playable
-without an account. It is the only part of the site a stranger can *try* rather
+Seven games of our own — Blocks, Spot, SOS, Recall, Trail, Flood and Merge —
+playable without an account. It is the only part of the site a stranger can *try* rather
 than read, which is why it is not behind sign-in.
 
 **The shelf is ordered by how long a game takes to understand, not by when it
@@ -191,7 +191,15 @@ was built.** Merge led for months because it shipped first, and watching
 someone meet it cold settled it: a player who has to be taught a rule before
 the screen means anything has already gone. Blocks and Spot explain themselves
 in a glance and go first; Merge is the one you find after you already trust the
-place.
+place. SOS sits third because half of Indonesia already learned it at a school
+desk — a game somebody knows needs no instructions either.
+
+**SOS's opponent is a rule, not a player.** It takes a line when one is there,
+looks one move ahead as often as the ladder says it should, and breaks ties out
+of the same seeded stream as everything else — so the server replays both sides
+of a match from the one player's moves. Its carelessness early is deliberate and
+measured: an opponent that always looks ahead wins every SOS endgame, and a
+competent test player lost 0–10 to it before the curve was added.
 
 **Every score in the database is the score of a round that was actually played.**
 A browser never sends a score; it sends the moves, and the server replays them

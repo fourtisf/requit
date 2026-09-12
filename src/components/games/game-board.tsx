@@ -1,6 +1,7 @@
 import type { GameSlug } from "@/lib/games/catalog";
 import { BlocksBoard } from "@/components/games/blocks-board";
 import { SpotBoard } from "@/components/games/spot-board";
+import { SosBoard } from "@/components/games/sos-board";
 import { MergeBoard } from "@/components/games/merge-board";
 import { TrailBoard } from "@/components/games/trail-board";
 import { FloodBoard } from "@/components/games/flood-board";
@@ -16,6 +17,7 @@ import { RecallBoard } from "@/components/games/recall-board";
 const BOARDS: Record<GameSlug, typeof MergeBoard> = {
   blocks: BlocksBoard,
   spot: SpotBoard,
+  sos: SosBoard,
   merge: MergeBoard,
   trail: TrailBoard,
   flood: FloodBoard,

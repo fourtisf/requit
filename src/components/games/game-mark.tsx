@@ -72,6 +72,29 @@ export function GameMark({ slug }: { slug: GameSlug }) {
     );
   }
 
+  if (slug === "sos") {
+    // The mark is the winning line, which is the whole game.
+    const letters: Record<number, string> = { 4: "S", 5: "O", 6: "S" };
+    return (
+      <Frame>
+        {Array.from({ length: 16 }, (_, index) => (
+          <div
+            key={index}
+            className={`mn flex items-center justify-center rounded-[2px] text-[8px] font-semibold ${
+              letters[index]
+                ? "bg-[rgba(107,203,165,.5)] text-bg"
+                : index === 9 || index === 2
+                  ? "bg-surf-3 text-fg-3"
+                  : "bg-surf-2/40 text-transparent"
+            }`}
+          >
+            {letters[index] ?? (index === 9 ? "O" : index === 2 ? "S" : "")}
+          </div>
+        ))}
+      </Frame>
+    );
+  }
+
   if (slug === "merge") {
     const tiles: Record<number, string> = {
       5: "bg-surf-3",

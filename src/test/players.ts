@@ -5,6 +5,7 @@ import { COLOURS, createFlood } from "@/lib/games/flood";
 import { CARDS, createRecall } from "@/lib/games/recall";
 import { SHAPES, SIZE as BLOCKS_SIZE, createBlocks, fits } from "@/lib/games/blocks";
 import { createSpot } from "@/lib/games/spot";
+import { type Letter, type SosMove, createSos, scoringMoves } from "@/lib/games/sos";
 import type { GameSlug } from "@/lib/games/catalog";
 
 /**
@@ -230,10 +231,60 @@ export function playSpot(seed: number, limit = 200): Round {
   return { moves, score: state.score, best: state.best, over: state.over };
 }
 
+/**
+ * SOS: takes a line when one is there, otherwise plays somewhere harmless.
+ *
+ * The same two rules the opponent follows, which is the point — a bot that
+ * played worse than the opponent would never win a board, and the tests need a
+ * run that actually climbs the ladder.
+ */
+export function playSos(seed: number, limit = 400): Round {
+  const game = createSos(seed);
+  const moves: SosMove[] = [];
+
+  while (!game.state().over && moves.length < limit) {
+    const { board, size } = game.state();
+
+    const wins = scoringMoves(board, size);
+    let move: SosMove | null = wins[0]?.move ?? null;
+
+    if (move === null) {
+      // Nothing to take, so give nothing away: prefer a square that leaves the
+      // opponent no line to walk into. The opponent reasons the same way, which
+      // is the point — a test player worse than the opponent would never win a
+      // board, and then the ladder would never be exercised at all.
+      for (let cell = 0; cell < size * size && move === null; cell += 1) {
+        if (board[cell] !== "") continue;
+        for (const letter of ["S", "O"] as Letter[]) {
+          const after = [...board];
+          after[cell] = letter;
+          if (scoringMoves(after, size).length === 0) {
+            move = { cell, letter };
+            break;
+          }
+        }
+      }
+    }
+
+    if (move === null) {
+      const open = board.findIndex((square) => square === "");
+      if (open < 0) break;
+      move = { cell: open, letter: "O" };
+    }
+
+    if (!game.play(move)) break;
+    moves.push(move);
+  }
+
+  const state = game.state();
+  return { moves, score: state.score, best: state.best, over: state.over };
+}
+
 /** A played round of every game in the catalog, by slug. */
 export const PLAYERS: Record<GameSlug, (seed: number) => Round> = {
   blocks: (seed) => playBlocks(seed),
   spot: (seed) => playSpot(seed),
+  sos: (seed) => playSos(seed),
   merge: (seed) => playMerge(seed),
   trail: (seed) => playTrail(seed),
   flood: (seed) => playFlood(seed),
