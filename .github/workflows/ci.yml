@@ -52,8 +52,23 @@ jobs:
           --health-timeout 5s
           --health-retries 10
 
+      # Postgres is not the only thing the integration suite talks to. Wallet
+      # binding burns its nonce in Redis — that is what makes a signature
+      # single-use — so the tests that prove a nonce cannot be replayed need a
+      # real one. src/test/db-setup.ts points them at localhost:6379.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     env:
       DATABASE_URL: postgresql://requit:requit@localhost:5432/requit?schema=public
+      REDIS_URL: redis://localhost:6379
 
     steps:
       - uses: actions/checkout@v4
