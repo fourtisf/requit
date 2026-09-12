@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { BrandLockup } from "@/components/ui/brand-mark";
 import { SignInForm } from "@/components/signin-form";
 import { emailTransportConfigured, emailTransportDetail } from "@/lib/auth/email";
+import { OTP_LENGTH } from "@/lib/auth/otp";
 import { serverEnv } from "@/lib/env";
 import { BRAND } from "@/lib/brand";
 
@@ -17,11 +18,22 @@ export default async function SignInPage() {
       <div className="w-full max-w-[380px]">
         <BrandLockup />
 
+        {/*
+          The heading names both jobs because this page does both, and the
+          landing page's button says "Create an account" while this said only
+          "Sign in". Someone who has never been here reads that as a door that
+          needs a key they were not given, and leaves — which is the one thing
+          this page cannot afford, since it is the only way in.
+        */}
         <h1 className="mt-7 text-[27px] font-semibold leading-tight tracking-[-0.042em]">
-          Sign in
+          Sign in or create an account
         </h1>
         <p className="mt-2.5 text-[13.5px] leading-[1.6] text-fg-2">
-          No password. We email you a code each time — there is nothing stored that can leak.
+          One form for both. We email you a {OTP_LENGTH}-digit code — entering it signs you in, or
+          opens your account if this is your first time.
+        </p>
+        <p className="mt-2 text-[12.5px] leading-[1.6] text-fg-4">
+          No password anywhere, so there is none to steal and none for us to lose.
         </p>
 
         {emailTransportConfigured() ? (

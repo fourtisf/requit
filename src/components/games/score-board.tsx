@@ -111,7 +111,7 @@ export async function ScoreBoard({
         <p className="mt-3 text-[13px] leading-[1.6] text-fg-3">
           Rounds played without an account are not recorded, so they cannot be ranked.{" "}
           <Link href="/signin" className="text-ac-2 underline underline-offset-4">
-            Sign in
+            Sign in or create one
           </Link>{" "}
           and your scores go on the board.
         </p>

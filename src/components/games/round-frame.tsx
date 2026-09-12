@@ -191,9 +191,9 @@ export function RoundFrame<TMove, TState>({
         <p className="mt-4 max-w-[46ch] text-[13px] leading-[1.6] text-fg-2">
           Nothing was recorded.{" "}
           <a href="/signin" className="text-ac-2 underline underline-offset-4">
-            Sign in
+            Sign in or create an account
           </a>{" "}
-          and your rounds start being kept against your account.
+          — one form, either way — and your rounds start being kept.
         </p>
       ) : null}
 
