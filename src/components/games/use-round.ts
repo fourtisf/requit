@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import type { GameSlug } from "@/lib/games/catalog";
 import type { Engine, RoundState } from "@/lib/games/engine";
+import { play } from "@/components/games/sound";
 
 /**
  * A round, from the button that opens it to the score the server writes down.
@@ -49,11 +50,19 @@ export function useRound<TMove, TState extends RoundState>({
   signedIn,
   personalBest,
   create,
+  clicks = true,
 }: {
   game: GameSlug;
   signedIn: boolean;
   personalBest: number;
   create: (seed: number) => Engine<TMove, TState>;
+  /**
+   * Whether an ordinary move makes a noise.
+   *
+   * False for a game that moves on a timer: Trail sends a move eight times a
+   * second, and a click on each of them is not feedback, it is a fault.
+   */
+  clicks?: boolean;
 }): Round<TMove, TState> {
   const engine = useRef<Engine<TMove, TState> | null>(null);
   const moves = useRef<TMove[]>([]);
@@ -157,15 +166,21 @@ export function useRound<TMove, TState extends RoundState>({
       if (!current.play(move)) return false;
 
       moves.current.push(move);
+      const before = state?.score ?? 0;
       const next = current.state();
       setState(next);
+
+      if (next.score > before) play("score");
+      else if (clicks) play("tap");
+
       if (next.over) {
+        play("end");
         live.current = false;
         void finish();
       }
       return true;
     },
-    [finish],
+    [clicks, finish, state],
   );
 
   return { state, status, error, saved, best, begin, send, stop };

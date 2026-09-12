@@ -44,6 +44,9 @@ export function TrailBoard({
     signedIn,
     personalBest,
     create: useCallback((seed: number) => createTrail(seed), []),
+    // A move here is a tick of the clock, not a decision. Only fruit and the
+    // wall are worth hearing.
+    clicks: false,
   });
   const { state, status, send } = round;
 

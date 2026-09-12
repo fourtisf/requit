@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { loadSound, setSound } from "@/components/games/sound";
 import type { GameEntry } from "@/lib/games/catalog";
 import type { Round } from "@/components/games/use-round";
 
@@ -71,6 +72,16 @@ export function RoundFrame<TMove, TState>({
     if (status === "playing") board.current?.scrollIntoView({ block: "nearest" });
   }, [status]);
 
+  /**
+   * The sound switch starts on, then adopts what this browser remembers.
+   *
+   * Reading storage during the first render would have the server and the
+   * client disagree about the icon, which React reports as a hydration error
+   * over a speaker. One frame of the default is the cheaper wrong.
+   */
+  const [audible, setAudible] = useState(true);
+  useEffect(() => setAudible(loadSound()), []);
+
   return (
     <div className="w-full max-w-[min(460px,58vh)]">
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
@@ -86,6 +97,23 @@ export function RoundFrame<TMove, TState>({
           <p className="mn text-[11.5px] uppercase tracking-[0.08em] text-fg-4">Your best</p>
           <p className="mn text-[17px] text-fg-2">{best}</p>
         </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            const next = !audible;
+            setAudible(next);
+            setSound(next);
+          }}
+          aria-pressed={audible}
+          aria-label={audible ? "Turn sound off" : "Turn sound on"}
+          title={audible ? "Sound on" : "Sound off"}
+          className={`flex size-9 shrink-0 items-center justify-center rounded-full transition-colors ${
+            audible ? "bg-surf-2 text-fg-2 hover:text-fg" : "bg-surf text-fg-4 hover:text-fg-3"
+          }`}
+        >
+          <Speaker on={audible} />
+        </button>
       </div>
 
       {/* The control line lives above the board, not under it.
@@ -160,5 +188,28 @@ export function RoundFrame<TMove, TState>({
 
       {error ? <p className="mt-3 text-[12.5px] text-amber">{error}</p> : null}
     </div>
+  );
+}
+
+/** Drawn rather than typed, for the reason the game glyphs are. */
+function Speaker({ on }: { on: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" aria-hidden>
+      <path
+        d="M4 9.5h3.2L12 5.6v12.8L7.2 14.5H4z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      {on ? (
+        <>
+          <path d="M15.4 9.2a4 4 0 0 1 0 5.6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+          <path d="M18 6.8a7.6 7.6 0 0 1 0 10.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+        </>
+      ) : (
+        <path d="m16 9.6 4.4 4.8m0-4.8L16 14.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      )}
+    </svg>
   );
 }

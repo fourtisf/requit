@@ -51,7 +51,17 @@ export function SosBoard({
       }
       ended={state?.cleared ? "You cleared the ladder." : "It took the board."}
     >
-      <div className="rounded-card bg-surf p-2 shadow-[inset_0_0_0_1px_var(--color-bd)]">
+      {/*
+        Sized by the board rather than by the column. Stretching five squares
+        across 460px gave 90px cells holding one letter each, which reads as a
+        different game from the eight-square board it grows into — and looks
+        like a mistake next to every other board on the shelf. Capped per
+        square, the grid grows as the ladder does, which is the point of it.
+      */}
+      <div
+        className="rounded-card bg-surf p-2 shadow-[inset_0_0_0_1px_var(--color-bd)]"
+        style={{ maxWidth: `${size * 58 + 22}px` }}
+      >
         {/* Which letter you are writing. Two buttons rather than a toggle: at a
             glance you can see which one is armed, which a switch does not give
             you when the thing it controls is a letter. */}

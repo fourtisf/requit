@@ -234,6 +234,15 @@ exists to not be. *Law*: paying a leaderboard from a pot, on a schedule, by
 rank, is a lottery in several jurisdictions, and §9 already puts the token half
 behind a written legal go-ahead. Until both open, no screen mentions a prize.
 
+**Sound is three synthesised blips and a switch** (`src/components/games/sound.ts`,
+wired once in `useRound` so every game gets it). Nothing is fetched, so nothing
+can fail to load; the audio context is built on the first cue rather than on
+page load, because browsers refuse one before a gesture. The switch sits beside
+the score on every board and is remembered per browser — and every read of that
+preference is wrapped, because a board that will not render for want of a mute
+setting is a worse bug than an unwanted noise. Trail passes `clicks: false`: it
+sends a move eight times a second, and a click on each is a fault, not feedback.
+
 **Spot's clock is in the board, not in the rules** (`spot-board.tsx`). A replay
 can prove a tap was legal and can never prove it was quick, so the timer ends
 the round and adds nothing to the score — what the server recomputes is levels
