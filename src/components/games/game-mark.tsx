@@ -37,10 +37,41 @@ function Cells({ fill }: { fill: (index: number) => string }) {
 }
 
 const TRAIL = new Set([5, 6, 7, 11]);
+const BLOCKS = new Set([1, 2, 5, 6, 9, 10, 11]);
 const FLOOD: Record<number, string> = { 0: "#6bcba5", 1: "#6bcba5", 4: "#6bcba5", 5: "#6bcba5" };
 const FLOOD_REST = ["#e8c68b", "#7fa6d9", "#b98cd4", "#d98f77", "#8fa0ad"];
 
 export function GameMark({ slug }: { slug: GameSlug }) {
+  if (slug === "blocks") {
+    return (
+      <Frame>
+        <Cells
+          fill={(index) =>
+            BLOCKS.has(index) ? "bg-[rgba(107,203,165,.55)]" : "bg-surf-2/40"
+          }
+        />
+      </Frame>
+    );
+  }
+
+  if (slug === "spot") {
+    // The mark is the game: fifteen the same, one not.
+    return (
+      <div
+        aria-hidden
+        className="grid size-[58px] shrink-0 grid-cols-4 gap-[3px] rounded-[10px] bg-surf p-[5px] shadow-[inset_0_0_0_1px_var(--color-bd)]"
+      >
+        {Array.from({ length: 16 }, (_, index) => (
+          <div
+            key={index}
+            className={CELL}
+            style={{ background: index === 9 ? "hsl(150 44% 66%)" : "hsl(150 44% 46%)" }}
+          />
+        ))}
+      </div>
+    );
+  }
+
   if (slug === "merge") {
     const tiles: Record<number, string> = {
       5: "bg-surf-3",

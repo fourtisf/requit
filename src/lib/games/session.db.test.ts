@@ -17,6 +17,12 @@ beforeEach(async () => {
   await resetDatabase();
 });
 
+/** Every game at zero. Built from the catalog, so a new game cannot break it. */
+const NOTHING_PLAYED = Object.fromEntries(GAME_SLUGS.map((slug) => [slug, 0])) as Record<
+  GameSlug,
+  number
+>;
+
 let seq = 0;
 async function member() {
   seq += 1;
@@ -161,7 +167,7 @@ describe("personal bests", () => {
   it("is zero for someone who has not played", async () => {
     const user = await member();
     expect(await personalBest(user.id, "merge")).toBe(0);
-    expect(await personalBests(user.id)).toEqual({ merge: 0, trail: 0, flood: 0, recall: 0 });
+    expect(await personalBests(user.id)).toEqual(NOTHING_PLAYED);
   });
 
   it("keeps the best finished round of each game, per player", async () => {
@@ -180,7 +186,7 @@ describe("personal bests", () => {
     });
 
     expect(await personalBest(user.id, "merge")).toBe(340);
-    expect(await personalBests(user.id)).toEqual({ merge: 340, trail: 90, flood: 0, recall: 0 });
+    expect(await personalBests(user.id)).toEqual({ ...NOTHING_PLAYED, merge: 340, trail: 90 });
   });
 
   it("ignores a game that is no longer on the shelf", async () => {
@@ -188,6 +194,6 @@ describe("personal bests", () => {
     await prisma.gameSession.create({
       data: { userId: user.id, game: "solitaire", seed: 1, score: 500, endedAt: new Date() },
     });
-    expect(await personalBests(user.id)).toEqual({ merge: 0, trail: 0, flood: 0, recall: 0 });
+    expect(await personalBests(user.id)).toEqual(NOTHING_PLAYED);
   });
 });

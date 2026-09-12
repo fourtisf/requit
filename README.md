@@ -182,9 +182,16 @@ placeholder.
 
 ## The arcade (`/play`)
 
-Four games of our own — Merge, Trail, Flood and Recall — playable without an
-account. It is the only part of the site a stranger can *try* rather than read,
-which is why it is not behind sign-in.
+Six games of our own — Blocks, Spot, Recall, Trail, Flood and Merge — playable
+without an account. It is the only part of the site a stranger can *try* rather
+than read, which is why it is not behind sign-in.
+
+**The shelf is ordered by how long a game takes to understand, not by when it
+was built.** Merge led for months because it shipped first, and watching
+someone meet it cold settled it: a player who has to be taught a rule before
+the screen means anything has already gone. Blocks and Spot explain themselves
+in a glance and go first; Merge is the one you find after you already trust the
+place.
 
 **Every score in the database is the score of a round that was actually played.**
 A browser never sends a score; it sends the moves, and the server replays them
@@ -209,9 +216,12 @@ never becomes a payout.
 | `GameRules`: `create`, `parse`, `maxMoves` | same file, exported |
 | Title, tagline, how-to, what its second number means | `GAMES` in `src/lib/games/catalog.ts` |
 | The board | `src/components/games/<slug>-board.tsx`, via `useRound` |
+| Its mark on the shelf | `GameMark` in `src/components/games/game-mark.tsx` |
+| A bot that plays it, for the tests | `PLAYERS` in `src/test/players.ts` |
 
 No migration: `GameSession.game` is a slug, and `bestTile` holds whatever second
-number the game names (`bestLabel`). The catalog is also the security boundary —
+number the game names (`bestLabel`) — lines cleared, level reached, best tile,
+trail length, tiles filled, best streak. The catalog is also the security boundary —
 a slug that is not a key in it is not a game, and a round is always scored with
 the rules of the slug *stored on its row*, never one that arrives with the moves.
 `src/lib/games/catalog.test.ts` holds every game to that contract in one loop, so

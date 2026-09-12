@@ -25,9 +25,10 @@ export const dynamic = "force-dynamic";
  * Putting it behind sign-in would waste the one page that answers "is there a
  * product here" by letting someone find out for themselves.
  *
- * Four games rather than one for the same reason: whoever bounces off a puzzle
+ * Six games rather than one for the same reason: whoever bounces off a puzzle
  * in ten seconds will play the arcade one, and the point of the page is that
- * they play something.
+ * they play something. They are ordered by how long each takes to understand —
+ * see the note on GAME_SLUGS.
  */
 export default async function PlayPage() {
   const user = await currentUser();

@@ -1,4 +1,6 @@
 import type { GameSlug } from "@/lib/games/catalog";
+import { BlocksBoard } from "@/components/games/blocks-board";
+import { SpotBoard } from "@/components/games/spot-board";
 import { MergeBoard } from "@/components/games/merge-board";
 import { TrailBoard } from "@/components/games/trail-board";
 import { FloodBoard } from "@/components/games/flood-board";
@@ -12,6 +14,8 @@ import { RecallBoard } from "@/components/games/recall-board";
  * would otherwise show up as a blank page under a working link.
  */
 const BOARDS: Record<GameSlug, typeof MergeBoard> = {
+  blocks: BlocksBoard,
+  spot: SpotBoard,
   merge: MergeBoard,
   trail: TrailBoard,
   flood: FloodBoard,

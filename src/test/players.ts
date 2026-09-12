@@ -3,6 +3,8 @@ import { createGame } from "@/lib/games/play";
 import { SIZE as TRAIL_SIZE, createTrail } from "@/lib/games/trail";
 import { COLOURS, createFlood } from "@/lib/games/flood";
 import { CARDS, createRecall } from "@/lib/games/recall";
+import { SHAPES, SIZE as BLOCKS_SIZE, createBlocks, fits } from "@/lib/games/blocks";
+import { createSpot } from "@/lib/games/spot";
 import type { GameSlug } from "@/lib/games/catalog";
 
 /**
@@ -178,8 +180,60 @@ export function playRecall(seed: number): Round {
   return { moves, score: state.score, best: state.best, over: state.over };
 }
 
+/**
+ * Blocks: the first square the first piece in hand will go on.
+ *
+ * Packing from the top left is not clever, and it is not meant to be — it fills
+ * rows as a side effect, which is enough for a test to see a real round with
+ * real clears in it. It asks the rules whether a placement fits rather than
+ * working it out again here.
+ */
+export function playBlocks(seed: number, limit = 600): Round {
+  const game = createBlocks(seed);
+  const moves: { piece: number; cell: number }[] = [];
+
+  while (!game.state().over && moves.length < limit) {
+    const { board, tray } = game.state();
+
+    let played = false;
+    for (let piece = 0; piece < tray.length && !played; piece += 1) {
+      const shape = tray[piece];
+      if (shape === null || shape === undefined) continue;
+
+      for (let cell = 0; cell < BLOCKS_SIZE * BLOCKS_SIZE; cell += 1) {
+        if (!fits(board, SHAPES[shape]!, cell)) continue;
+        game.play({ piece, cell });
+        moves.push({ piece, cell });
+        played = true;
+        break;
+      }
+    }
+    if (!played) break;
+  }
+
+  const state = game.state();
+  return { moves, score: state.score, best: state.best, over: state.over };
+}
+
+/** Spot: taps the odd tile every time, which the state has to tell it. */
+export function playSpot(seed: number, limit = 200): Round {
+  const game = createSpot(seed);
+  const moves: number[] = [];
+
+  while (!game.state().over && moves.length < limit) {
+    const { odd } = game.state();
+    game.play(odd);
+    moves.push(odd);
+  }
+
+  const state = game.state();
+  return { moves, score: state.score, best: state.best, over: state.over };
+}
+
 /** A played round of every game in the catalog, by slug. */
 export const PLAYERS: Record<GameSlug, (seed: number) => Round> = {
+  blocks: (seed) => playBlocks(seed),
+  spot: (seed) => playSpot(seed),
   merge: (seed) => playMerge(seed),
   trail: (seed) => playTrail(seed),
   flood: (seed) => playFlood(seed),

@@ -4,6 +4,8 @@ import { TARGET } from "@/lib/games/merge";
 import { TRAIL_RULES, FRUIT_POINTS } from "@/lib/games/trail";
 import { FLOOD_RULES, MOVE_LIMIT, TILE_POINTS, SPARE_MOVE_POINTS } from "@/lib/games/flood";
 import { RECALL_RULES, MATCH_POINTS, MISS_PENALTY, PAIRS } from "@/lib/games/recall";
+import { BLOCKS_RULES } from "@/lib/games/blocks";
+import { SPOT_RULES } from "@/lib/games/spot";
 
 /**
  * Every game on the site, in one list.
@@ -24,7 +26,17 @@ import { RECALL_RULES, MATCH_POINTS, MISS_PENALTY, PAIRS } from "@/lib/games/rec
  * time someone tunes a game and reads only the code.
  */
 
-export const GAME_SLUGS = ["merge", "trail", "flood", "recall"] as const;
+/**
+ * The order is the shelf, and the shelf is ordered by how long it takes to
+ * understand the game rather than by when it was built.
+ *
+ * Merge went first for months because it was first. Watching someone meet it
+ * cold settled the question: a player who has to be taught a rule before the
+ * screen means anything has already gone. Blocks and Spot explain themselves in
+ * a glance, so they lead; Merge is the one you find after you already trust the
+ * place.
+ */
+export const GAME_SLUGS = ["blocks", "spot", "recall", "trail", "flood", "merge"] as const;
 
 export type GameSlug = (typeof GAME_SLUGS)[number];
 
@@ -52,8 +64,8 @@ export type GameEntry = {
 };
 
 /**
- * Closes over one game's rules so the catalog can hold four games whose moves
- * are four different types.
+ * Closes over one game's rules so the catalog can hold games whose moves are
+ * all different types — a direction, a colour, a card, a placement.
  *
  * The alternative — a record of rules with the move type erased — needs a cast
  * to build and gives nothing back: the only thing anyone does with a rules
@@ -67,6 +79,24 @@ function playable<TMove>(rules: GameRules<TMove>) {
 }
 
 export const GAMES: Record<GameSlug, GameEntry> = {
+  blocks: {
+    slug: "blocks",
+    title: "Blocks",
+    tagline: "Drop the pieces in. Fill a line and it clears.",
+    how: `Tap a piece, then a square on the board. Fill a whole row or column and it empties — two at once is worth four times one. The round ends when nothing in your hand fits anywhere.`,
+    input: "Tap a piece, then a square",
+    bestLabel: "Lines cleared",
+    ...playable(BLOCKS_RULES),
+  },
+  spot: {
+    slug: "spot",
+    title: "Spot",
+    tagline: "One tile is not like the others.",
+    how: `Tap the odd one out. Each level the grid grows and the difference gets smaller, and the points grow with it. One wrong tile ends the round — there is no clock, so take as long as you like.`,
+    input: "Tap the odd tile",
+    bestLabel: "Level reached",
+    ...playable(SPOT_RULES),
+  },
   merge: {
     slug: "merge",
     title: "Merge",

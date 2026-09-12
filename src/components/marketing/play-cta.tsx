@@ -15,7 +15,7 @@ import { BRAND } from "@/lib/brand";
  * It promises nothing about earning. That half is not connected, and a CTA
  * hinting otherwise would be the first broken promise a visitor met.
  */
-/** A headline reads "four games", not "4 games". The shelf's own label can count. */
+/** A headline reads "six games", not "6 games". The shelf's own label can count. */
 const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight"];
 
 export function PlayCta() {
